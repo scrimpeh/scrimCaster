@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\render">
+      <UniqueIdentifier>{900492f0-bb90-4343-bf1e-aa3f2d64f5ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{93360662-d617-4c67-8796-ad83bbde2e35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game">
+      <UniqueIdentifier>{1350798a-99a6-4ca3-943e-c6eeeac85897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\input">
+      <UniqueIdentifier>{369f4a3a-3780-48ea-ac09-f7b2f561c138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game\map">
+      <UniqueIdentifier>{6deaf4eb-ad00-4e01-a1d2-d954341dafde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game\actor">
+      <UniqueIdentifier>{daae062d-a80f-44ab-83ca-bde3d3413a5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibSDL x86">
+      <UniqueIdentifier>{03027036-52ff-4cf0-8103-51f13b3b980c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibSDL x64">
+      <UniqueIdentifier>{aefb60e1-2ed6-47dc-8fe1-735e48213c05}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="window.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="ttf.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="scan.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="frame.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Source Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputmap.h">
+      <Filter>Source Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="cell.h">
+      <Filter>Source Files\game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="map.h">
+      <Filter>Source Files\game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="gfxloader.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="mouselook.h">
+      <Filter>Source Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="actor.h">
+      <Filter>Source Files\game\actor</Filter>
+    </ClInclude>
+    <ClInclude Include="actorcontainers.h">
+      <Filter>Source Files\game\actor</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="renderconstants.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="mapupdate.h">
+      <Filter>Source Files\game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="maputil.h">
+      <Filter>Source Files\game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="init.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cleanup.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="scrimCaster.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="scrimCaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="ttf.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="scan.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="frame.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputmap.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="cell.cpp">
+      <Filter>Source Files\game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="map.cpp">
+      <Filter>Source Files\game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="gfxloader.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="mouselook.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="actor.cpp">
+      <Filter>Source Files\game\actor</Filter>
+    </ClCompile>
+    <ClCompile Include="actorcontainers.cpp">
+      <Filter>Source Files\game\actor</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="renderconstants.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="mapupdate.cpp">
+      <Filter>Source Files\game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="maputil.cpp">
+      <Filter>Source Files\game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cleanup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libsdl\SDL2-2.0.4\lib\x86\SDL2.lib">
+      <Filter>LibSDL x86</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2-2.0.4\lib\x86\SDL2main.lib">
+      <Filter>LibSDL x86</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2_ttf-2.0.14\lib\x86\SDL2_ttf.lib">
+      <Filter>LibSDL x86</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2_image-2.0.1\lib\x86\SDL2_image.lib">
+      <Filter>LibSDL x86</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2-2.0.4\lib\x64\SDL2.lib">
+      <Filter>LibSDL x64</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2-2.0.4\lib\x64\SDL2main.lib">
+      <Filter>LibSDL x64</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2_ttf-2.0.14\lib\x64\SDL2_ttf.lib">
+      <Filter>LibSDL x64</Filter>
+    </Library>
+    <Library Include="libsdl\SDL2_image-2.0.1\lib\x64\SDL2_image.lib">
+      <Filter>LibSDL x64</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

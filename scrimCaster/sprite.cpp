@@ -51,9 +51,7 @@ extern u8 viewport_x_fov, viewport_x_fov_half;
 
 extern float projection_dist;
 
-extern float* z_buffer[];
-extern SDL_Surface* blend_masks[];
-extern u8* layer_count;
+extern float* z_buffer;
 
 extern SDL_Surface* worldSpriteBuffer[];
 
@@ -111,7 +109,7 @@ void DrawSprites(SDL_Surface* toDraw)
 		if (spr_rect.x + spr_rect.w < 0 || spr_rect.y + spr_rect.h < 0) 
 			continue;
 
-		// The idea: Make a loop running through all the pixel collumns, clipping accordingly at the edges:
+		// The idea: Make a loop running through all the pixel columns, clipping accordingly at the edges:
 		// If and only if the sprite needs to be masked, blit into a specialty area first
 		const i32 x_start = SDL_max(spr_rect.x, 0);
 		const i32 x_end = SDL_min(spr_rect.x + spr_rect.w, viewport_w);
@@ -129,47 +127,18 @@ void DrawSprites(SDL_Surface* toDraw)
 		float sprcol_x = spr_rect.x >= 0 ? 0 : -spr_rect.x * x_inc;
 		for (i32 x_i = x_start; x_i < x_end; ++x_i)
 		{
-			if (ds->dist > z_buffer[0][x_i])
-				goto skip;
-
 			float sprcol_y = spr_rect.y >= 0 ? 0 : -spr_rect.y * y_inc;
-			const u8 layercount = layer_count[x_i];
 			u32* render_px = (u32*)toDraw->pixels + (y_start * viewport_w) + x_i;
 			const u32* const ws_px = (u32*)spr_ptr_begin + (u16)sprcol_x;
-
-			if (layercount && ds->dist > z_buffer[1][x_i])		// We need to mask something
-			{
-				u8 l = 0;
-				u32* const spr_buf_px = sprite_buffer;
-				
-				for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)	// Write sprite into temporary buffer for masking
-				{
-					spr_buf_px[y_buf] = *(ws_px + (u16)sprcol_y * spritesheet_width);
-					sprcol_y += y_inc;
-				}
-				while (l < layercount && ds->dist > z_buffer[l+1][x_i])	// Mask
-				{
-					u32* blend_px = (u32*)blend_masks[l++]->pixels + (y_start * viewport_w) + x_i;
-					for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)
-						if (blend_px[y_buf * viewport_w]) spr_buf_px[y_buf] = COLOR_KEY;
-				}
-				for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)	// Draw masked sprite in world
-				{
-					const u32 spr_col = spr_buf_px[y_buf];
-					if (spr_col != COLOR_KEY)
-						*render_px = spr_col;
-					render_px += viewport_w;
-				}
-			}
-			else for (i32 y_i = y_start; y_i < y_end; ++y_i)	// Draw the sprite without masking
+			for (i32 y_i = y_start; y_i < y_end; ++y_i)
 			{
 				const u32 spr_col = *(ws_px + (u16)sprcol_y * spritesheet_width);
-				if (spr_col != COLOR_KEY)
+				if (spr_col != COLOR_KEY && z_buffer[y_i * viewport_w + x_i] > ds->dist)
 					*render_px = spr_col;
 				sprcol_y += y_inc;
 				render_px += viewport_w;
 			}
-		skip:
+	
 			sprcol_x += x_inc;
 		}
 	}
@@ -330,7 +299,9 @@ static i32 SpriteDistSort(const void* p1, const void* p2)
 	const ActorSprite* const d1 = (ActorSprite*)p1;
 	const ActorSprite* const d2 = (ActorSprite*)p2;
 
-	if (d1->dist > d2->dist) return  1;
-	if (d1->dist < d2->dist) return -1;
+	if (d1->dist > d2->dist) 
+		return  1;
+	if (d1->dist < d2->dist) 
+		return -1;
 	return 0;
 }

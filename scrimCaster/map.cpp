@@ -96,6 +96,7 @@ void LoadMap()
 			cellgrid[6][i].s.type = 1;
 			cellgrid[i][0].w.type = 1;
 		}
+		cellgrid[4][0].w.type = 0;
 
 		cellgrid[0][6].e.type = 3;
 		cellgrid[2][6].e.type = 1;
@@ -119,6 +120,7 @@ void LoadMap()
 			cellgrid[3 + i][7].w.type = 4;
 			cellgrid[3 + i][7].w.flags = SideFlags(PASSABLE | TRANSLUCENT);
 		}
+
 
 		cellgrid[1][1].e.type = 3;
 		cellgrid[1][1].s.type = 1;

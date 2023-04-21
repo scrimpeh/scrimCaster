@@ -1,8 +1,12 @@
 #pragma once
 
+#include "common.h"
+
 #include "SDL/SDL_surface.h"
 #include "actor.h"
 #include "actorcontainers.h"
+
+#define MAXWIDTH 256 // Maximum width of a sprite in the sheet
 
 typedef struct ActorSprite
 {

@@ -1,4 +1,3 @@
-#include "types.h"
 #include "sprite.h"
 #include "map.h"
 #include <math.h>
@@ -6,12 +5,14 @@
 #include "renderconstants.h"
 #include "SDL/SDL_log.h"
 
-//I'm not sure if we want a set sprite buffer, rather than statically allocating it.
-//Then, qsort only works on arrays, and we need some fixed bounds on that.
+#include "input.h"
 
-//Sprite data should probably be externalized to a separate file so data can be edited without
-//rebuilding the solution.
-#define CORNERS(x1,y1,x2,y2) { (x1), (y1), ((x2) - (x1)), ((y2) - (y1)) }
+// I'm not sure if we want a set sprite buffer, rather than statically allocating it.
+// Then, qsort only works on arrays, and we need some fixed bounds on that.
+
+// Sprite data should probably be externalized to a separate file so data can be edited without
+// rebuilding the solution.
+#define CORNERS(x1, y1, x2,y2) { (x1), (y1), ((x2) - (x1)), ((y2) - (y1)) }
 
 const WorldSprite worldSprites[] =
 {
@@ -60,15 +61,23 @@ void DrawSprites(SDL_Surface* toDraw)
 {
 	SDL_Rect spr_rect;
 	const static ActorList* const actorLists[] =
-	{ &map.levelPickups, &projectiles, &particles, &tempEnemies };
+	{ 
+		&map.levelPickups, 
+		&projectiles, 
+		&particles, 
+		&tempEnemies 
+	};
 	const static ActorArray* const actorArrays[] =
-	{ &map.levelEnemies, &map.levelObjs };
+	{ 
+		&map.levelEnemies, 
+		&map.levelObjs 
+	};
 
 	//First off, populate the sprite buffer
-	u32 ds_index = 0, i;
-	for (i = 0; i < SDL_arraysize(actorLists); ++i)
+	u32 ds_index = 0;
+	for (u32 i = 0; i < SDL_arraysize(actorLists); ++i)
 		PopulateSpriteBufferList(actorLists[i], &ds_index);
-	for (i = 0; i < SDL_arraysize(actorArrays); ++i)
+	for (u32 i = 0; i < SDL_arraysize(actorArrays); ++i)
 		PopulateSpriteBufferArray(actorArrays[i], &ds_index);
 	SDL_qsort(sprite_slot_buffer, ds_index, sizeof(ActorSprite), SpriteDistSort);
 
@@ -90,18 +99,20 @@ void DrawSprites(SDL_Surface* toDraw)
 			(ds->relative_angle > 180 ? 360 : 0)
 			- viewport_x_fov_half;
 
-		spr_rect.w = i32((projection_dist * ws.coords.w) / ds->dist);
+		spr_rect.w = (i32)((projection_dist * ws.coords.w) / ds->dist);
 		//if (spr_rect.w > max_width) spr_rect.w = max_width;
-		spr_rect.h = i32((projection_dist * height) / ds->dist);
-		spr_rect.x = i32(tan(TO_RAD(angle))*projection_dist) + (viewport_w_half) - (spr_rect.w / 2);
+		spr_rect.h = (i32)((projection_dist * height) / ds->dist);
+		spr_rect.x = (i32)(tan(TO_RAD(angle))*projection_dist) + (viewport_w_half) - (spr_rect.w / 2);
 		spr_rect.y = h_offset + ((viewport_h - spr_rect.h) / 2);
 
-		//Shouldn't happen - todo, investigate what's going wrong
-		if (spr_rect.x >= viewport_w || spr_rect.y >= viewport_h) continue;
-		if (spr_rect.x + spr_rect.w < 0 || spr_rect.y + spr_rect.h < 0) continue;
+		// Shouldn't happen - todo, investigate what's going wrong
+		if (spr_rect.x >= viewport_w || spr_rect.y >= viewport_h) 
+			continue;
+		if (spr_rect.x + spr_rect.w < 0 || spr_rect.y + spr_rect.h < 0) 
+			continue;
 
-		//The idea: Make a loop running through all the pixel collumns, clipping accordingly at the edges:
-		//If and only if the sprite needs to be masked, blit into a specialty area first
+		// The idea: Make a loop running through all the pixel collumns, clipping accordingly at the edges:
+		// If and only if the sprite needs to be masked, blit into a specialty area first
 		const i32 x_start = SDL_max(spr_rect.x, 0);
 		const i32 x_end = SDL_min(spr_rect.x + spr_rect.w, viewport_w);
 		const float x_inc = ws.coords.w / float(spr_rect.w) - SPRITE_RATIO_END;
@@ -126,23 +137,23 @@ void DrawSprites(SDL_Surface* toDraw)
 			u32* render_px = (u32*)toDraw->pixels + (y_start * viewport_w) + x_i;
 			const u32* const ws_px = (u32*)spr_ptr_begin + (u16)sprcol_x;
 
-			if (layercount && ds->dist > z_buffer[1][x_i])		//We need to mask something
+			if (layercount && ds->dist > z_buffer[1][x_i])		// We need to mask something
 			{
 				u8 l = 0;
 				u32* const spr_buf_px = sprite_buffer;
 				
-				for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)	//Write sprite into temporary buffer for masking
+				for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)	// Write sprite into temporary buffer for masking
 				{
 					spr_buf_px[y_buf] = *(ws_px + (u16)sprcol_y * spritesheet_width);
 					sprcol_y += y_inc;
 				}
-				while (l < layercount && ds->dist > z_buffer[l+1][x_i])	//Mask
+				while (l < layercount && ds->dist > z_buffer[l+1][x_i])	// Mask
 				{
 					u32* blend_px = (u32*)blend_masks[l++]->pixels + (y_start * viewport_w) + x_i;
 					for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)
 						if (blend_px[y_buf * viewport_w]) spr_buf_px[y_buf] = COLOR_KEY;
 				}
-				for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)	//Draw masked sprite in world
+				for (i32 y_buf = 0; y_buf < y_diff; ++y_buf)	// Draw masked sprite in world
 				{
 					const u32 spr_col = spr_buf_px[y_buf];
 					if (spr_col != COLOR_KEY)
@@ -150,7 +161,7 @@ void DrawSprites(SDL_Surface* toDraw)
 					render_px += viewport_w;
 				}
 			}
-			else for (i32 y_i = y_start; y_i < y_end; ++y_i)	//Draw the sprite without masking
+			else for (i32 y_i = y_start; y_i < y_end; ++y_i)	// Draw the sprite without masking
 			{
 				const u32 spr_col = *(ws_px + (u16)sprcol_y * spritesheet_width);
 				if (spr_col != COLOR_KEY)
@@ -173,14 +184,14 @@ static inline WorldSprite GetWorldSprite(const ActorSprite* a)
 	return actorFrames->sprites[0];
 }
 
-static inline bool ActorOnScreen(const Actor* actor, u32 *ds_index)
+static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 {
-	//1.If sprite in back 180° skip it, it can't possibly be seen
-	//2.If the sprite is in the view fov, draw it, it's definitely seen
-	//3.Between those two fields, calculate the sprite's width at the projected distance.
-	//--Calculate an error angle for that distance, draw the sprite if it falls in that range
-	//-- applying cosine correction makes sprites ungodly large at the edge of the FOV,
-	//-- so we need to compromise
+	// 1.If sprite in back 180° skip it, it can't possibly be seen
+	// 2.If the sprite is in the view fov, draw it, it's definitely seen
+	// 3.Between those two fields, calculate the sprite's width at the projected distance.
+	// -- Calculate an error angle for that distance, draw the sprite if it falls in that range
+	// -- applying cosine correction makes sprites ungodly large at the edge of the FOV,
+	//    so we need to compromise
 
 	const double x_disp = actor->x - viewport_x;
 	const double y_disp = actor->y - viewport_y;
@@ -189,13 +200,18 @@ static inline bool ActorOnScreen(const Actor* actor, u32 *ds_index)
 	const double fov_min_full = SubtractAngle(viewport_angle, viewport_x_fov);
 	const double fov_max_full = AddAngle(viewport_angle, viewport_x_fov);
 
-	bool skipsprite;
+	// Test if the sprite is outside the player's FOV
 	if (fov_min_full > fov_max_full)
-		skipsprite = slope < fov_min_full && slope > fov_max_full;
+	{
+		if (slope < fov_min_full && slope > fov_max_full)
+			return false;
+	}
 	else
-		skipsprite = slope < fov_min_full || slope > fov_max_full;
-	if (skipsprite) return false;
-
+	{
+		if (slope < fov_min_full || slope > fov_max_full)
+			return false;
+	}
+		
 	const double relative_angle = TO_RAD(viewport_angle - slope);
 	const double cos_ra = cos(relative_angle);
 	const double spr_dist = sqrt(pow(x_disp, 2) + pow(y_disp, 2)) * cos_ra;
@@ -204,8 +220,9 @@ static inline bool ActorOnScreen(const Actor* actor, u32 *ds_index)
 	const double fov_max_half = AddAngle(viewport_angle, viewport_x_fov_half);
 	const double angle_to_sprite = SubtractAngle(fov_max_half, slope);
 
+	// Test if the sprite is inside the player's FOV
 	bool drawsprite;
-	if (fov_min_half > fov_max_half)	//360° rollaround
+	if (fov_min_half > fov_max_half)
 		drawsprite = slope >= fov_min_half || slope <= fov_max_half;
 	else
 		drawsprite = slope >= fov_min_half && slope <= fov_max_half;
@@ -218,13 +235,19 @@ static inline bool ActorOnScreen(const Actor* actor, u32 *ds_index)
 		return true;
 	}
 
-	//Todo: Get the projected sprite's width
+	// The sprite now partially intersects with the player's view.
+	// Todo: Get the projected sprite's width
 	WorldSprite ws = GetWorldSprite(&as);
-	double spr_width = ((projection_dist * ws.coords.w) / spr_dist) / 2;
+	const double spr_width = ((projection_dist * ws.coords.w) / spr_dist) / 2;
+	// Sanity check if the sprite gets way too large
+	if (spr_width > viewport_w * 128)
+		return false;
 	const double px_angle_ratio = (double)viewport_x_fov / viewport_w;
 	const double err_angle = px_angle_ratio * spr_width;
-	//The error angle now contains the absolute offset that we should look ahead
 
+	goto setsprite;
+
+	// The error angle now contains the absolute offset that we should look ahead
 	const double fov_min_err = SubtractAngle(fov_min_half, err_angle);
 	const double fov_max_err = AddAngle(fov_max_half, err_angle);
 
@@ -233,33 +256,38 @@ static inline bool ActorOnScreen(const Actor* actor, u32 *ds_index)
 	else
 		drawsprite = slope >= fov_min_err && slope <= fov_max_err;
 
-	if (drawsprite) goto setsprite;
+	if (drawsprite) 
+		goto setsprite;
 	return false;
 }
 
-static void PopulateSpriteBufferList(const ActorList* actors, u32 *ds_index)
+static void PopulateSpriteBufferList(const ActorList* actors, u32* ds_index)
 {
-	if (*ds_index >= MAX_SPRITES) return;
+	if (*ds_index >= MAX_SPRITES) 
+		return;
 
 	const ActorNode* node = actors->first;
 	while (node)
 	{
 		if (ActorOnScreen(node->content, ds_index))
-			if (*ds_index >= MAX_SPRITES) return;
+			if (*ds_index >= MAX_SPRITES) 
+				return;
 		node = node->next;
 	}
 }
 
 static void PopulateSpriteBufferArray(const ActorArray* actors, u32 *ds_index)
 {
-	if (*ds_index >= MAX_SPRITES) return;
+	if (*ds_index >= MAX_SPRITES) 
+		return;
 
 	const Actor* act;
 	for (u32 i = 0; i < actors->count; ++i)
 	{
 		act = &actors->actor[i];
 		if (ActorOnScreen(act, ds_index))
-			if (*ds_index >= MAX_SPRITES) return;
+			if (*ds_index >= MAX_SPRITES) 
+				return;
 	}
 }
 

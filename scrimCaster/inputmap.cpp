@@ -1,4 +1,3 @@
-#include "types.h"
 #include "inputmap.h"
 #include "input.h"
 
@@ -7,13 +6,15 @@
 
 extern Input input;
 
-const u16 KEYCODE_COUNT = 0x11A;
+#define  KEYCODE_COUNT 0x11A
 
 //Maps SDL scan codes to teh offset in the input structure
 u8 scancode_map[KEYCODE_COUNT];
 
 void LoadInitialBindings()
 {
+	scancode_map[SDL_SCANCODE_LSHIFT] = offsetof(Input, debug);
+
 	scancode_map[SDL_SCANCODE_W] = offsetof(Input, forward);
 	scancode_map[SDL_SCANCODE_S] = offsetof(Input, backward);
 	scancode_map[SDL_SCANCODE_A] = offsetof(Input, strafe_left);

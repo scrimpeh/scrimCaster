@@ -201,15 +201,15 @@ void LoadMap()
 	pil.x = 96;
 	pil.y = 480;
 	al->actor[1] = pil;
-
+	
 	pil.x = 448;
 	pil.y = 320;
 	al->actor[2] = pil;
-
+	
 	pil.x = 448;
 	pil.y = 256;
 	al->actor[3] = pil;
-
+	
 	pil.x = 448;
 	pil.y = 192;
 	al->actor[4] = pil;

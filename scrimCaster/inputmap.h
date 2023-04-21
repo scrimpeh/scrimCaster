@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.h"
+
 #include "SDL/SDL_keycode.h"
 
 void LoadInitialBindings();

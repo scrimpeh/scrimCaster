@@ -1,4 +1,3 @@
-#include "types.h"
 #include "input.h"
 #include "inputmap.h"
 
@@ -30,7 +29,7 @@ void GetInput(SDL_Event* evt)
 
 void FilterInput()
 {
-	//Filter old button presses
+	// Filter old button presses
 	input_tf = input_lf;
 	u8* btn_ptr_tf = (u8*)&input_tf;
 	u8* btn_ptr =    (u8*)&input;

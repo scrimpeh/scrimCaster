@@ -98,7 +98,8 @@ void CloseRenderer()
 //should be replaced by a proper solution
 void TextOut(SDL_Surface* surf, const char* str, i32 x, i32 y)
 {
-	if (!fontDebug) return;
+	if (!fontDebug) 
+		return;
 
 	SDL_Rect r = { x, y, 0, 0 };
 
@@ -292,20 +293,19 @@ void RenderFrame()
 	//Do the rendering pipeline
 	show_map = input.map != 0;
 
-	//SDL_Surface* mainWindowSurface = SDL_GetWindowSurface(mainWindow);
-	//Render ceiling and bottom
+	// Render ceiling and floor
 	SDL_Rect upper = { 0, 0, viewport_w, viewport_h / 2 };
 	SDL_Rect lower = { 0, viewport_h / 2, viewport_w, viewport_h / 2 };
 
 	SDL_FillRect(viewportSurface, &upper, 0x00A8A8C8);
 	SDL_FillRect(viewportSurface, &lower, 0x00C0C0C0);
 
-	Scan(viewportSurface);		//Draw the Video Out
+	DrawGeometry(viewportSurface);
 	DrawSprites(viewportSurface);
-	if(show_map)
+	if (show_map)
 		DrawMap(viewportSurface);
-	else 
-		if(draw_crosshair) DrawCrosshair(viewportSurface);
+	else if (draw_crosshair) 
+		DrawCrosshair(viewportSurface);
 	
 	
 	char buf[256];

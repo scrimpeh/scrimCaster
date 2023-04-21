@@ -1,4 +1,3 @@
-#include "types.h"
 #include "scrimCaster.h"
 #include "SDL/SDL.h"
 
@@ -17,17 +16,19 @@ char* app_dir = NULL;
 i32 main(i32 argc, char** argv)
 {
 	bool quit = false;
+	u32 delta_ticks;
+	u32 render_ticks;
 
-	u32 deltaTicks, renderTicks;
-	if ( InitGame(argc, argv) ) return -1;
+	if (InitGame(argc, argv)) 
+		return -1;
 
 	SDL_Log("Starting Main Loop");
-	deltaTicks = SDL_GetTicks();
+	delta_ticks = SDL_GetTicks();
 
 	SDL_Event evt;
 	while (!quit)
 	{
-		renderTicks = SDL_GetTicks();
+		render_ticks = SDL_GetTicks();
 		while (SDL_PollEvent(&evt))
 		{
 			switch (evt.type)
@@ -52,14 +53,14 @@ i32 main(i32 argc, char** argv)
 			}
 		}
 
-		//Do game logic here.
-		u32 delta = SDL_GetTicks() - deltaTicks;
+		// Do game logic here
+		u32 delta = SDL_GetTicks() - delta_ticks;
 		FilterInput();
 		UpdateGame(delta);
-		deltaTicks = SDL_GetTicks();
+		delta_ticks = SDL_GetTicks();
 
 		RenderFrame();
-		EndFrame(renderTicks);
+		EndFrame(render_ticks);
 	}
 
 	CleanUp();

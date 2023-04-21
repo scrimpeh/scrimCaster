@@ -170,7 +170,7 @@ void DrawGeometry(SDL_Surface* target)
 		{
 			if (++cell_distance >= maxDistance)
 				goto drawcol;
-			if (y_cell < 0 || y_cell >= map.boundsY)
+			if (y_cell < 0 || y_cell >= map.boundsY || grid_x < 0 || grid_x >= map.boundsX)
 				goto drawcol;
 
 			offset = (map.boundsX * y_cell) + grid_x;

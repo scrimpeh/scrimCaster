@@ -25,6 +25,8 @@ Coordinates ProjectVector(double x_in, double y_in, double angle, double disp)
 	return { x_in + d_x, y_in + d_y };
 }
 
+// TODO: These functions don't handle OOB.
+
 //Determines if, along a given line, a wall has been hit
 bool IntersectWall(SideCoords* coords, Coordinates origin, Coordinates dest)
 {
@@ -139,6 +141,8 @@ trace:
 	while (grid_y != new_grid_y)
 	{
 		if (north ? grid_y < 0 : grid_y > map.boundsY)
+			goto end;
+		if (grid_x < 0 || grid_x >= map.boundsX)
 			goto end;
 
 		Cell* c = GetCell({ grid_x, grid_y });

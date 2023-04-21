@@ -1,12 +1,11 @@
-#include "types.h"
 #include "map.h"
-
-#include "SDL\SDL_log.h"
-#include "SDL\SDL_assert.h"
 
 #include "actor.h"
 #include "gfxloader.h"
 #include "mapupdate.h"
+
+#include "SDL/SDL_log.h"
+#include "SDL/SDL_assert.h"
 
 /* On scrolling doors:
  * When activated, a door switches from 'SOLID' into 'TRANSLUCENT' as well as other flags that need changing.
@@ -34,7 +33,7 @@ Cell* GetCell(GridPos gp)
 	SDL_assert(gp.x >= 0 && gp.x < map.boundsX);
 	SDL_assert(gp.y >= 0 && gp.y < map.boundsY);
 
-	return &map.cells[gp.y*map.boundsX + gp.x];
+	return &map.cells[gp.y * map.boundsX + gp.x];
 }
 
 Cell* GetCell(double x, double y)

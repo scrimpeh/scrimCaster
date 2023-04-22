@@ -2,24 +2,23 @@
 
 #include "common.h"
 
-#include "SDL/SDL_surface.h"
-
+#include "geometry.h"
 #include "cell.h"
 #include "actor.h"
 
-//Buffer for translucent sides.
-typedef struct DrawSide
+#include "SDL/SDL_surface.h"
+
+i32 scan_init(u8 collumn_width);
+void scan_close();
+
+void scan_draw(SDL_Surface* target);
+
+static void scan_draw_column(SDL_Surface* target, float x, float y, const g_intercept* intercept, u16 col);
+
+static inline bool collect_intercept(const g_intercept* intercept);
+
+typedef struct g_intercept_stack
 {
-	struct DrawSide* next;
-	const Side* side;
-	float dist;
-	u8 texcol;
-} DrawSide;
-
-static inline void PushDrawSide(const Side* s, float p_x, float p_y, u8 orientation);
-
-i32 InitializeScan(u8 collumn_width = 1);
-void CloseScan();
-
-void DrawGeometry(SDL_Surface* toDraw);
-static void DrawColumn(SDL_Surface* toDraw, const DrawSide* ds, float angle, u16 col);
+	g_intercept_stack* next;
+	g_intercept intercept;
+};

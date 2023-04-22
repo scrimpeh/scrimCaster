@@ -11,6 +11,21 @@
 #include "input.h"
 #include "mouselook.h"
 
+// The great big 2023 revisit todo list
+
+// [X] Fix sprites getting too large (Fix maybe ?)
+// [X] Unified 2-D Z Buffer
+// [X] Infinitely many draw sides
+// [ ] Make E/W walls slightly darker than N/S walls
+// [ ] Distance fog
+// [ ] Sprite rotation and animation system
+// [ ] Sound (?)
+// [ ] Decals (Dynamic and static)
+// [ ] Unified, general-purpose ray caster / geometry interceptor
+// [ ] Code cleanup
+// [ ] Port to C (C99 or newer)
+// [ ] Update SDL to newest
+
 char* app_dir = NULL;
 
 i32 main(i32 argc, char** argv)

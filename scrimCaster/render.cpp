@@ -1,6 +1,5 @@
-#include "types.h"
 #include "render.h"
-#include "SDL/SDL_render.h"
+
 #include "SDL/SDL_ttf.h"
 #include "scan.h"
 #include "sprite.h"
@@ -49,9 +48,13 @@ bool show_map = false;
 bool draw_crosshair = true;
 extern Input input;
 
-i32 InitializeRenderer(u16 w, u16 h, u8 col)
+static float r_map_intercept_x;
+static float r_map_intercept_y;
+
+
+i32 r_init(u16 w, u16 h, u8 col)
 {
-	CloseRenderer();	//close the old renderer first
+	r_close();	//close the old renderer first
 
 	viewport_w = w;
 	viewport_h = h;
@@ -65,7 +68,7 @@ i32 InitializeRenderer(u16 w, u16 h, u8 col)
 		return -1;
 	}
 
-	if (InitializeScan(col))
+	if (scan_init(col))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR,
 			"Couldn't initialize map renderer! %s",
@@ -85,9 +88,9 @@ i32 InitializeRenderer(u16 w, u16 h, u8 col)
 	return 0;
 }
 
-void CloseRenderer()
+void r_close()
 {
-	CloseScan();
+	scan_close();
 	SDL_free(sprite_buffer);
 	sprite_buffer = NULL;
 	SDL_FreeSurface(viewportSurface);
@@ -177,32 +180,53 @@ void DrawLineBounds(const SDL_Surface* const surf, const SDL_Point p1, const SDL
 {
 }
 
+static bool r_map_view_intersect(const g_intercept* intercept)
+{
+	// This is not re-entrant, and I'd rather have a closure, but oh well
+	if (intercept->type == G_INTERCEPT_VOID)
+		return false;
+
+	r_map_intercept_x = intercept->x;
+	r_map_intercept_y = intercept->y;
+
+	return intercept->type == G_INTERCEPT_NON_SOLID;
+}
+
+static void r_map_coordinate(float x, float y, SDL_Point* target)
+{
+	float scale = 0.5;
+	const u8 offset_x = 24;
+	const u8 offset_y = 24;
+	target->x = (i32)(x * scale) + offset_x;
+	target->y = (i32)(y * scale) + offset_x;
+}
+
 void DrawMap(SDL_Surface* surface)
 {
 	static const u16 TILESIZE = 32;
-	static const u8 OFFSET = 24;
+	const u8 map_offset = 24;
 	u8 n;
 	SDL_Rect tileRect[4];
-	tileRect[0].y = OFFSET;
-	tileRect[1].y = OFFSET;
-	tileRect[2].y = OFFSET;
-	tileRect[3].y = OFFSET + TILESIZE - 1;
+	tileRect[0].y = map_offset;
+	tileRect[1].y = map_offset;
+	tileRect[2].y = map_offset;
+	tileRect[3].y = map_offset + TILESIZE - 1;
 
-	tileRect[0].h = TILESIZE;	//East
+	tileRect[0].h = TILESIZE;	// East
 	tileRect[0].w = 1;
-	tileRect[1].h = 1;	//North
+	tileRect[1].h = 1;			// North
 	tileRect[1].w = TILESIZE;
-	tileRect[2].h = TILESIZE;	//West
+	tileRect[2].h = TILESIZE;	// West
 	tileRect[2].w = 1;
-	tileRect[3].h = 1;	//South
+	tileRect[3].h = 1;			// South
 	tileRect[3].w = TILESIZE;
 	Cell* cellptr = map.cells;
 	for (u8 i = 0; i < map.boundsY; ++i)
 	{
-		tileRect[0].x = OFFSET + TILESIZE - 1;
-		tileRect[1].x = OFFSET;
-		tileRect[2].x = OFFSET;
-		tileRect[3].x = OFFSET;
+		tileRect[0].x = map_offset + TILESIZE - 1;
+		tileRect[1].x = map_offset;
+		tileRect[2].x = map_offset;
+		tileRect[3].x = map_offset;
 		for (u8 j = 0; j < map.boundsX; ++j)
 		{
 			for (n = 0; n < 4; ++n)
@@ -214,14 +238,14 @@ void DrawMap(SDL_Surface* surface)
 		for (n = 0; n < 4; ++n) tileRect[n].y += TILESIZE;
 	}
 
-	//Draw the player
+	// Draw the player
 	SDL_Rect r;
 	const u16 div = CELLSIZE / TILESIZE;
 	const Bounds playerBounds = GetActorBounds(PLAYER);
 	r.h = 2 * i32(playerBounds.x) / div;
 	r.w = 2 * i32(playerBounds.y) / div;
-	r.x = i32(OFFSET + (player.x / div) - r.h / 2);
-	r.y = i32(OFFSET + (player.y / div) - r.w / 2);
+	r.x = i32(map_offset + (player.x / div) - r.h / 2);
+	r.y = i32(map_offset + (player.y / div) - r.w / 2);
 
 	SideCoords s1, s2;
 	SDL_Point edge1, edge2;
@@ -229,25 +253,33 @@ void DrawMap(SDL_Surface* surface)
 	double angle2 = player.angle + (viewport_x_fov / 2);
 	if (angle1 < 0) angle1 += 360;
 	if (angle2 >= 360) angle2 -= 360;
-	if (IntersectWall(&s1, { player.x, player.y }, angle1, VisibilitySolid)
-		&& IntersectWall(&s2, { player.x, player.y }, angle2, VisibilitySolid))
-	{
-		edge1 = { (i32)s1.p_x, (i32)s1.p_y };
-		edge2 = { (i32)s2.p_x, (i32)s2.p_y };
 
-		SDL_Point start = { i32(OFFSET + (player.x / div)), i32(OFFSET + (player.y / div)) };
-		edge1.x /= div;
-		edge1.x += OFFSET;
-		edge1.y /= div;
-		edge1.y += OFFSET;
-		edge2.x /= div;
-		edge2.x += OFFSET;
-		edge2.y /= div;
-		edge2.y += OFFSET;
 
-		DrawLine(surface, start, edge1, 0xFFFFFF);
-		DrawLine(surface, start, edge2, 0xFFFFFF);
-	}
+	double intersect_l_x;
+	double intersect_l_y;
+	g_cast(player.x, player.y, TO_RADF(angle1), r_map_view_intersect);
+	intersect_l_x = r_map_intercept_x;
+	intersect_l_y = r_map_intercept_y;
+
+	double intersect_r_x;
+	double intersect_r_y;
+	g_cast(player.x, player.y, TO_RADF(angle2), r_map_view_intersect);
+	intersect_r_x = r_map_intercept_x;
+	intersect_r_y = r_map_intercept_y;
+
+	SDL_Point player_origin;
+	r_map_coordinate(player.x, player.y, &player_origin);
+
+	SDL_Point intercept_l;
+	r_map_coordinate(intersect_l_x, intersect_l_y, &intercept_l);
+
+	SDL_Point intercept_r;
+	r_map_coordinate(intersect_r_x, intersect_r_y, &intercept_r);
+
+
+	DrawLine(surface, player_origin, intercept_l, 0xFFFFFF);
+	DrawLine(surface, player_origin, intercept_r, 0xFFFFFF);
+
 	
 	SDL_FillRect(surface, &r, 0xFFFF00);
 
@@ -259,8 +291,8 @@ void DrawMap(SDL_Surface* surface)
 		SDL_Rect r;
 		r.h = i32(2 * b.y) / div;
 		r.w = i32(2 * b.x) / div;
-		r.x = OFFSET + i32(a.x / div) - r.h / 2;
-		r.y = OFFSET + i32(a.y / div) - r.h / 2;
+		r.x = map_offset + i32(a.x / div) - r.h / 2;
+		r.y = map_offset + i32(a.y / div) - r.h / 2;
 		SDL_FillRect(surface, &r, 0xFF00FF);
 	}
 	for (u32 i = 0; i < levelEnemies.count; ++i)
@@ -270,8 +302,8 @@ void DrawMap(SDL_Surface* surface)
 		SDL_Rect r;
 		r.h = i32(2 * b.y) / div;
 		r.w = i32(2 * b.x) / div;
-		r.x = OFFSET + i32(a.x / div) - r.h / 2;
-		r.y = OFFSET + i32(a.y / div) - r.h / 2;
+		r.x = map_offset + i32(a.x / div) - r.h / 2;
+		r.y = map_offset + i32(a.y / div) - r.h / 2;
 		SDL_FillRect(surface, &r, 0xFF0000);
 	}
 	
@@ -300,7 +332,7 @@ void RenderFrame()
 	SDL_FillRect(viewportSurface, &upper, 0x00A8A8C8);
 	SDL_FillRect(viewportSurface, &lower, 0x00C0C0C0);
 
-	DrawGeometry(viewportSurface);
+	scan_draw(viewportSurface);
 	DrawSprites(viewportSurface);
 	if (show_map)
 		DrawMap(viewportSurface);

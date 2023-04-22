@@ -12,7 +12,7 @@ extern char* app_dir;
 //Clean up everything
 void CleanUp()
 {
-	CloseRenderer();
+	r_close();
 	UnloadMap();
 	UnloadAllTextures();
 	SDL_free(app_dir);

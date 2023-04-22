@@ -1,22 +1,22 @@
 #include "scan.h"
-#include "SDL/SDL_assert.h"
-#include "SDL/SDL_log.h"
-#include "math.h"	//fmod is obsolete: maybe replace?
-#include "float.h"
 
 #include "map.h"
 #include "camera.h"
+#include "geometry.h"
 #include "render.h"
 #include "renderconstants.h"
 
+#include "SDL/SDL_assert.h"
+#include "SDL/SDL_log.h"
+#include <math.h>	//fmod is obsolete: maybe replace?
+#include <float.h>
+
+// How many columsn to draw before we stop looking
 #define MAXDIST 32
-#define TRANSPARENCY_LAYERS 16
 
 const float WALL_OFF = 8e-4f;
 #define HALFSIZE (TEX_SIZE / 2)
 
-// How many collumns to draw before we stop looking
-const u8 maxDistance = MAXDIST;
 extern u64 ticks;
 
 extern float viewport_x;
@@ -39,23 +39,20 @@ u8 colwidth = 1;
 const float MAXSLOPE = 1e+8f;
 
 float projection_dist;
-extern float spr_ratio;
-
 // The Z Buffer is used for masking sprites against the wall. It covers every pixel on the screen to support blending spriets
 // against transparency layers
 float* z_buffer;
 
 // For drawing transparent surfaces, we keep a stack of (dynamically allocated) draw side
-DrawSide* draw_side_stack = NULL;
+g_intercept_stack* intercept_stack = NULL;
 
 float* angle_offsets;
 
 // Set up the scanning parameters as needed
-i32 InitializeScan(u8 collumn_width)
+i32 scan_init(u8 column_width)
 {
 	// Set up global rendering parameters
-	collumn_width = 1;
-	colwidth = collumn_width;
+	colwidth = column_width;
 
 	// Derive constant values from it
 	viewport_w_half = viewport_w / 2;
@@ -65,9 +62,7 @@ i32 InitializeScan(u8 collumn_width)
 	angle_offsets = (float*)SDL_malloc(sizeof(float) * viewport_w);
 	if (!angle_offsets)
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-			"Couldn't initialize offset buffer! %s",
-			SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR,"Couldn't initialize offset buffer! %s", SDL_GetError());
 		return -1;
 	}
 
@@ -85,176 +80,96 @@ i32 InitializeScan(u8 collumn_width)
 }
 
 // To be called whenever the viewport FOV is changed
-void CloseScan()
+void scan_close()
 {
 	SDL_free(z_buffer);
 	z_buffer = NULL;
 
 	SDL_free(angle_offsets);
-	angle_offsets = 0;
-
+	angle_offsets = NULL;
 }
 
-static inline void PushDrawSide(const Side* side, float p_x, float p_y, u8 orientation)
+static inline bool collect_intercept(const g_intercept* intercept)
 {
-	const float d_x = p_x - viewport_x;
-	const float d_y = p_y - viewport_y;
-	const float dist = sqrtf(powf(d_x, 2) + powf(d_y, 2));
-
-	const i8 offset = side->flags & (SCROLL_H | DOOR_H) && side->param1 ?
-		((i64)ticks / (i16)side->param1) % TEX_SIZE :
-		0;
-
-	u8 texcol = ((u8)(orientation & 1 ? p_x : p_y) + offset) % TEX_SIZE;
-	if (orientation & 2) 
-		texcol = (TEX_SIZE - 1) - texcol;
-	if (side->flags & MIRR_H) 
-		texcol = (TEX_SIZE - 1) - texcol;
-
-	// Not sure how amazing it is that we allocate and free drawsides so frequently, but it's probably fine
-	DrawSide* ds = (DrawSide*)SDL_malloc(sizeof(DrawSide));
-	ds->next = draw_side_stack;
-	ds->side = side;
-	ds->dist = dist;
-	ds->texcol = texcol;
-
-	draw_side_stack = ds;
+	if (intercept->type == G_INTERCEPT_VOID || intercept->type == G_INTERCEPT_VOID_EDGE)
+		return false;
+	g_intercept_stack* store_intercept = (g_intercept_stack*) SDL_malloc(sizeof(g_intercept_stack));
+	if (!store_intercept)
+		return false;
+	SDL_memcpy(&store_intercept->intercept, intercept, sizeof(g_intercept));
+	store_intercept->next = intercept_stack;
+	intercept_stack = store_intercept;
+	return intercept->type != G_INTERCEPT_SOLID;
 }
 
-void DrawGeometry(SDL_Surface* target)
+void scan_draw(SDL_Surface* target)
 {
-	DrawSide ds;
-	float angle;
-	const Side* cur_side;
-	u8 cell_orientation;
-	u8 cell_distance;
-	const Cell* const cellptr = map.cells;
-	u32 offset;
-
 	// Clear Z Buffer
-	for (u64 i = 0; i < viewport_w * viewport_h; i++)
+	for (u64 i = 0; i < (u64)viewport_w * viewport_h; i++)
 		z_buffer[i] = FLT_MAX;
 
 	const float angle_rad = TO_RADF(viewport_angle);
 	for (u16 col = 0; col < viewport_w; col += colwidth)
 	{
-
-		angle = angle_rad - angle_offsets[col];
-		while (angle < 0) 
+		float angle = angle_rad - angle_offsets[col];
+		while (angle < 0)
 			angle += (float)PI_2_1;
-		while (angle >= PI_2_1) 
+		while (angle >= PI_2_1)
 			angle -= (float)PI_2_1;
 
-		cell_distance = 0;
+		g_cast(viewport_x, viewport_y, angle, collect_intercept);
 
-		const bool north = angle < M_PI; 
-		const bool east = angle < PI_1_2 || angle > PI_3_2;
-
-		i16 grid_x = (i16)floorf(viewport_x / CELLSIZE);
-		i16 grid_y = (i16)floorf(viewport_y / CELLSIZE);
-		// Since our grid inverts the y coordinate, invert the slope
-		float slope = -1 * tanf(angle);
-		float p_x = viewport_x;
-		float p_y = viewport_y;
-		float diff_x = (!east ? grid_x : grid_x + 1) * CELLSIZE - p_x;
-
-		if (fabsf(slope) > MAXSLOPE)
-			slope = slope > 0 ? MAXSLOPE : -MAXSLOPE;
-	trace:
-		p_x += diff_x;
-		p_y += diff_x * slope; 
-		const i16 new_grid_y = (i16)floorf(p_y / CELLSIZE);
-		
-		// Trace grid vertically first
-		for (i16 y_cell = grid_y; y_cell != new_grid_y; y_cell += north ? -1 : 1 )
+		while (intercept_stack) 
 		{
-			if (++cell_distance >= maxDistance)
-				goto drawcol;
-			if (y_cell < 0 || y_cell >= map.boundsY || grid_x < 0 || grid_x >= map.boundsX)
-				goto drawcol;
-
-			offset = (map.boundsX * y_cell) + grid_x;
-			cur_side = north ? &cellptr[offset].n : &cellptr[offset].s;
-			if (cur_side->type)
-			{
-				// We hit something - invert the sloping operation to
-				// determine the exact position of impact
-				const float p_x_old = p_x;
-				const float p_y_old = p_y;
-				const i16 y_cell_side = north ? y_cell : y_cell + 1;
-
-				p_x -= diff_x;
-				p_y -= diff_x * slope;
-				p_x += ((y_cell_side * CELLSIZE ) - p_y) / slope;
-				p_y = float(y_cell_side * CELLSIZE);
-
-				cell_orientation = north ? 1 : 3;
-
-				PushDrawSide(cur_side, p_x, p_y, cell_orientation);
-				if (!(cur_side->flags & TRANSLUCENT))
-					goto drawcol;
-				else
-				{
-					// Continue
-					p_x = p_x_old;
-					p_y = p_y_old;
-				}
-			}
-		}
-
-		// Now look horizontally
-		grid_y = new_grid_y;
-		if (++cell_distance >= maxDistance)
-			goto drawcol;
-		if (grid_x < 0 || grid_x >= map.boundsX)
-			goto drawcol;
-		offset = (map.boundsX * grid_y) + grid_x;
-		cur_side = east ? &cellptr[offset].e : &cellptr[offset].w;
-		if (cur_side->type)
-		{
-			cell_orientation = east ? 0 : 2;
-			PushDrawSide(cur_side, p_x, p_y, cell_orientation);
-			if (!(cur_side->flags & TRANSLUCENT))
-				goto drawcol;
-		}
-
-		// Didn't find anything
-		diff_x = east ? float(CELLSIZE) : float(-CELLSIZE);
-		grid_x += east ? 1 : -1;
-		goto trace;
-
-	drawcol:
-		while (draw_side_stack) 
-		{
-			DrawSide* ds = draw_side_stack;
-			DrawColumn(target, ds, angle, col);
-			draw_side_stack = draw_side_stack->next;
-			SDL_free(ds);
+			g_intercept_stack* cur_intercept = intercept_stack;
+			scan_draw_column(target, viewport_x, viewport_y, &cur_intercept->intercept, col);
+			intercept_stack = intercept_stack->next;
+			SDL_free(cur_intercept);
 		}
 	}
 }
 
-static void DrawColumn(SDL_Surface* target, const DrawSide* ds, float angle, u16 col)
+static void scan_draw_column(SDL_Surface* target, float x, float y, const g_intercept* intercept, u16 col)
 {
 	// For doors, we basically have to work out how open the door is (presumably as a ratio between
 	// total height and pixel height, and what pixel to start dawing at
 	// -> this is gonna become spaghetti code super fast.
 
 	// Do triangular correction on the distance
-	const float relative_angle = TO_RADF(viewport_angle) - angle;
-	const float dist = ds->dist * cosf(relative_angle);
+	const angle_rad_f relative_angle = TO_RADF(viewport_angle) - intercept->angle;
+	float dx = intercept->x - x;
+	float dy = intercept->y - y;
+	float distance = sqrt(pow(dx, 2) + pow(dy, 2));
+	distance *= cosf(relative_angle);
 
 	// Get the wall parameters
-	i32 wall_h = (i32)(projection_dist * CELLHEIGHT / dist);
+	i32 wall_h = (i32)(projection_dist * CELLHEIGHT / distance);
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
-	const u8 tx_index = ds->side->type & 0x00FF;
-	u8 tx_sheet = (ds->side->type & 0xFF00) >> 8;
+	const Cell* cell = &map.cells[intercept->map_y * map.boundsX + intercept->map_x];
+	const Side* side = NULL;
+	switch (intercept->orientation)
+	{
+	case SIDE_ORIENTATION_NORTH:
+		side = &cell->n;
+		break;
+	case SIDE_ORIENTATION_EAST:
+		side = &cell->e;
+		break;
+	case SIDE_ORIENTATION_SOUTH:
+		side = &cell->s;
+		break;
+	case SIDE_ORIENTATION_WEST:
+		side = &cell->w;
+		break;
+	}
+	const u8 tx_index = side->type & 0x00FF;
+	u8 tx_sheet = (side->type & 0xFF00) >> 8;
 	if (tx_sheet >= fillCount) 
 		tx_sheet = 0;
 
-	const u16 tex_x = ds->texcol + (tx_index & 0x0F) * TEX_SIZE;
+	const u16 tex_x = intercept->side_col + (tx_index & 0x0F) * TEX_SIZE;
 	const u16 tex_y = (tx_index & 0xF0) * (TEX_SIZE >> 4);
 
 	const u32* tex_px = (u32*)mapTextureBuffer[tx_sheet]->pixels;	
@@ -269,33 +184,34 @@ static void DrawColumn(SDL_Surface* target, const DrawSide* ds, float angle, u16
 	i32 y_top = SDL_max(0, wall_y);
 	i32 y_end = viewport_h - y_top;
 
-	if (ds->side->flags & DOOR_V)
+	if (side->flags & DOOR_V)
 	{
 		float offset = 0.;
-		if (ds->side->door.status & 1)
-			offset = (float)ds->side->door.timer_ticks /
-			( ds->side->door.status & 2 ? -ds->side->door.closespeed : ds->side->door.openspeed );
+		if (side->door.status & 1)
+			offset = (float)side->door.timer_ticks /
+			( side->door.status & 2 ? -side->door.closespeed : side->door.openspeed );
 
-		tex_y_px += ds->side->door.scroll + offset;
+		tex_y_px += side->door.scroll + offset;
 
-		wall_h = (i32)(projection_dist * (CELLHEIGHT - ds->side->door.scroll) / dist);
+		wall_h = (i32)(projection_dist * (CELLHEIGHT - side->door.scroll) / distance);
 		y_end = SDL_min(viewport_h, wall_y + wall_h);
 	}
 
+	// TODO: Colum nwidth
 	u32* render_px = (u32*)target->pixels;
 	float* z_buffer_px = z_buffer;
 
 	render_px += (y_top * viewport_w) + col;
 	z_buffer_px += (y_top * viewport_w) + col;
 
-	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y )
+	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 	{
 		tex_px = tx + (u8)tex_y_px * TEX_MAP_SIZE;
 		const u32 tex_col = *tex_px;
 		if (tex_col != COLOR_KEY)
 		{
 			*render_px = tex_col;
-			*z_buffer_px = dist;
+			*z_buffer_px = distance;
 		}
 
 		render_px += viewport_w;

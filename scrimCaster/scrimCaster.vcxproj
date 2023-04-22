@@ -306,6 +306,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="common.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="geometry.h" />
     <ClInclude Include="init.h" />
     <ClInclude Include="mapupdate.h" />
     <ClInclude Include="maputil.h" />
@@ -349,6 +350,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="renderconstants.cpp" />
     <ClCompile Include="scan.cpp" />
     <ClCompile Include="scrimCaster.cpp" />
+    <ClCompile Include="geometry.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="ttf.cpp" />

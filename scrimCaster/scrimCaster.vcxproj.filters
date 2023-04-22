@@ -115,6 +115,9 @@
     <ClInclude Include="debug.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="geometry.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.cpp">
@@ -191,6 +194,9 @@
     </ClCompile>
     <ClCompile Include="enemy.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

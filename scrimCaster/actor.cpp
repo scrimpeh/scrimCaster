@@ -171,8 +171,8 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 	for (i16 x = x_start; x != x_end; x += inc)
 	{
 		//Todo: This might be optimized by just adding to pointers directly.
-		const Cell cell_top = cells[y_top * map.boundsX + x];
-		const Cell cell_bottom = cells[y_bottom * map.boundsX + x];
+		const Cell cell_top = cells[y_top * map.w + x];
+		const Cell cell_bottom = cells[y_bottom * map.w + x];
 
 		const Side side_top = d_x > 0 ? cell_top.e : cell_top.w;
 		const Side side_bottom = d_x > 0 ? cell_bottom.e : cell_bottom.w;
@@ -207,8 +207,8 @@ static bool CollideVerticalWall(const Actor* actor, double* p_dy)
 	const i8 inc = y_start > y_end ? -1 : 1;
 	for (i16 y = y_start; y != y_end; y += inc)
 	{
-		const Cell cell_left = cells[y * map.boundsX + x_left];
-		const Cell cell_right = cells[y * map.boundsX + x_right];
+		const Cell cell_left = cells[y * map.w + x_left];
+		const Cell cell_right = cells[y * map.w + x_right];
 
 		const Side side_left = d_y > 0 ? cell_left.s : cell_left.n;
 		const Side side_right = d_y > 0 ? cell_right.s : cell_right.n;

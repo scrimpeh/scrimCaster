@@ -21,7 +21,7 @@
 // [ ] Sprite rotation and animation system
 // [ ] Sound (?)
 // [ ] Decals (Dynamic and static)
-// [ ] Unified, general-purpose ray caster / geometry interceptor
+// [X] Unified, general-purpose ray caster / geometry interceptor
 // [ ] Code cleanup
 // [ ] Port to C (C99 or newer)
 // [ ] Update SDL to newest

@@ -30,10 +30,10 @@ Cell cellgrid[16][16];
 
 Cell* GetCell(GridPos gp)
 {
-	SDL_assert(gp.x >= 0 && gp.x < map.boundsX);
-	SDL_assert(gp.y >= 0 && gp.y < map.boundsY);
+	SDL_assert(gp.x >= 0 && gp.x < map.w);
+	SDL_assert(gp.y >= 0 && gp.y < map.h);
 
-	return &map.cells[gp.y * map.boundsX + gp.x];
+	return &map.cells[gp.y * map.w + gp.x];
 }
 
 Cell* GetCell(double x, double y)
@@ -41,7 +41,7 @@ Cell* GetCell(double x, double y)
 	const i16 offset_x = (i16)SDL_floor(x / CELLSIZE);
 	const i16 offset_y = (i16)SDL_floor(y / CELLSIZE);
 
-	return &map.cells[offset_y*map.boundsX + offset_x];
+	return &map.cells[offset_y*map.w + offset_x];
 }
 
 GridPos GetGridPosition(double x, double y)
@@ -55,7 +55,7 @@ GridPos GetGridPosition(double x, double y)
 u32 AsMapOffset(i16 x, i16 y, Orientation o)
 {
 	SDL_assert(o < 4);
-	return ((y * map.boundsX) + x) * 4 + o;
+	return ((y * map.w) + x) * 4 + o;
 };
 
 Side* FromMapOffset(u32 offset)
@@ -66,8 +66,8 @@ Side* FromMapOffset(u32 offset)
 void LoadMap()
 {
 	u8 i, j, n;
-	map.boundsX = 16;
-	map.boundsY = 16;
+	map.w = 16;
+	map.h = 16;
 	map.cells = cellgrid[0];
 	map.info.txSetCount = 1;
 	map.info.txSets = tx_sets;
@@ -96,6 +96,8 @@ void LoadMap()
 			cellgrid[i][0].w.type = 1;
 		}
 		cellgrid[4][0].w.type = 0;
+
+		cellgrid[0][0].w.type = 2;
 
 		cellgrid[0][6].e.type = 3;
 		cellgrid[2][6].e.type = 1;

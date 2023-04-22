@@ -1,6 +1,7 @@
 #include "scan.h"
 
 #include "map.h"
+#include "maputil.h"
 #include "camera.h"
 #include "geometry.h"
 #include "render.h"
@@ -91,7 +92,7 @@ void scan_close()
 
 static inline bool collect_intercept(const g_intercept* intercept)
 {
-	if (intercept->type == G_INTERCEPT_VOID || intercept->type == G_INTERCEPT_VOID_EDGE)
+	if (intercept->type == G_INTERCEPT_VOID)
 		return false;
 	g_intercept_stack* store_intercept = (g_intercept_stack*) SDL_malloc(sizeof(g_intercept_stack));
 	if (!store_intercept)
@@ -99,7 +100,7 @@ static inline bool collect_intercept(const g_intercept* intercept)
 	SDL_memcpy(&store_intercept->intercept, intercept, sizeof(g_intercept));
 	store_intercept->next = intercept_stack;
 	intercept_stack = store_intercept;
-	return intercept->type != G_INTERCEPT_SOLID;
+	return intercept->type == G_INTERCEPT_NON_SOLID;
 }
 
 void scan_draw(SDL_Surface* target)
@@ -147,23 +148,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
-	const Cell* cell = &map.cells[intercept->map_y * map.boundsX + intercept->map_x];
-	const Side* side = NULL;
-	switch (intercept->orientation)
-	{
-	case SIDE_ORIENTATION_NORTH:
-		side = &cell->n;
-		break;
-	case SIDE_ORIENTATION_EAST:
-		side = &cell->e;
-		break;
-	case SIDE_ORIENTATION_SOUTH:
-		side = &cell->s;
-		break;
-	case SIDE_ORIENTATION_WEST:
-		side = &cell->w;
-		break;
-	}
+	const Side* side = map_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
 	const u8 tx_index = side->type & 0x00FF;
 	u8 tx_sheet = (side->type & 0xFF00) >> 8;
 	if (tx_sheet >= fillCount) 

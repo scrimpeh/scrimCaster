@@ -27,14 +27,14 @@ typedef enum g_intercept_type
 	// The ray ended in the void. This is generally not supposed to happen, unless the ray started outside from the map to begin with, which it never should
 	G_INTERCEPT_VOID = 0,
 
-	// The ray ended in the void at the edge of a map
-	G_INTERCEPT_VOID_EDGE = 1,
-
 	// The ray ended in a solid
-	G_INTERCEPT_SOLID = 2,
+	G_INTERCEPT_SOLID = 1,
 
 	// The ray intersected with a transparent wall and kept going
-	G_INTERCEPT_NON_SOLID = 3
+	G_INTERCEPT_NON_SOLID = 2,
+
+	// The ray ended in a transparent well bordering the void
+	G_INTERCEPT_VOID_NON_SOLID = 3,
 } g_intercept_type;
 
 
@@ -62,3 +62,5 @@ static inline bool g_is_north(g_orientation orientation);
 static inline bool g_is_east(g_orientation orientation);
 static inline bool g_is_west(g_orientation orientation);
 static inline bool g_is_south(g_orientation orientation);
+
+static inline g_intercept_type g_get_intercept_type(const Side* side, bool is_edge);

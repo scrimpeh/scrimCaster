@@ -24,8 +24,8 @@ typedef struct MapInfo
 typedef struct Map
 {
 	MapInfo info;
-	u16 boundsX;
-	u16 boundsY;
+	u16 w;
+	u16 h;
 	Cell* cells;	//A pointer to a cell structure contained somewhere on the heap
 					//should contain exactly bounds X * bounds Y cells
 	ActorArray levelObjs;

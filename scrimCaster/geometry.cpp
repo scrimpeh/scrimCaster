@@ -11,11 +11,15 @@ const float MAXSLOPE = 1e+8f;
 
 void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept_collector)
 {
-	g_orientation orientation = g_get_orientation(angle);
-
 	i16 grid_x = (i16)floorf(x / CELLSIZE);
 	i16 grid_y = (i16)floorf(y / CELLSIZE);
+
+	// First, out of bounds check. A ray may not start out of bounds, and it may never go out of bounds
+	if (grid_y < 0 || grid_y >= map.h || grid_x < 0 || grid_x >= map.w)
+		return;
+
 	// Since our grid inverts the y coordinate, invert the slope
+	g_orientation orientation = g_get_orientation(angle);
 	float slope = -1 * tanf(angle);
 	float dx = (!g_is_east(orientation) ? grid_x : grid_x + 1) * CELLSIZE - x;
 
@@ -30,19 +34,13 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 		// Trace grid vertically first
 		for (i16 y_cell = grid_y; y_cell != next_grid_y; y_cell += g_is_north(orientation) ? -1 : 1)
 		{
-			const bool y_void = y_cell < 0 || y_cell >= map.boundsY;
-			const bool y_edge = 
-				(g_is_north(orientation) && y_cell == 0) || 
-				(g_is_south(orientation) && y_cell == map.boundsY - 1);
-			bool y_void_edge = false;
-			const Side* y_side = NULL;
-			if (!y_void)
-			{
-				const Cell* cell = &map.cells[map.boundsX * y_cell + grid_x];
-				y_side = g_is_north(orientation) ? &cell->n : &cell->s;
-				y_void_edge = y_edge && !y_side->type;
-			}
-			if (y_void || y_side->type || y_void_edge)
+			const Cell* cell = &map.cells[map.w * y_cell + grid_x];
+			const Side* side = g_is_north(orientation) ? &cell->n : &cell->s;
+			const bool edge =
+				(g_is_north(orientation) && y_cell == 0) ||
+				(g_is_south(orientation) && y_cell == map.h - 1);
+
+			if (edge || side->type)
 			{
 				// We hit something - invert the sloping operation to determine the exact position of the intercept
 				const i16 y_cell_side = g_is_north(orientation) ? y_cell : y_cell + 1;
@@ -51,13 +49,10 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 				x_inv += ((y_cell_side * CELLSIZE) - y_inv) / slope;
 				y_inv = (float)(y_cell_side * CELLSIZE);
 
-				g_intercept_type intercept_type = G_INTERCEPT_VOID;
-				if (!y_void_edge && y_side)
-					intercept_type = y_side->flags & TRANSLUCENT ? G_INTERCEPT_NON_SOLID : G_INTERCEPT_SOLID;
 				g_intercept intercept =
 				{
 					g_is_north(orientation) ? SIDE_ORIENTATION_NORTH : SIDE_ORIENTATION_SOUTH,
-					intercept_type,
+					g_get_intercept_type(side, edge),
 					angle,
 					x_inv,
 					y_inv,
@@ -74,31 +69,18 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 
 		// Now look horizontally
 		grid_y = next_grid_y;
-		const bool x_void = grid_x < 0 || grid_x >= map.boundsX;
-		const bool x_edge =
+		const Cell* cell = &map.cells[map.w * grid_y + grid_x];
+		const Side* side = g_is_west(orientation) ? &cell->w : &cell->e;
+		const bool edge =
 			(g_is_west(orientation) && grid_x == 0) ||
-			(g_is_east(orientation) && grid_x == map.boundsX - 1);
-		bool x_void_edge = false;
-		const Side* x_side = NULL;
-		if (!x_void)
-		{
-			const Cell* cell = &map.cells[map.boundsX * grid_y + grid_x];
-			x_side = g_is_east(orientation) ? &cell->e : &cell->w;
-			x_void_edge = x_edge && !x_side->type;
-		}
+			(g_is_east(orientation) && grid_x == map.w - 1);
 			
-		if (x_void || x_side->type || x_void_edge)
+		if (edge || side->type)
 		{
-			// We hit something horizontally
-			g_intercept_type intercept_type = G_INTERCEPT_VOID;
-			if (x_void_edge)
-				intercept_type = G_INTERCEPT_VOID_EDGE;
-			else if (x_side)
-				intercept_type = x_side->flags & TRANSLUCENT ? G_INTERCEPT_NON_SOLID : G_INTERCEPT_SOLID;
 			g_intercept intercept =
 			{
-				g_is_east(orientation) ? SIDE_ORIENTATION_EAST : SIDE_ORIENTATION_WEST,
-				intercept_type,
+				g_is_west(orientation) ? SIDE_ORIENTATION_WEST : SIDE_ORIENTATION_EAST,
+				g_get_intercept_type(side, edge),
 				angle,
 				x,
 				y,
@@ -145,4 +127,17 @@ static inline bool g_is_west(g_orientation orientation)
 static inline bool g_is_south(g_orientation orientation)
 {
 	return !g_is_north(orientation);
+}
+
+
+static inline g_intercept_type g_get_intercept_type(const Side* side, bool is_edge)
+{
+	g_intercept_type intercept_type;
+	if (is_edge && side->type)
+		intercept_type = side->flags & TRANSLUCENT ? G_INTERCEPT_VOID_NON_SOLID : G_INTERCEPT_SOLID;
+	if (is_edge && !side->type)
+		intercept_type = G_INTERCEPT_VOID;
+	if (!is_edge && side->type)
+		intercept_type = side->flags & TRANSLUCENT ? G_INTERCEPT_NON_SOLID : G_INTERCEPT_SOLID;
+	return intercept_type;
 }

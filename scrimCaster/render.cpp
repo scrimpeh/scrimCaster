@@ -10,16 +10,16 @@
 #include "renderconstants.h"
 
 
-//Basic rendering pipeline:
-// 1.Draw floor and ceiling/sky:
-// can be as complicated or simple as needed
-// 2.Figure out what walls to draw and draw them
-// 3.Draw World Sprites
-// 4.Draw Hud Sprites 
+// Basic rendering pipeline:
+//  1.Draw floor and ceiling/sky:
+//  can be as complicated or simple as needed
+//  2.Figure out what walls to draw and draw them
+//  3.Draw World Sprites
+//  4.Draw Hud Sprites 
 
-//note that these are decoupled from the window width and height
-//it should only be the case that these are smaller or equal to the window sizes
-//as otherwise, space gets wasted
+// note that these are decoupled from the window width and height
+// it should only be the case that these are smaller or equal to the window sizes
+// as otherwise, space gets wasted
 u16 viewport_w, viewport_h;
 
 extern i32 displayWidth;
@@ -123,14 +123,14 @@ inline void DrawPixelBounds(const SDL_Surface* const surf, const SDL_Point p, co
 		DrawPixel(surf, p, col);
 };
 
-//Draw a line from p1 to p2 in the color supplied
+// Draw a line from p1 to p2 in the color supplied
 void DrawLine(const SDL_Surface* const surf, const SDL_Point p1, const SDL_Point p2, const u32 col)
 {
 	float x1 = (float)p1.x, x2 = (float)p2.x, y1 = (float)p1.y, y2 = (float)p2.y;
 	float temp;
 
 	const bool steep = (fabs(y2 - y1) > fabs(x2 - x1));
-	//Swap x1 and y1, swap x2 and y2
+	// Swap x1 and y1, swap x2 and y2
 	if (steep)
 	{
 		temp = y1;	
@@ -183,12 +183,10 @@ void DrawLineBounds(const SDL_Surface* const surf, const SDL_Point p1, const SDL
 static bool r_map_view_intersect(const g_intercept* intercept)
 {
 	// This is not re-entrant, and I'd rather have a closure, but oh well
-	if (intercept->type == G_INTERCEPT_VOID)
-		return false;
-
 	r_map_intercept_x = intercept->x;
 	r_map_intercept_y = intercept->y;
 
+	// This is the only case in which we want to keep going
 	return intercept->type == G_INTERCEPT_NON_SOLID;
 }
 
@@ -221,13 +219,13 @@ void DrawMap(SDL_Surface* surface)
 	tileRect[3].h = 1;			// South
 	tileRect[3].w = TILESIZE;
 	Cell* cellptr = map.cells;
-	for (u8 i = 0; i < map.boundsY; ++i)
+	for (u8 i = 0; i < map.h; ++i)
 	{
 		tileRect[0].x = map_offset + TILESIZE - 1;
 		tileRect[1].x = map_offset;
 		tileRect[2].x = map_offset;
 		tileRect[3].x = map_offset;
-		for (u8 j = 0; j < map.boundsX; ++j)
+		for (u8 j = 0; j < map.w; ++j)
 		{
 			for (n = 0; n < 4; ++n)
 				if (cellptr->sides[n].type)
@@ -247,7 +245,6 @@ void DrawMap(SDL_Surface* surface)
 	r.x = i32(map_offset + (player.x / div) - r.h / 2);
 	r.y = i32(map_offset + (player.y / div) - r.w / 2);
 
-	SideCoords s1, s2;
 	SDL_Point edge1, edge2;
 	double angle1 = player.angle - (viewport_x_fov / 2);
 	double angle2 = player.angle + (viewport_x_fov / 2);
@@ -255,6 +252,7 @@ void DrawMap(SDL_Surface* surface)
 	if (angle2 >= 360) angle2 -= 360;
 
 
+	// TODO: Do not draw a line if player is OOB
 	double intersect_l_x;
 	double intersect_l_y;
 	g_cast(player.x, player.y, TO_RADF(angle1), r_map_view_intersect);
@@ -275,7 +273,6 @@ void DrawMap(SDL_Surface* surface)
 
 	SDL_Point intercept_r;
 	r_map_coordinate(intersect_r_x, intersect_r_y, &intercept_r);
-
 
 	DrawLine(surface, player_origin, intercept_l, 0xFFFFFF);
 	DrawLine(surface, player_origin, intercept_r, 0xFFFFFF);

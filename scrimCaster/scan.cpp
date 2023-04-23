@@ -1,7 +1,9 @@
 #include "scan.h"
 
+#include "colormap.h"
 #include "map.h"
 #include "maputil.h"
+#include "mathutil.h"
 #include "camera.h"
 #include "geometry.h"
 #include "render.h"
@@ -9,6 +11,7 @@
 
 #include "SDL/SDL_assert.h"
 #include "SDL/SDL_log.h"
+
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
 
@@ -49,13 +52,9 @@ g_intercept_stack* intercept_stack = NULL;
 
 float* angle_offsets;
 
-// Set up the scanning parameters as needed
-i32 scan_init(u8 column_width)
+i32 scan_init()
 {
 	// Set up global rendering parameters
-	colwidth = column_width;
-
-	// Derive constant values from it
 	viewport_w_half = viewport_w / 2;
 	viewport_x_fov_half = viewport_x_fov / 2;
 	projection_dist = viewport_w_half / tanf(TO_RADF(viewport_x_fov_half));
@@ -138,10 +137,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Do triangular correction on the distance
 	const angle_rad_f relative_angle = TO_RADF(viewport_angle) - intercept->angle;
-	float dx = intercept->x - x;
-	float dy = intercept->y - y;
-	float distance = sqrt(pow(dx, 2) + pow(dy, 2));
-	distance *= cosf(relative_angle);
+	const float distance = math_dist_f(x, y, intercept->x, intercept->y) * cosf(relative_angle);
 
 	// Get the wall parameters
 	i32 wall_h = (i32)(projection_dist * CELLHEIGHT / distance);
@@ -182,7 +178,6 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		y_end = SDL_min(viewport_h, wall_y + wall_h);
 	}
 
-	// TODO: Colum nwidth
 	u32* render_px = (u32*)target->pixels;
 	float* z_buffer_px = z_buffer;
 
@@ -192,9 +187,14 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 	{
 		tex_px = tx + (u8)tex_y_px * TEX_MAP_SIZE;
-		const u32 tex_col = *tex_px;
+		u32 tex_col = *tex_px;
 		if (tex_col != COLOR_KEY)
 		{
+			// Darken walls oriented E/W slightly
+			if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
+				tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.12f);
+
+			auto ceil = 0x00A8A8C8;
 			*render_px = tex_col;
 			*z_buffer_px = distance;
 		}

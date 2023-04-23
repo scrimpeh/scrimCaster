@@ -36,8 +36,6 @@ const u16 MAX_SPRITES = 256;
 
 const float SPRITE_RATIO_END = 8e-4f;
 
-//SDL_Surface* sprite_buffer = NULL;
-u32* sprite_buffer = NULL;
 ActorSprite sprite_slot_buffer[MAX_SPRITES];
 
 extern Map map;

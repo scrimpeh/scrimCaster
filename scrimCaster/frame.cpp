@@ -1,5 +1,5 @@
-#include "types.h"
 #include "frame.h"
+
 #include "SDL/SDL_timer.h"
 
 #define TICKS_PER_FRAME (1000 / (double)desiredFramerate)

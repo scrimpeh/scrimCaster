@@ -1,4 +1,3 @@
-#include "types.h"
 #include "timer.h"
 
 void MkTimer(Timer* t, u64 total, bool start, bool repeating)

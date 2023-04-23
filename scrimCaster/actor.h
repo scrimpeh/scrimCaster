@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 // On actor types
 /* Actor types:
                | Coords | Movement | Angle	| HP   | Status flags/Timers | Other stuff
@@ -53,7 +55,7 @@ typedef struct Actor
 	};
 	double x, y; //The position of an actor is given as cartesian coordinates.
 	double speed, strafe; //momentum, forward and backward
-	double angle; //Angle is measured in degrees, with 0 facing east, counterclockwise. [0, 360[	
+	angle_d angle;
 
 	//Extra variables, while the names may be indicative of the purpose,
 	//they can be used for whatever makes sense for the type
@@ -84,7 +86,7 @@ Bounds GetPickupBounds(u8 type);
 Bounds GetOtherBounds(u8 type);
 
 bool MoveActor(Actor* actor, u32 delta, u32 flags);
-void ActorNormalizeAngle(Actor* actor);
+
 
 static bool CollideHorizontalWall(const Actor* actor, double* p_dx);
 static bool CollideVerticalWall(const Actor* actor, double* p_dy);

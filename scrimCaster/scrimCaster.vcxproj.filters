@@ -118,6 +118,15 @@
     <ClInclude Include="geometry.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="colormap.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="angle.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mathutil.h">
+      <Filter>Source Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.cpp">
@@ -197,6 +206,15 @@
     </ClCompile>
     <ClCompile Include="geometry.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="colormap.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="angle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mathutil.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

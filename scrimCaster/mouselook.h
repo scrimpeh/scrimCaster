@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 #include "SDL/SDL_events.h"
 
 void SuspendMouselook(bool suspend);

@@ -8,7 +8,7 @@
 
 #include "SDL/SDL_surface.h"
 
-i32 scan_init(u8 collumn_width);
+i32 scan_init();
 void scan_close();
 
 void scan_draw(SDL_Surface* target);
@@ -21,4 +21,4 @@ typedef struct g_intercept_stack
 {
 	g_intercept_stack* next;
 	g_intercept intercept;
-};
+} g_intercept_stack;

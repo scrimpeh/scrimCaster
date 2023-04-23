@@ -78,7 +78,7 @@ void UpdateGame(u32 timeStep)
 	if (loadMap)
 	{
 		LoadMap();
-		PlayerStartMap();
+		player_spawn();
 		loadMap = false;
 		SetMenu(false);
 		inGame = true;
@@ -95,7 +95,7 @@ void UpdateGame(u32 timeStep)
 		ticks += timeStep;
 		UpdateEnemies(timeStep);
 		UpdateSides(timeStep);
-		UpdatePlayer(timeStep);
+		player_update(timeStep);
 		UpdateCamera(timeStep);
 		
 		if (input_tf.pause)

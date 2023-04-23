@@ -1,5 +1,5 @@
-#include "types.h"
 #include "mouselook.h"
+
 #include "SDL/SDL_assert.h"
 
 #include "actor.h"

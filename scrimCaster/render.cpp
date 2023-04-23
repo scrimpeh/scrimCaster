@@ -17,10 +17,9 @@
 //  3.Draw World Sprites
 //  4.Draw Hud Sprites 
 
-// note that these are decoupled from the window width and height
-// it should only be the case that these are smaller or equal to the window sizes
-// as otherwise, space gets wasted
-u16 viewport_w, viewport_h;
+// These are decoupled from the window width and height and should equal to or smaller than the window
+u16 viewport_w;
+u16 viewport_h;
 
 extern i32 displayWidth;
 extern i32 displayHeight;
@@ -52,36 +51,23 @@ static float r_map_intercept_x;
 static float r_map_intercept_y;
 
 
-i32 r_init(u16 w, u16 h, u8 col)
+i32 r_init(u16 w, u16 h)
 {
 	r_close();	//close the old renderer first
 
 	viewport_w = w;
 	viewport_h = h;
 
-	viewportSurface = SDL_CreateRGBSurface(0, viewport_w, viewport_h, 32,
-		0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
+	viewportSurface = SDL_CreateRGBSurface(0, viewport_w, viewport_h, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
 	if (!viewportSurface)
 	{
-		SDL_LogError(SDL_LOG_PRIORITY_CRITICAL, 
-			"Couldn't initialize viewport! %s", SDL_GetError());
+		SDL_LogError(SDL_LOG_PRIORITY_CRITICAL, "Couldn't initialize viewport! %s", SDL_GetError());
 		return -1;
 	}
 
-	if (scan_init(col))
+	if (scan_init())
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-			"Couldn't initialize map renderer! %s",
-			SDL_GetError());
-		return -1;
-	}
-
-	sprite_buffer = (u32*)SDL_malloc(sizeof(u32) * viewport_h);
-	if (!sprite_buffer)
-	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-			"Couldn't initialize sprite buffer! %s",
-			SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize map renderer! %s", SDL_GetError());
 		return -1;
 	}
 
@@ -91,8 +77,6 @@ i32 r_init(u16 w, u16 h, u8 col)
 void r_close()
 {
 	scan_close();
-	SDL_free(sprite_buffer);
-	sprite_buffer = NULL;
 	SDL_FreeSurface(viewportSurface);
 	viewportSurface = NULL;
 }
@@ -335,7 +319,6 @@ void RenderFrame()
 		DrawMap(viewportSurface);
 	else if (draw_crosshair) 
 		DrawCrosshair(viewportSurface);
-	
 	
 	char buf[256];
 	SDL_memset(buf, 0, 256);

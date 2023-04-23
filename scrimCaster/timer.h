@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 typedef enum TimerFlags : u32
 {
 	CLOSED = 0,

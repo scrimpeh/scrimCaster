@@ -300,9 +300,11 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
   <ItemGroup>
     <ClInclude Include="actor.h" />
     <ClInclude Include="actorcontainers.h" />
+    <ClInclude Include="angle.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="cell.h" />
     <ClInclude Include="cleanup.h" />
+    <ClInclude Include="colormap.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="enemy.h" />
@@ -310,6 +312,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="init.h" />
     <ClInclude Include="mapupdate.h" />
     <ClInclude Include="maputil.h" />
+    <ClInclude Include="mathutil.h" />
     <ClInclude Include="renderconstants.h" />
     <ClInclude Include="frame.h" />
     <ClInclude Include="game.h" />
@@ -331,9 +334,11 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
   <ItemGroup>
     <ClCompile Include="actor.cpp" />
     <ClCompile Include="actorcontainers.cpp" />
+    <ClCompile Include="angle.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cell.cpp" />
     <ClCompile Include="cleanup.cpp" />
+    <ClCompile Include="colormap.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="frame.cpp" />
     <ClCompile Include="game.cpp" />
@@ -344,6 +349,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="map.cpp" />
     <ClCompile Include="mapupdate.cpp" />
     <ClCompile Include="maputil.cpp" />
+    <ClCompile Include="mathutil.cpp" />
     <ClCompile Include="mouselook.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render.cpp" />

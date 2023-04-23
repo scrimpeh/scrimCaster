@@ -326,6 +326,8 @@ static bool CollideActor(Actor* actor, bool vertical, double* disp)
 //returns whether a collision has occured
 bool MoveActor(Actor* actor, u32 delta, u32 flags)
 {
+	actor->angle = angle_normalize_deg_d(actor->angle);
+
 	bool collision = false;
 	double arctan, d_x, d_y;
 	arctan = TO_RAD(ATAN_DEG(actor->angle));
@@ -354,15 +356,4 @@ bool MoveActor(Actor* actor, u32 delta, u32 flags)
 	actor->x += d_x;
 
 	return collision;
-}
-
-//Could be replaced by a call to fmod
-void ActorNormalizeAngle(Actor* actor)
-{
-	double a = actor->angle;
-	while (a < 0)
-		a += 360;
-	while (a >= 360)
-		a -= 360;
-	actor->angle = a;
 }

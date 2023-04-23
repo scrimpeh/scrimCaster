@@ -4,4 +4,5 @@
 // TODO: Add '#include <stdbool.h>' when switching project to C
 
 #include "types.h"
+#include "angle.h"
 #include "debug.h"

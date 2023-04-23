@@ -16,7 +16,7 @@
 // [X] Fix sprites getting too large (Fix maybe ?)
 // [X] Unified 2-D Z Buffer
 // [X] Infinitely many draw sides
-// [ ] Make E/W walls slightly darker than N/S walls
+// [X] Make E/W walls slightly darker than N/S walls
 // [ ] Distance fog
 // [ ] Sprite rotation and animation system
 // [ ] Sound (?)
@@ -25,6 +25,9 @@
 // [ ] Code cleanup
 // [ ] Port to C (C99 or newer)
 // [ ] Update SDL to newest
+// [ ] Reorganize source files to match VS structure
+// [ ] Floor rendering (I think I might actually know how)
+// [ ] HW Acceleration using SDL_Video
 
 char* app_dir = NULL;
 

@@ -15,17 +15,11 @@
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
 
-// How many columsn to draw before we stop looking
-#define MAXDIST 32
 
 const float WALL_OFF = 8e-4f;
 #define HALFSIZE (TEX_SIZE / 2)
 
 extern u64 ticks;
-
-extern float viewport_x;
-extern float viewport_y;
-extern float viewport_angle;
 
 extern Map map;
 extern u8 viewport_x_fov;
@@ -36,13 +30,10 @@ extern u8 fillCount;
 extern u8 MAX_TEXTURE_BUF;
 extern SDL_Surface* mapTextureBuffer[];
 
-extern u16 viewport_w, viewport_h;
 u16 viewport_w_half;
-u8 colwidth = 1;
-
-const float MAXSLOPE = 1e+8f;
 
 float projection_dist;
+
 // The Z Buffer is used for masking sprites against the wall. It covers every pixel on the screen to support blending spriets
 // against transparency layers
 float* z_buffer;
@@ -91,8 +82,6 @@ void scan_close()
 
 static inline bool collect_intercept(const g_intercept* intercept)
 {
-	if (intercept->type == G_INTERCEPT_VOID)
-		return false;
 	g_intercept_stack* store_intercept = (g_intercept_stack*) SDL_malloc(sizeof(g_intercept_stack));
 	if (!store_intercept)
 		return false;
@@ -109,7 +98,7 @@ void scan_draw(SDL_Surface* target)
 		z_buffer[i] = FLT_MAX;
 
 	const float angle_rad = TO_RADF(viewport_angle);
-	for (u16 col = 0; col < viewport_w; col += colwidth)
+	for (u16 col = 0; col < viewport_w; col++)
 	{
 		float angle = angle_rad - angle_offsets[col];
 		while (angle < 0)
@@ -137,10 +126,11 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Do triangular correction on the distance
 	const angle_rad_f relative_angle = TO_RADF(viewport_angle) - intercept->angle;
-	const float distance = math_dist_f(x, y, intercept->x, intercept->y) * cosf(relative_angle);
+	const float distance = math_dist_f(x, y, intercept->x, intercept->y);
+	const float distance_corrected = distance * cosf(relative_angle);
 
 	// Get the wall parameters
-	i32 wall_h = (i32)(projection_dist * CELLHEIGHT / distance);
+	i32 wall_h = (i32)(projection_dist * CELLHEIGHT / distance_corrected);
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
@@ -156,9 +146,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	const u32* tex_px = (u32*)mapTextureBuffer[tx_sheet]->pixels;	
 	const u32* const tx = tex_px + (tex_y * TEX_MAP_SIZE + tex_x);
  
-	float tex_y_px = wall_y >= 0 ? 
-		0 :
-		HALFSIZE - (((float)viewport_h / wall_h) * HALFSIZE);
+	float tex_y_px = wall_y >= 0 ? 0 : HALFSIZE - (((float)viewport_h / wall_h) * HALFSIZE);
 	const float inc_ratio = (TEX_SIZE / (wall_h + WALL_OFF));
 
 	// Now draw the texture slice
@@ -174,8 +162,8 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		tex_y_px += side->door.scroll + offset;
 
-		wall_h = (i32)(projection_dist * (CELLHEIGHT - side->door.scroll) / distance);
-		y_end = SDL_min(viewport_h, wall_y + wall_h);
+		wall_h = (i32)(projection_dist * (CELLHEIGHT - side->door.scroll) / distance_corrected);
+		y_end = SDL_min(viewport_h, wall_y + wall_h + 1);
 	}
 
 	u32* render_px = (u32*)target->pixels;
@@ -194,13 +182,53 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
 				tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.12f);
 
-			auto ceil = 0x00A8A8C8;
 			*render_px = tex_col;
-			*z_buffer_px = distance;
+			*z_buffer_px = distance_corrected;
 		}
 
 		render_px += viewport_w;
 		z_buffer_px += viewport_w;
 		tex_y_px += inc_ratio;
+	}
+
+	u32* floor_render_px_top = (u32*)target->pixels + ((y_top - 1) * viewport_w) + col;
+	u32* floor_render_px_bottom = (u32*)target->pixels + ((viewport_h - y_top) * viewport_w) + col;
+
+	// Now draw the ceiling and floor
+	// For this, we invert the projection and cosine correction to get the wall height
+	// TODO: Texture mapping
+
+	// No need to draw another floor, because we've already done so from the previous wall
+	if (intercept->type == G_INTERCEPT_NON_SOLID)
+		return;
+
+	for (u32 y_px = y_top - 1; y_px != -1; y_px--)
+	{
+		u16 height = viewport_h - (2 * y_px);
+		float d = (projection_dist * CELLHEIGHT) / height;
+		d /= cosf(relative_angle);
+		float xa;
+		float ya;
+		math_vec_cast_f(x, y, intercept->angle, d, &xa, &ya);
+
+		const i16 grid_xa = (i16)(floorf(xa / CELLSIZE));
+		const i16 grid_ya = (i16)(floorf(ya / CELLSIZE));
+
+		const i16 cell_x = (i16)(fmodf(floorf(xa), (float)(CELLSIZE)));
+		const i16 cell_y = (i16)(fmodf(floorf(ya), (float)(CELLSIZE)));
+
+		if ((grid_xa & 1) ^ (grid_ya & 1))
+		{
+			*floor_render_px_top = *((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE));
+			*floor_render_px_bottom = *((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE));
+		}
+		else
+		{
+			*floor_render_px_top = cm_map(*((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE)), CM_GET(0, 0, 0), 0.12f);
+			*floor_render_px_bottom = cm_map(*((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE)), CM_GET(0, 0, 0), 0.12f);
+		}
+
+		floor_render_px_top -= viewport_w;
+		floor_render_px_bottom += viewport_w;
 	}
 }

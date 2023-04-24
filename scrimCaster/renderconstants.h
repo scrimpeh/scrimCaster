@@ -4,13 +4,8 @@
 
 #include "colormap.h"
 
-/*
-arctan = TO_RAD(actor->angle < 180 ?
-actor->angle :
--360 + actor->angle);*/
-
 #define ATAN_INTERNAL(a, halfcircle, circle) ((a) < (halfcircle) ? (a) : (-(circle)) + (a))
-#define ATAN_RAD(a) ATAN_INTERNAL(a, M_PI, M_PI*2)
+#define ATAN_RAD(a) ATAN_INTERNAL(a, M_PI, M_PI * 2)
 #define ATAN_DEG(a) ATAN_INTERNAL(a, 180, 360)
 
 #define TEX_SIZE 64

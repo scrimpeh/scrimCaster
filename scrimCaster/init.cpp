@@ -34,7 +34,7 @@ i32 InitGame(i32 argc, char** argv)
 
 	app_dir = SDL_GetBasePath();
 
-	if (InitFonts())
+	if (ttf_init())
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error: Couldn't load fonts! You'll not see any text in the app! %s", SDL_GetError());
 		//return -1;
@@ -53,7 +53,7 @@ i32 InitGame(i32 argc, char** argv)
 	SetMouselook(true, 2.0);
 	SetViewportFov(90);
 
-	if (r_init(480, 360))
+	if (r_init(360, 240))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Fatal Error: Can't initialize renderer! %s", SDL_GetError());
 		return -1;

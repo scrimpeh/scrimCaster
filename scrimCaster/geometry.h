@@ -32,9 +32,6 @@ typedef enum g_intercept_type
 
 	// The ray intersected with a transparent wall and kept going
 	G_INTERCEPT_NON_SOLID = 2,
-
-	// The ray ended in a transparent well bordering the void
-	G_INTERCEPT_VOID_NON_SOLID = 3,
 } g_intercept_type;
 
 

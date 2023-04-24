@@ -1,7 +1,7 @@
-#include "types.h"
 #include "camera.h"
 
 #include "actor.h"
+#include "input.h"
 #include "scan.h"
 
 const u8 VIEWPORT_FOV_MIN = 20;
@@ -10,7 +10,8 @@ extern Actor player;
 
 u8 viewport_x_fov;
 float viewport_angle;
-float viewport_x, viewport_y;
+float viewport_x;
+float viewport_y;
 
 void SetViewportFov(u8 fov)
 {

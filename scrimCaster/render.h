@@ -1,20 +1,27 @@
 #pragma once
 
+// This module handles everything related to rendering
+
+// In 3D space, we use a basic raycaster with cosine correction, as you would expect
+// In 2D space, to be independent of pixel sizes, sizes are treated as floats in [0., 1.[
+// with the value denoting how far the are from the edge of the screen
+
 #include "common.h"
 
 #include "geometry.h"
 
 #include "SDL/SDL_render.h"
 
-inline void DrawPixel(const SDL_Surface* const surface, const SDL_Point p, const u32 col);
-inline void DrawPixelBounds(const SDL_Surface* const surf, const SDL_Point p, const u32 col);
-void DrawLine(const SDL_Surface* const surf, const SDL_Point p1, const SDL_Point p2, const u32 col);
-void DrawLineBounds(const SDL_Surface* const surf, const SDL_Point p1, const SDL_Point p2, const u32 col);
+extern u16 viewport_w;
+extern u16 viewport_h;
 
 i32 r_init(u16 w, u16 h);
 void r_close();
-void RenderFrame();
-void TextOut(SDL_Surface* surf, const char* str, i32 x, i32 y);
+void r_draw();
 
-static void r_map_coordinate(float x, float y, SDL_Point* target);
-static bool r_map_view_intersect(const g_intercept* intercept);
+i16 r_hud_px_h(float x);
+i16 r_hud_px_v(float y);
+float r_hud_hu_h(i16 x);
+float r_hud_hu_v(i16 y);
+
+static void r_draw_crosshair(SDL_Surface* target);

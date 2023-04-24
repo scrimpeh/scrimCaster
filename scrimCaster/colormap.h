@@ -11,6 +11,8 @@
 
 #include "common.h"
 
+#include "SDL/SDL_video.h"
+
 typedef u32 cm_color;
 typedef u8 cm_channel;
 
@@ -25,6 +27,11 @@ typedef u8 cm_channel;
 #define CM_GET(r, g, b) (((r) << 16) | ((g) << 8) | (b))
 
 cm_color cm_map(cm_color source, cm_color target, float alpha);
+cm_color cm_from_sdl_color(const SDL_Color* color);
+void cm_to_sdl_color(SDL_Color* color, cm_color source);
 
 static cm_channel cm_mix_channel(cm_channel source, cm_channel target, float alpha);
+
+static bool r_clip_line(i32 w, i32 h, i32 x_a, i32 y_a, i32 x_b, i32 y_b);
+static inline u8 r_clip_code(i32 w, i32 h, i32 x, i32 y);
 

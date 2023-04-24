@@ -1,5 +1,5 @@
-#include "types.h"
 #include "renderconstants.h"
+
 #include <math.h>
 
 /* Take the angle between two points and return 

@@ -1,5 +1,5 @@
-﻿#include "types.h"
-#include "ttf.h"
+﻿#include "ttf.h"
+
 #include "SDL/SDL_ttf.h"
 
 const char* fonDirPath = "fon\\";
@@ -9,11 +9,12 @@ extern char* app_dir;
 
 char fonPathBuf[256];
 
-TTF_Font* fontDebug = NULL;
+TTF_Font* ttf_font_debug = NULL;
 
-u32 InitFonts()
+u32 ttf_init()
 {
-	if (TTF_Init() < 0) return -1;
+	if (TTF_Init() < 0) 
+		return -1;
 	
 	SDL_memset(fonPathBuf, 0, sizeof(fonPathBuf));
 	SDL_snprintf(fonPathBuf, sizeof(fonPathBuf), "%s%s%s", app_dir, fonDirPath, fonNames[0]);
@@ -24,13 +25,13 @@ u32 InitFonts()
 	//If, for some reason, you don't have vgasys.fon on your computer, use another font.
 
 	//fontDebug = TTF_OpenFont(fonPathBuf, 12);
-	fontDebug = TTF_OpenFont("C:\\Windows\\Fonts\\vgasys.fon", 12);
+	ttf_font_debug = TTF_OpenFont("C:\\Windows\\Fonts\\vgasys.fon", 12);
 
-	return !fontDebug;
+	return !ttf_font_debug;
 }
 
-void CloseFonts()
+void ttf_close()
 {
-	TTF_CloseFont(fontDebug);
+	TTF_CloseFont(ttf_font_debug);
 	TTF_Quit();
 }

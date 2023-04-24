@@ -1,6 +1,5 @@
 #include "player.h"
 
-#include "actor.h"
 #include "input.h"
 #include "map.h"
 #include "maputil.h"

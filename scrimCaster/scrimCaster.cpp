@@ -27,6 +27,7 @@
 // [ ] Update SDL to newest
 // [ ] Reorganize source files to match VS structure
 // [ ] Floor rendering (I think I might actually know how)
+// [ ] Skybox texture with cylinder projection or similar
 // [ ] HW Acceleration using SDL_Video
 
 char* app_dir = NULL;
@@ -77,7 +78,7 @@ i32 main(i32 argc, char** argv)
 		UpdateGame(delta);
 		delta_ticks = SDL_GetTicks();
 
-		RenderFrame();
+		r_draw();
 		EndFrame(render_ticks);
 	}
 

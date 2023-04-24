@@ -25,6 +25,9 @@ typedef struct Input
 	u8 map;
 } Input;
 
+extern Input input;
+extern Input input_tf;
+
 void InitializeInput();
 void GetInput(SDL_Event* evt);
 void FilterInput();

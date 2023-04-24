@@ -22,3 +22,6 @@ typedef struct g_intercept_stack
 	g_intercept_stack* next;
 	g_intercept intercept;
 } g_intercept_stack;
+
+float scan_distance_to_height(float distance);
+float scan_pixel_to_distance(u16 y);

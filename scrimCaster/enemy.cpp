@@ -1,5 +1,5 @@
-#include "types.h"
 #include "enemy.h"
+
 #include "actor.h"
 #include "actorcontainers.h"
 

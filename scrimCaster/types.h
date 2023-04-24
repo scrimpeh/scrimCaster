@@ -1,6 +1,6 @@
 #pragma once
 
-//Common typedefs, the usual
+// Common typedefs, the usual
 #include "SDL/SDL_stdinc.h"
 
 typedef uint8_t u8, byte;

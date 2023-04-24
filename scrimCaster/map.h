@@ -50,3 +50,5 @@ Side* FromMapOffset(u32 offset);
 
 void LoadMap();
 void UnloadMap();
+
+extern Map map;

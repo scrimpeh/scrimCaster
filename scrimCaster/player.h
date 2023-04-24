@@ -2,7 +2,10 @@
 
 #include "common.h"
 
+#include "actor.h"
 #include "geometry.h"
+
+extern Actor player;
 
 void player_spawn();
 void player_update(u32 delta);

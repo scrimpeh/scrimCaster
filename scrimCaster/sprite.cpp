@@ -1,11 +1,12 @@
 #include "sprite.h"
+
 #include "map.h"
+#include "mathutil.h"
+#include "renderconstants.h"
+
 #include <math.h>
 #include "SDL/SDL_assert.h"
-#include "renderconstants.h"
 #include "SDL/SDL_log.h"
-
-#include "input.h"
 
 // I'm not sure if we want a set sprite buffer, rather than statically allocating it.
 // Then, qsort only works on arrays, and we need some fixed bounds on that.
@@ -160,9 +161,9 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 	// -- applying cosine correction makes sprites ungodly large at the edge of the FOV,
 	//    so we need to compromise
 
-	const double x_disp = actor->x - viewport_x;
-	const double y_disp = actor->y - viewport_y;
-	const double slope = AngleToDeg(y_disp * -1, x_disp);
+	const double dx = actor->x - viewport_x;
+	const double dy = actor->y - viewport_y;
+	const double slope = AngleToDeg(dy * -1, dx);
 
 	const double fov_min_full = SubtractAngle(viewport_angle, viewport_x_fov);
 	const double fov_max_full = AddAngle(viewport_angle, viewport_x_fov);
@@ -179,9 +180,9 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 			return false;
 	}
 		
-	const double relative_angle = TO_RAD(viewport_angle - slope);
-	const double cos_ra = cos(relative_angle);
-	const double spr_dist = sqrt(pow(x_disp, 2) + pow(y_disp, 2)) * cos_ra;
+	const double angle = TO_RAD(viewport_angle - slope);
+	const double distance = math_dist(viewport_x, viewport_y, actor->x, actor->y);
+	const double distance_corrected = distance * cos(angle);
 
 	const double fov_min_half = SubtractAngle(viewport_angle, viewport_x_fov_half);
 	const double fov_max_half = AddAngle(viewport_angle, viewport_x_fov_half);
@@ -194,7 +195,7 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 	else
 		drawsprite = slope >= fov_min_half && slope <= fov_max_half;
 
-	const ActorSprite as = { actor, spr_dist, angle_to_sprite };
+	const ActorSprite as = { actor, distance_corrected, angle_to_sprite };
 	if (drawsprite)
 	{
 		setsprite:
@@ -205,7 +206,7 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 	// The sprite now partially intersects with the player's view.
 	// Todo: Get the projected sprite's width
 	WorldSprite ws = GetWorldSprite(&as);
-	const double spr_width = ((projection_dist * ws.coords.w) / spr_dist) / 2;
+	const double spr_width = ((projection_dist * ws.coords.w) / distance_corrected) / 2;
 	// Sanity check if the sprite gets way too large
 	if (spr_width > viewport_w * 128)
 		return false;

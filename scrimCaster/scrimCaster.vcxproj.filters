@@ -127,6 +127,10 @@
     <ClInclude Include="mathutil.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="renderutil.h" />
+    <ClInclude Include="automap.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.cpp">
@@ -215,6 +219,12 @@
     </ClCompile>
     <ClCompile Include="mathutil.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="renderutil.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="automap.cpp">
+      <Filter>Source Files\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

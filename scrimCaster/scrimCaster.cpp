@@ -79,7 +79,7 @@ i32 main(i32 argc, char** argv)
 		delta_ticks = SDL_GetTicks();
 
 		r_draw();
-		EndFrame(render_ticks);
+		frame_end(render_ticks);
 	}
 
 	CleanUp();

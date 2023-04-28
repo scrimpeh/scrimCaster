@@ -4,11 +4,11 @@
 #include "camera.h"
 #include "input.h"
 #include "renderconstants.h"
+#include "renderdebug.h"
 #include "renderutil.h"
 #include "scan.h"
 #include "sprite.h"
-
-#include "SDL/SDL_ttf.h"
+#include "watch.h"
 
 // These are decoupled from the window width and height and should equal to or smaller than the window
 u16 viewport_w;
@@ -23,8 +23,8 @@ extern SDL_Window* mainWindow;
 SDL_Surface* viewportSurface = NULL;
 SDL_Surface* mainWindowSurface = NULL;
 
-extern u64 framecounter;
-extern float framerate;
+extern u64 frame_count;
+extern float frame_fps;
 
 extern ActorVector levelEnemies;
 
@@ -33,7 +33,7 @@ bool draw_crosshair = true;
 
 i32 r_init(u16 w, u16 h)
 {
-	r_close();	//close the old renderer first
+	r_close();	// Close the old renderer first
 
 	viewport_w = w;
 	viewport_h = h;
@@ -85,13 +85,9 @@ void r_draw()
 	else if (draw_crosshair) 
 		r_draw_crosshair(viewportSurface);
 	
-	char buf[256];
-	SDL_memset(buf, 0, 256);
-	SDL_snprintf(buf, 256, "FPS: %.2f | Framecount: %d", framerate, framecounter);
-	r_draw_text(viewportSurface, buf, 4, 2, ttf_font_debug, CM_GET(255, 255, 255));
-
-	SDL_BlitScaled(viewportSurface, NULL, mainWindowSurface, NULL);
+	rd_render_debug(viewportSurface);
 	
+	SDL_BlitScaled(viewportSurface, NULL, mainWindowSurface, NULL);
 	SDL_UpdateWindowSurface(mainWindow);
 }
 

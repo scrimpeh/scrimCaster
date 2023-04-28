@@ -5,6 +5,7 @@
 #include "maputil.h"
 #include "mapupdate.h"
 #include "mathutil.h"
+#include "watch.h"
 
 #include "SDL/SDL_assert.h"
 #include "SDL/SDL_log.h"
@@ -32,6 +33,7 @@ static g_intercept player_fire_intercept;
 
 void player_spawn()
 {
+	watch_add_new(3, WCH_F64, "x: ", &player.x, WCH_F64, ", y: ", &player.y, WCH_F32, ", angle: ", &player.angle);
 	player.type = PLAYER;
 	player.x = 50;
 	player.y = 50;

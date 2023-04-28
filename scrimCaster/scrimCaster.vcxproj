@@ -324,6 +324,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="mouselook.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="render.h" />
+    <ClInclude Include="renderdebug.h" />
     <ClInclude Include="renderutil.h" />
     <ClInclude Include="scan.h" />
     <ClInclude Include="scrimCaster.h" />
@@ -331,6 +332,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="ttf.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="watch.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -357,6 +359,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="renderconstants.cpp" />
+    <ClCompile Include="renderdebug.cpp" />
     <ClCompile Include="renderutil.cpp" />
     <ClCompile Include="scan.cpp" />
     <ClCompile Include="scrimCaster.cpp" />
@@ -364,6 +367,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="ttf.cpp" />
+    <ClCompile Include="watch.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>

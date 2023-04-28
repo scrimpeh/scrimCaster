@@ -16,6 +16,7 @@ extern u16 viewport_w;
 extern u16 viewport_h;
 
 i32 r_init(u16 w, u16 h);
+
 void r_close();
 void r_draw();
 

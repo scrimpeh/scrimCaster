@@ -29,6 +29,9 @@
     <Filter Include="LibSDL x64">
       <UniqueIdentifier>{aefb60e1-2ed6-47dc-8fe1-735e48213c05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\debugutil">
+      <UniqueIdentifier>{5aebc0eb-8385-4c17-ab54-f0eada4872d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -47,9 +50,6 @@
       <Filter>Source Files\game</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
-      <Filter>Source Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="player.h">
       <Filter>Source Files\game</Filter>
     </ClInclude>
     <ClInclude Include="scan.h">
@@ -131,6 +131,15 @@
     <ClInclude Include="automap.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="watch.h">
+      <Filter>Source Files\debugutil</Filter>
+    </ClInclude>
+    <ClInclude Include="renderdebug.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Source Files\game\actor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.cpp">
@@ -152,9 +161,6 @@
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="player.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="scan.cpp">
@@ -225,6 +231,15 @@
     </ClCompile>
     <ClCompile Include="automap.cpp">
       <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="watch.cpp">
+      <Filter>Source Files\debugutil</Filter>
+    </ClCompile>
+    <ClCompile Include="renderdebug.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Source Files\game\actor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

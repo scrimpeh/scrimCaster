@@ -21,7 +21,7 @@ extern ActorVector levelEnemies;
 //This should presumably be offloaded to a separate file, either a source file 
 //or perhaps even an external file
 const Bounds NullBounds = { 0., 0. };
-const Bounds PlayerBounds = { (double)CELLSIZE / 8, (double)CELLSIZE / 8 };
+const Bounds PlayerBounds = { (double)M_CELLSIZE / 8, (double)M_CELLSIZE / 8 };
 const Bounds PillarBounds = PlayerBounds;
 
 const static ActorList* const actorLists[] =
@@ -160,10 +160,10 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 	if (d_x == 0) return false;
 
 	const double bounds_x = curBounds.x * (d_x >= 0 ? 1 : -1);
-	const i16 x_start = (i16)SDL_floor((actor->x - bounds_x) / CELLSIZE);					 //Draw a line on the actor's movement plane
-	const i16 x_end = (i16)SDL_floor((actor->x + d_x + bounds_x) / CELLSIZE); //and check if he hit a wall
-	const i16 y_top = (i16)SDL_floor((actor->y - curBounds.y) / CELLSIZE);
-	const i16 y_bottom = (i16)SDL_floor((actor->y + curBounds.y) / CELLSIZE);
+	const i16 x_start = (i16)SDL_floor((actor->x - bounds_x) / M_CELLSIZE);					 //Draw a line on the actor's movement plane
+	const i16 x_end = (i16)SDL_floor((actor->x + d_x + bounds_x) / M_CELLSIZE); //and check if he hit a wall
+	const i16 y_top = (i16)SDL_floor((actor->y - curBounds.y) / M_CELLSIZE);
+	const i16 y_bottom = (i16)SDL_floor((actor->y + curBounds.y) / M_CELLSIZE);
 
 	const Cell* cells = map.cells;
 
@@ -180,8 +180,8 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 		if ((side_top.type && !(side_top.flags  & PASSABLE)) ||
 			(side_bottom.type && !(side_bottom.flags & PASSABLE)))
 		{
-			double new_x = double(x*CELLSIZE) - bounds_x;
-			if (d_x >= 0) new_x += double(CELLSIZE) - MIN_WALL_DIST;
+			double new_x = double(x*M_CELLSIZE) - bounds_x;
+			if (d_x >= 0) new_x += double(M_CELLSIZE) - MIN_WALL_DIST;
 			*p_dx = new_x - actor->x;
 			return true;
 		}
@@ -197,10 +197,10 @@ static bool CollideVerticalWall(const Actor* actor, double* p_dy)
 	if (d_y == 0) return false;
 
 	const double bounds_y = curBounds.y * (d_y >= 0 ? 1 : -1);
-	const i16 y_start = (i16)SDL_floor((actor->y - bounds_y) / CELLSIZE);					 //Draw a line on the actor's movement plane
-	const i16 y_end = (i16)SDL_floor((actor->y + d_y + bounds_y) / CELLSIZE); //and check if he hit a wall
-	const i16 x_left = (i16)SDL_floor((actor->x - curBounds.x) / CELLSIZE);
-	const i16 x_right = (i16)SDL_floor((actor->x + curBounds.x) / CELLSIZE);
+	const i16 y_start = (i16)SDL_floor((actor->y - bounds_y) / M_CELLSIZE);					 //Draw a line on the actor's movement plane
+	const i16 y_end = (i16)SDL_floor((actor->y + d_y + bounds_y) / M_CELLSIZE); //and check if he hit a wall
+	const i16 x_left = (i16)SDL_floor((actor->x - curBounds.x) / M_CELLSIZE);
+	const i16 x_right = (i16)SDL_floor((actor->x + curBounds.x) / M_CELLSIZE);
 
 	const Cell* cells = map.cells;
 
@@ -216,8 +216,8 @@ static bool CollideVerticalWall(const Actor* actor, double* p_dy)
 		if ((side_left.type  && !(side_left.flags  & PASSABLE)) ||
 			(side_right.type && !(side_right.flags & PASSABLE)))
 		{
-			double new_y = double(y*CELLSIZE) - bounds_y;
-			if (d_y >= 0) new_y += double(CELLSIZE) - MIN_WALL_DIST;
+			double new_y = double(y*M_CELLSIZE) - bounds_y;
+			if (d_y >= 0) new_y += double(M_CELLSIZE) - MIN_WALL_DIST;
 			*p_dy = new_y - actor->y;
 			return true;
 		}

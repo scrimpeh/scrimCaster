@@ -11,13 +11,13 @@ const float MAXSLOPE = 1e+8f;
 
 void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept_collector)
 {
-	i16 grid_x = (i16)floorf(x / CELLSIZE);
-	i16 grid_y = (i16)floorf(y / CELLSIZE);
+	i16 grid_x = (i16)floorf(x / M_CELLSIZE);
+	i16 grid_y = (i16)floorf(y / M_CELLSIZE);
 
 	// Since our grid inverts the y coordinate, invert the slope
 	g_orientation orientation = g_get_orientation(angle);
 	float slope = -1 * tanf(angle);
-	float dx = (!g_is_east(orientation) ? grid_x : grid_x + 1) * CELLSIZE - x;
+	float dx = (!g_is_east(orientation) ? grid_x : grid_x + 1) * M_CELLSIZE - x;
 
 	if (fabsf(slope) > MAXSLOPE)
 		slope = slope > 0 ? MAXSLOPE : -MAXSLOPE;
@@ -25,7 +25,7 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 	{
 		x += dx;
 		y += dx * slope;
-		const i16 next_grid_y = (i16)floorf(y / CELLSIZE);
+		const i16 next_grid_y = (i16)floorf(y / M_CELLSIZE);
 
 		// Trace grid vertically first
 		for (i16 y_cell = grid_y; y_cell != next_grid_y; y_cell += g_is_north(orientation) ? -1 : 1)
@@ -46,8 +46,8 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 				const i16 y_cell_side = g_is_north(orientation) ? y_cell : y_cell + 1;
 				float x_inv = x - dx;
 				float y_inv = y - (dx * slope);
-				x_inv += ((y_cell_side * CELLSIZE) - y_inv) / slope;
-				y_inv = (float)(y_cell_side * CELLSIZE);
+				x_inv += ((y_cell_side * M_CELLSIZE) - y_inv) / slope;
+				y_inv = (float)(y_cell_side * M_CELLSIZE);
 
 				g_intercept intercept =
 				{
@@ -99,7 +99,7 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 		}
 
 		// Didn't find anything
-		dx = g_is_east(orientation) ? float(CELLSIZE) : float(-CELLSIZE);
+		dx = g_is_east(orientation) ? float(M_CELLSIZE) : float(-M_CELLSIZE);
 		grid_x += g_is_east(orientation) ? 1 : -1;
 	}
 }

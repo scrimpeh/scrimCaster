@@ -22,7 +22,7 @@ double accel_strafe = 0;
 #define MAXSPEED .38
 #define MAXSTRAFE .35
 
-#define USELENGTH (CELLSIZE / 2)
+#define USELENGTH (M_CELLSIZE / 2)
 
 static bool player_use_has_intercept;
 static g_intercept player_use_intercept;

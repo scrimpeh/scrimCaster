@@ -4,7 +4,7 @@
 #include "SDL/SDL_assert.h"
 #include "SDL/SDL_log.h"
 
-#define DOOR_SCROLL_MAX (CELLHEIGHT - 4)
+#define DOOR_SCROLL_MAX (M_CELLHEIGHT - 4)
 #define DOOR_TICKS_PER_SEC 60
 #define PLAYER_HEIGHT 32
 

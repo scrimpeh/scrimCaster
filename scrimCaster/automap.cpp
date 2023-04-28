@@ -9,7 +9,7 @@
 
 
 // Cap the automap to the bounds of the map and inside this zone.
-#define AM_MARIGN (2 * CELLSIZE)
+#define AM_MARIGN (2 * M_CELLSIZE)
 
 // If am_foölow is false, center the map around the this point, otherwise,
 // center the map around the player
@@ -27,8 +27,8 @@ static float r_map_intercept_y;
 
 void am_init()
 {
-	am_center_x = (float)map.w * CELLSIZE / 2;
-	am_center_y = (float)map.h * CELLSIZE / 2;
+	am_center_x = (float)map.w * M_CELLSIZE / 2;
+	am_center_y = (float)map.h * M_CELLSIZE / 2;
 }
 
 void am_draw(SDL_Surface* target)
@@ -40,9 +40,9 @@ void am_draw(SDL_Surface* target)
 
 	const float viewport_ratio = (float)viewport_w / viewport_h;
 	const float am_x_min = AM_MARIGN * viewport_ratio;
-	const float am_x_max = (map.w * CELLSIZE - AM_MARIGN) * viewport_ratio;
+	const float am_x_max = (map.w * M_CELLSIZE - AM_MARIGN) * viewport_ratio;
 	const float am_y_min = AM_MARIGN;
-	const float am_y_max = map.h * CELLSIZE - AM_MARIGN;
+	const float am_y_max = map.h * M_CELLSIZE - AM_MARIGN;
 
 	am_x = SDL_min(SDL_max(am_x, am_x_min), am_x_max);
 	am_y = SDL_min(SDL_max(am_y, am_y_min), am_y_max);
@@ -62,19 +62,19 @@ static void am_draw_cell(SDL_Surface* target, i16 grid_x, i16 grid_y)
 
 static i32 am_map_h(float x)
 {
-	float rel_grid = (x - am_x) / CELLSIZE;
+	float rel_grid = (x - am_x) / M_CELLSIZE;
 	return r_hud_px_h(rel_grid * am_cell_size) + r_hud_px_h(.5f);
 }
 
 static i32 am_map_v(float y)
 {
-	float rel_grid = (y - am_y) / CELLSIZE;
+	float rel_grid = (y - am_y) / M_CELLSIZE;
 	return r_hud_px_h(rel_grid * am_cell_size) + r_hud_px_v(.5f);
 }
 
 static i32 am_map_distance(float d)
 {
-	float rel_size = am_cell_size / CELLSIZE;
+	float rel_size = am_cell_size / M_CELLSIZE;
 	return r_hud_px_h(d * rel_size);
 }
 
@@ -83,9 +83,9 @@ static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side
 	if (!side->type)
 		return;
 
-	const i32 px_x = am_map_h(grid_x * CELLSIZE);
-	const i32 px_y = am_map_v(grid_y * CELLSIZE);
-	const i32 length = am_map_distance(CELLSIZE);
+	const i32 px_x = am_map_h(grid_x * M_CELLSIZE);
+	const i32 px_y = am_map_v(grid_y * M_CELLSIZE);
+	const i32 length = am_map_distance(M_CELLSIZE);
 
 	i32 x_a;
 	i32 y_a;

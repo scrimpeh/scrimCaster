@@ -85,12 +85,12 @@ void DrawSprites(SDL_Surface* toDraw)
 
 		//Todo: work out what animation frame and angle to use
 		WorldSprite ws = GetWorldSprite(ds);
-		const i32 height = ws.anchor == FLOORCEIL ? CELLHEIGHT : ws.coords.h;
+		const i32 height = ws.anchor == FLOORCEIL ? M_CELLHEIGHT : ws.coords.h;
 		//const u16 max_width = viewport_w + (viewport_w / 4);	//cap the size of the sprite
 
 		const i16 h_offset = ws.anchor == FLOORCEIL ? 0 :
 			i16((projection_dist * ws.offset +
-			((CELLHEIGHT / 2) + (ws.coords.h / 2) * ws.anchor == FLOOR ? 1 : -1) / ds->dist));
+			((M_CELLHEIGHT / 2) + (ws.coords.h / 2) * ws.anchor == FLOOR ? 1 : -1) / ds->dist));
 
 		const double angle = ds->relative_angle - 
 			(ds->relative_angle > 180 ? 360 : 0)

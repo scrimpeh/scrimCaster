@@ -38,8 +38,8 @@ Cell* GetCell(GridPos gp)
 
 Cell* GetCell(double x, double y)
 {
-	const i16 offset_x = (i16)SDL_floor(x / CELLSIZE);
-	const i16 offset_y = (i16)SDL_floor(y / CELLSIZE);
+	const i16 offset_x = (i16)SDL_floor(x / M_CELLSIZE);
+	const i16 offset_y = (i16)SDL_floor(y / M_CELLSIZE);
 
 	return &map.cells[offset_y*map.w + offset_x];
 }
@@ -47,12 +47,12 @@ Cell* GetCell(double x, double y)
 GridPos GetGridPosition(double x, double y)
 {
 	return { 
-		(i16)SDL_floor(x / CELLSIZE), 
-		(i16)SDL_floor(y / CELLSIZE) 
+		(i16)SDL_floor(x / M_CELLSIZE), 
+		(i16)SDL_floor(y / M_CELLSIZE) 
 	};
 }
 
-u32 AsMapOffset(i16 x, i16 y, Orientation o)
+u32 AsMapOffset(i16 x, i16 y, m_orientation o)
 {
 	SDL_assert(o < 4);
 	return ((y * map.w) + x) * 4 + o;
@@ -60,7 +60,7 @@ u32 AsMapOffset(i16 x, i16 y, Orientation o)
 
 Side* FromMapOffset(u32 offset)
 {
-	return &map.cells[offset / 4].sides[offset % 4];
+	return m_get_side(&map.cells[offset / 4], offset % 4);
 };
 
 void LoadMap()
@@ -85,7 +85,7 @@ void LoadMap()
 	for (i = 0; i < 8; ++i)
 		for (j = 0; j < 8; ++j)
 			for (n = 0; n < 4; ++n)
-				cellgrid[i][j].sides[n].type = 0;
+				m_get_side(&cellgrid[i][j], n)->type = 0;
 
 	//make rudimentary walls
 	{
@@ -178,7 +178,7 @@ void LoadMap()
 		cellgrid[6][1].s.door.staytime = 12;
 		cellgrid[6][1].s.door.closespeed = 12;
 		cellgrid[6][1].s.door.door_flags = DoorFlags(LINKED | PLAYER_ACTIVATE); //double sided
-		cellgrid[6][1].s.door.linked_to = AsMapOffset(1, 7, NORTH);
+		cellgrid[6][1].s.door.linked_to = AsMapOffset(1, 7, M_NORTH);
 
 		cellgrid[7][1].n.type = 5;
 		cellgrid[7][1].n.flags = DOOR_V;
@@ -187,7 +187,7 @@ void LoadMap()
 		cellgrid[7][1].n.door.staytime = 12;
 		cellgrid[7][1].n.door.closespeed = 1;
 		cellgrid[7][1].n.door.door_flags = DoorFlags(LINKED | PLAYER_ACTIVATE); //double sided
-		cellgrid[7][1].n.door.linked_to = AsMapOffset(1, 6, SOUTH);
+		cellgrid[7][1].n.door.linked_to = AsMapOffset(1, 6, M_SOUTH);
 
 	}
 

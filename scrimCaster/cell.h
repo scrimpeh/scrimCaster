@@ -1,16 +1,24 @@
 #pragma once
 
-//A cell is the basic unit a map is comprised of.
-//Each cell has a uniform size in game units and four walls on the interior side
-//that can either have a type or nothing
+#include "common.h"
 
-//Note: All directionality in this game is East - North - West - South
+// A cell is the basic unit a map is comprised of.
+// Each cell has a uniform size in game units and four walls on the interior side
+// that can either have a type or nothing
+
+// Note: All directionality in this game is East - North - West - South
 // 0° degrees in a circle is pointing east as well.
+typedef u8 m_orientation;
 
-// Define the size of one individual cell in game units.
-#define CELLHEIGHT_RATIO 1
-#define CELLSIZE 64
-#define CELLHEIGHT ((CELLSIZE) * CELLHEIGHT_RATIO)
+#define M_EAST  0
+#define M_NORTH 1
+#define M_WEST  2
+#define M_SOUTH 3
+
+// Define The size of one individual cell in game units.
+#define M_CELLSIZE 64
+// The height of one individual cell in game units.
+#define M_CELLHEIGHT 64
 
 //Possible flags. Note: Which ones are actually gonna be implemented, I'm not sure
 //Just balling around ideas so far
@@ -75,10 +83,6 @@ typedef struct Side
 	u32 side_id;
 	union
 	{
-		struct
-		{
-			u8 padding[18];
-		};
 		struct			//default params
 		{
 			u8 scroll_x, scroll_y;
@@ -92,15 +96,10 @@ typedef struct Side
 typedef struct Cell
 {
 	Floor floor;
-	union 
-	{
-		Side sides[4];
-		struct 
-		{
-			Side e;
-			Side n;
-			Side w;
-			Side s;
-		};
-	};
+	Side e;
+	Side n;
+	Side w;
+	Side s;
 } Cell;
+
+Side* m_get_side(Cell* cell, m_orientation orientation);

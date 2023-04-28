@@ -130,7 +130,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	const float distance_corrected = distance * cosf(relative_angle);
 
 	// Get the wall parameters
-	i32 wall_h = (i32)(projection_dist * CELLHEIGHT / distance_corrected);
+	i32 wall_h = (i32)(projection_dist * M_CELLHEIGHT / distance_corrected);
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
@@ -162,7 +162,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		tex_y_px += side->door.scroll + offset;
 
-		wall_h = (i32)(projection_dist * (CELLHEIGHT - side->door.scroll) / distance_corrected);
+		wall_h = (i32)(projection_dist * (M_CELLHEIGHT - side->door.scroll) / distance_corrected);
 		y_end = SDL_min(viewport_h, wall_y + wall_h + 1);
 	}
 
@@ -205,17 +205,17 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (u32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
 		u16 height = viewport_h - (2 * y_px);
-		float d = (projection_dist * CELLHEIGHT) / height;
+		float d = (projection_dist * M_CELLHEIGHT) / height;
 		d /= cosf(relative_angle);
 		float xa;
 		float ya;
 		math_vec_cast_f(x, y, intercept->angle, d, &xa, &ya);
 
-		const i16 grid_xa = (i16)(floorf(xa / CELLSIZE));
-		const i16 grid_ya = (i16)(floorf(ya / CELLSIZE));
+		const i16 grid_xa = (i16)(floorf(xa / M_CELLSIZE));
+		const i16 grid_ya = (i16)(floorf(ya / M_CELLSIZE));
 
-		const i16 cell_x = (i16)(fmodf(floorf(xa), (float)(CELLSIZE)));
-		const i16 cell_y = (i16)(fmodf(floorf(ya), (float)(CELLSIZE)));
+		const i16 cell_x = (i16)(fmodf(floorf(xa), (float)(M_CELLSIZE)));
+		const i16 cell_y = (i16)(fmodf(floorf(ya), (float)(M_CELLSIZE)));
 
 		if ((grid_xa & 1) ^ (grid_ya & 1))
 		{

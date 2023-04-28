@@ -6,3 +6,6 @@
 #include "types.h"
 #include "angle.h"
 #include "debug.h"
+
+#include "SDL/SDL_assert.h"
+#include "SDL/SDL_log.h"

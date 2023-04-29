@@ -1,14 +1,15 @@
-#include "types.h"
-#include "init.h"
-#include "SDL\SDL.h"
+#include <init.h>
 
-#include "ttf.h"
-#include "window.h"
-#include "gfxloader.h"
-#include "input.h"
-#include "mouselook.h"
-#include "render.h"
-#include "camera.h"
+#include <camera.h>
+#include <gfxloader.h>
+#include <input.h>
+#include <mouselook.h>
+#include <render.h>
+#include <ttf.h>
+#include <window.h>
+
+#include <SDL/SDL.h>
+
 
 #define VER_NUM "0.01"
 #ifdef _MSC_VER
@@ -41,7 +42,7 @@ i32 InitGame(i32 argc, char** argv)
 	}
 
 	SDL_Log("Trying to create window...");
-	if (CreateMainWindow())
+	if (win_create())
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Fatal Error: Couldn't create window. %s", SDL_GetError());
 		return -1;

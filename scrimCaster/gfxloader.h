@@ -1,6 +1,8 @@
 #pragma once
 
-#include "SDL/SDL_render.h"
+#include <common.h>
+
+#include <SDL/SDL_render.h>
 
 
 static SDL_Surface* LoadSurface(const char* filename);

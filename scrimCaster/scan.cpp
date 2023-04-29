@@ -9,9 +9,6 @@
 #include "render.h"
 #include "renderconstants.h"
 
-#include "SDL/SDL_assert.h"
-#include "SDL/SDL_log.h"
-
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
 
@@ -21,7 +18,7 @@ const float WALL_OFF = 8e-4f;
 
 extern u64 ticks;
 
-extern Map map;
+extern Map m_map;
 extern u8 viewport_x_fov;
 u8 viewport_x_fov_half;
 
@@ -156,9 +153,9 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	if (side->flags & DOOR_V)
 	{
 		float offset = 0.;
-		if (side->door.status & 1)
+		if (side->door.state & 1)
 			offset = (float)side->door.timer_ticks /
-			( side->door.status & 2 ? -side->door.closespeed : side->door.openspeed );
+			( side->door.state & 2 ? -side->door.closespeed : side->door.openspeed );
 
 		tex_y_px += side->door.scroll + offset;
 
@@ -196,7 +193,6 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Now draw the ceiling and floor
 	// For this, we invert the projection and cosine correction to get the wall height
-	// TODO: Texture mapping
 
 	// No need to draw another floor, because we've already done so from the previous wall
 	if (intercept->type == G_INTERCEPT_NON_SOLID)

@@ -8,11 +8,11 @@
 
 
 const float MAXSLOPE = 1e+8f;
-extern Map map;
+extern Map m_map;
 
 Cell* map_get_cell(u16 grid_x, u16 grid_y)
 {
-	return &map.cells[grid_y * map.w + grid_x];
+	return &m_map.cells[grid_y * m_map.w + grid_x];
 }
 
 Side* map_get_side(u16 grid_x, u16 grid_y, g_side_orientation orientation)

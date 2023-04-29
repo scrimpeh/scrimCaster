@@ -72,12 +72,13 @@ void SetMenu(bool open)
 
 void UpdateGame(u32 timeStep)
 {
-	//Make sure we don't skip too much
-	if (timeStep > TIMESTEP_MAX) timeStep = TIMESTEP_MAX;
+	// Make sure we don't skip too much
+	if (timeStep > TIMESTEP_MAX) 
+		timeStep = TIMESTEP_MAX;
 
 	if (loadMap)
 	{
-		LoadMap();
+		m_load();
 		player_spawn();
 		loadMap = false;
 		SetMenu(false);
@@ -94,7 +95,7 @@ void UpdateGame(u32 timeStep)
 	{
 		ticks += timeStep;
 		UpdateEnemies(timeStep);
-		UpdateSides(timeStep);
+		mu_update(timeStep);
 		player_update(timeStep);
 		UpdateCamera(timeStep);
 		

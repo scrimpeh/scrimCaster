@@ -1,8 +1,4 @@
-#include "types.h"
 #include "mapupdate.h"
-
-#include "SDL/SDL_assert.h"
-#include "SDL/SDL_log.h"
 
 #define DOOR_SCROLL_MAX (M_CELLHEIGHT - 4)
 #define DOOR_TICKS_PER_SEC 60
@@ -13,110 +9,98 @@
 #define DOOR_CLOSED ~DOOR_OPEN
 #define DOOR_IMPASSABLE ~DOOR_PASSABLE
 
-SideList* activeSides = NULL;
-extern Map map;
+extern bool* m_tag_active;
+extern u32 m_max_tag;
 
-void UpdateSides(u32 timeStep)
+m_active_tag_list* m_active_tags = NULL;
+
+extern Map m_map;
+
+void mu_update(u32 t_delta)
 {
-	//This is where things like doors and switches are set. It would be wasteful to run through 
-	//the entire map each frame, so we just add it to the list.
-	SideList *curSide = activeSides, *lastSide = NULL, *toFree = NULL;
-	while (curSide)
+	m_active_tag_list* cur_tag = m_active_tags;
+	m_active_tag_list* prev_tag = NULL;
+
+	while (cur_tag)
 	{
-		Side* s = curSide->side;
-		//Now work out what side it is
-		if (s->flags & DOOR_H || s->flags & DOOR_V)
-			if (UpdateDoor(s, timeStep)) goto remove_side;
+		bool all_done = true;
+		m_taglist* sides = m_get_tags(cur_tag->tag);
+		for (u32 i = 0; i < sides->count; i++)
+			all_done &= mu_update_side(sides->sides[i], t_delta);
 
-		lastSide = curSide;
-		curSide = curSide->next;
-		continue;
-
-	remove_side:
-		toFree = curSide;
-		curSide = curSide->next;
-
-		if (lastSide)
-			lastSide->next = curSide;
+		if (all_done)
+		{
+			// All sides are done updating, remove the current tag
+			m_tag_active[cur_tag->tag] = false;
+			m_active_tag_list* to_free = cur_tag;
+			cur_tag = cur_tag->next;
+			if (prev_tag)
+				prev_tag->next = cur_tag;
+			else
+				m_active_tags = cur_tag;
+			SDL_free(cur_tag);
+		}
 		else
-			activeSides = curSide;
-
-		SDL_free(toFree);
-	}
-};
-
-SideList* AddActiveSide(Side* s)
-{
-	SideList* curSide = activeSides, *prevSide = NULL;
-	while (curSide)
-	{
-		if (curSide->side == s) return curSide;
-
-		prevSide = curSide;
-		curSide = curSide->next;
-	}
-
-	SideList* newSide = (SideList*)SDL_malloc(sizeof(SideList));
-
-	if (newSide)
-	{
-		newSide->side = s;
-		newSide->next = NULL;
-	}
-	
-	if (!activeSides)
-		activeSides = newSide;
-	else
-		prevSide->next = newSide;
-
-	return newSide;
-}
-
-void RemoveActiveSide(SideList* curr, SideList* prev)
-{
-	prev ? prev->next : activeSides = curr->next;	//ternary lvalues woo!
-	SDL_free(curr);
-}
-
-void ClearActiveSides()
-{
-	SideList *curSide = activeSides, *delSide = NULL;
-	while (curSide)
-	{
-		delSide = curSide;
-		curSide = curSide->next;
-		SDL_free(delSide);
+		{
+			prev_tag = cur_tag;
+			cur_tag = cur_tag->next;
+		}
 	}
 }
 
-//Update routines for individual sides
-static bool UpdateDoor(Side* const side, u32 timeStep)
+void mu_activate_tag(u32 tag)
 {
-	//Todo: Change this to determine passability to actors
-	//by individual actors and their height, not by the door
-	// i.e. move code that determines if this door is pasasble
-	// to actor code
+	SDL_assert(tag && tag <= m_max_tag);
+	if (!m_tag_active[tag])
+	{
+		m_tag_active[tag] = true;
+		m_active_tag_list* new_tag = (m_active_tag_list*) SDL_malloc(sizeof(m_active_tag_list));
+		new_tag->next = m_active_tags;
+		new_tag->tag = tag;
+		m_active_tags = new_tag;
 
-	DoorParams* const params = &side->door;
-	const u8 ticks = params->timer_ticks + timeStep;
-	bool retval = false;
+		m_taglist* sides = m_get_tags(new_tag->tag);
+		for (u32 i = 0; i < sides->count; i++)
+			sides->sides[i]->state = 0;
+	}
+}
 
-	switch (params->status & 3)
+void mu_clear()
+{
+	for (u32 i = 0; i <= m_max_tag; i++)
+		m_tag_active[i] = false;
+
+	m_active_tag_list* cur = m_active_tags;
+	m_active_tag_list* to_free = NULL;
+	while (cur)
+	{
+		to_free = cur;
+		cur = cur->next;
+		SDL_free(to_free);
+	}
+}
+
+static bool mu_update_side(Side* side, u32 delta)
+{
+	DoorParams* params = &side->door;
+	const u8 ticks = params->timer_ticks + delta;
+
+	switch (side->state)
 	{
 	default:
 		SDL_assert(0);
 		break;
-	case 0:		//activated
-		side->flags = SideFlags(side->flags | DOOR_OPEN);
+	case 0:		// Activated
+		side->flags = m_side_flags(side->flags | DOOR_OPEN);
 		params->timer_ticks = 0;
-		++params->status;
-		break;
-	case 1:		//opening, below player height
+		++side->state;
+		return false;
+	case 1:		// Opening
 		params->scroll += ticks / params->openspeed;
 		params->timer_ticks = ticks % params->openspeed;
 
 		if (params->scroll > PLAYER_HEIGHT)
-			side->flags = SideFlags(side->flags | DOOR_PASSABLE);
+			side->flags = m_side_flags(side->flags | DOOR_PASSABLE);
 
 		if (params->scroll > DOOR_SCROLL_MAX - 1)
 		{
@@ -125,47 +109,34 @@ static bool UpdateDoor(Side* const side, u32 timeStep)
 				params->scroll = DOOR_SCROLL_MAX;
 				params->timer_ticks = 0;
 				params->timer_staycounter = params->staytime * DOOR_TICKS_PER_SEC;
-				++params->status;
+				++side->state;
 			}
-			else retval = true;;
+			else
+				side->state = 4;
 		}
-		break;
+		return false;
 	case 2:		//stay open
-		params->timer_staycounter -= timeStep;
+		params->timer_staycounter -= delta;
 
 		if (params->timer_staycounter <= 0)
-			++params->status;
-
-		break;
+			++side->state;
+		return false;
 	case 3:
 		params->scroll -= ticks / params->closespeed;
 		params->timer_ticks = ticks % params->closespeed;
 
 		if (params->scroll < PLAYER_HEIGHT)
-			side->flags = SideFlags(side->flags & DOOR_IMPASSABLE);
+			side->flags = m_side_flags(side->flags & DOOR_IMPASSABLE);
 
 		if (params->scroll <= 0)
 		{
-			side->flags = SideFlags(side->flags & DOOR_CLOSED);
+			side->flags = m_side_flags(side->flags & DOOR_CLOSED);
 			params->scroll = 0;
-			params->status = 0;
-			retval = true;
+			++side->state;
+			return false;
 		}
-		break;
+		return false;
+	case 4:
+		return true;
 	}
-
-	if (params->door_flags & LINKED)
-	{
-		Side* const other_door = FromMapOffset(params->linked_to);
-
-		SDL_assert(other_door->type == 5);
-
-		SDL_assert(other_door);
-
-		other_door->door.scroll = params->scroll;
-		other_door->door.status = params->status;
-		other_door->flags = side->flags;
-	}
-
-	return retval;
 }

@@ -1244,16 +1244,16 @@ GLAPI void GLAPIENTRY glPixelStorei( GLenum pname, GLint param );
 GLAPI void GLAPIENTRY glPixelTransferf( GLenum pname, GLfloat param );
 GLAPI void GLAPIENTRY glPixelTransferi( GLenum pname, GLint param );
 
-GLAPI void GLAPIENTRY glPixelMapfv( GLenum map, GLsizei mapsize,
+GLAPI void GLAPIENTRY glPixelMapfv( GLenum m_map, GLsizei mapsize,
                                     const GLfloat *values );
-GLAPI void GLAPIENTRY glPixelMapuiv( GLenum map, GLsizei mapsize,
+GLAPI void GLAPIENTRY glPixelMapuiv( GLenum m_map, GLsizei mapsize,
                                      const GLuint *values );
-GLAPI void GLAPIENTRY glPixelMapusv( GLenum map, GLsizei mapsize,
+GLAPI void GLAPIENTRY glPixelMapusv( GLenum m_map, GLsizei mapsize,
                                      const GLushort *values );
 
-GLAPI void GLAPIENTRY glGetPixelMapfv( GLenum map, GLfloat *values );
-GLAPI void GLAPIENTRY glGetPixelMapuiv( GLenum map, GLuint *values );
-GLAPI void GLAPIENTRY glGetPixelMapusv( GLenum map, GLushort *values );
+GLAPI void GLAPIENTRY glGetPixelMapfv( GLenum m_map, GLfloat *values );
+GLAPI void GLAPIENTRY glGetPixelMapuiv( GLenum m_map, GLuint *values );
+GLAPI void GLAPIENTRY glGetPixelMapusv( GLenum m_map, GLushort *values );
 
 GLAPI void GLAPIENTRY glBitmap( GLsizei width, GLsizei height,
                                 GLfloat xorig, GLfloat yorig,

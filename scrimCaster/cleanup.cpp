@@ -1,22 +1,22 @@
-#include "types.h"
-#include "cleanup.h"
-#include "SDL\SDL.h"
+#include <cleanup.h>
 
-#include "window.h"
-#include "render.h"
-#include "map.h"
-#include "gfxloader.h"
+#include <gfxloader.h>
+#include <map.h>
+#include <render.h>
+#include <window.h>
+
+#include <SDL/SDL.h>
 
 extern char* app_dir;
 
-//Clean up everything
+// Clean up everything
 void CleanUp()
 {
 	r_close();
-	UnloadMap();
+	m_unload();
 	UnloadAllTextures();
 	SDL_free(app_dir);
-	DestroyMainWindow();
+	win_destroy();
 
 	SDL_Quit();
 }

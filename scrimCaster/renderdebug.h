@@ -2,11 +2,9 @@
 
 // This module is responsible for rendering debug information
 
-#include "common.h"
+#include <common.h>
 
-#include "watch.h"
-
-#include "SDL/SDL_video.h"
+#include <SDL/SDL_video.h>
 
 void rd_render_debug(SDL_Surface* target);
 

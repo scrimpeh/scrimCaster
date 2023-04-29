@@ -1,15 +1,15 @@
-#include "scrimCaster.h"
-#include "SDL/SDL.h"
+#include <scrimCaster.h>
 
-#include "init.h"
-#include "cleanup.h"
+#include <cleanup.h>
+#include <frame.h>
+#include <game.h>
+#include <init.h>
+#include <input.h>
+#include <mouselook.h>
+#include <render.h>
+#include <window.h>
 
-#include "game.h"
-#include "window.h"
-#include "render.h"
-#include "frame.h"
-#include "input.h"
-#include "mouselook.h"
+#include <SDL/SDL.h>
 
 // The great big 2023 revisit todo list
 
@@ -63,7 +63,7 @@ i32 main(i32 argc, char** argv)
 				GetInput(&evt);
 				break;
 			case SDL_WINDOWEVENT:
-				ProcessWindowEvent(&evt);
+				win_process_event(&evt);
 				break;
 			case SDL_QUIT:
 				SDL_Log("User Exit");

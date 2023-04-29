@@ -85,7 +85,7 @@ typedef struct SDL_Surface
     SDL_Rect clip_rect;         /**< Read-only */
 
     /** info for fast blit mapping to other surfaces */
-    struct SDL_BlitMap *map;    /**< Private */
+    struct SDL_BlitMap *m_map;    /**< Private */
 
     /** Reference count -- used when freeing surface */
     int refcount;               /**< Read-mostly */

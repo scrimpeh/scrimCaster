@@ -5,7 +5,6 @@
 #include "maputil.h"
 #include "mapupdate.h"
 #include "mathutil.h"
-#include "watch.h"
 
 #include "SDL/SDL_assert.h"
 #include "SDL/SDL_log.h"
@@ -50,14 +49,8 @@ static void player_use()
 		if (distance < USELENGTH)
 		{
 			Side* side = map_get_side(player_use_intercept.map_x, player_use_intercept.map_y, player_use_intercept.orientation);
-			if (side->type && side->flags & DOOR_V)
-			{
-				if ((side->door.status & 3) == 0)
-				{
-					side->door.status = 0;
-					AddActiveSide(side);
-				}
-			}
+			if (side->target)
+				mu_activate_tag(side->target);
 		}
 	}
 }
@@ -72,10 +65,10 @@ static bool player_use_check_intercept(const g_intercept* intercept)
 
 static void player_fire()
 {
-	//Here be some weapon specific code, but for now, let's just draw a line and see what we hit
+	// Here be some weapon specific code, but for now, let's just draw a line and see what we hit
 
-	//One: Trace a ray between the player and the nearest wall
-	//Two: Check if any one sprite could have been hit
+	// One: Trace a ray between the player and the nearest wall
+	// Two: Check if any one sprite could have been hit
 	player_use_has_intercept = false;
 	g_cast(player.x, player.y, TO_RADF(player.angle), player_use_check_intercept);
 	if (player_use_has_intercept)

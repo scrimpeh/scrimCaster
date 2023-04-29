@@ -187,7 +187,7 @@ extern DECLSPEC int SDLCALL SDL_SetThreadPriority(SDL_ThreadPriority priority);
  *
  *  It is safe to pass NULL to this function; it is a no-op.
  */
-extern DECLSPEC void SDLCALL SDL_WaitThread(SDL_Thread * thread, int *status);
+extern DECLSPEC void SDLCALL SDL_WaitThread(SDL_Thread * thread, int *state);
 
 /**
  *  A thread may be "detached" to signify that it should not remain until

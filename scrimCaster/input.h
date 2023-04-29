@@ -1,8 +1,8 @@
 #pragma once
 
-#include "types.h"
+#include <common.h>
 
-#include "SDL/SDL_events.h"
+#include <SDL/SDL_events.h>
 
 // First of all, a struct to hold all the player inputs for this frame:
 typedef struct Input
@@ -22,7 +22,7 @@ typedef struct Input
 
 	u8 pause;
 	u8 use;
-	u8 map;
+	u8 m_map;
 } Input;
 
 extern Input input;

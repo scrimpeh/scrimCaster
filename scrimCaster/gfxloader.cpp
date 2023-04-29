@@ -1,7 +1,7 @@
-#include "types.h"
-#include "gfxloader.h"
-#include "SDL/SDL_image.h"
-#include "renderconstants.h"
+#include <gfxloader.h>
+#include <renderconstants.h>
+
+#include <SDL/SDL_image.h>
 
 const char* txPath = "tx\\map\\";
 const char* sprPath = "tx\\spr\\world\\";
@@ -24,7 +24,7 @@ SDL_Surface* worldSpriteBuffer[WORLD_SPRITE_BUF];
 						
 char pathBuffer[256];
 
-extern SDL_PixelFormat* mainWindowFmt;
+extern SDL_PixelFormat* win_main_format;
 
 //Try load the surface at the filename and load it to the destination buffer.
 //Internal function, to be called by exported functions
@@ -36,7 +36,7 @@ static SDL_Surface* LoadSurface(const char* pathname)
 	surf = IMG_Load(pathname);
 
 	if (surf)
-		surf_opt = SDL_ConvertSurface(surf, mainWindowFmt, NULL);
+		surf_opt = SDL_ConvertSurface(surf, win_main_format, NULL);
 
 	SDL_FreeSurface(surf);
 

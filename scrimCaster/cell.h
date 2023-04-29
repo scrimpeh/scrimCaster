@@ -4,7 +4,12 @@
 
 // A cell is the basic unit a map is comprised of.
 // Each cell has a uniform size in game units and four walls on the interior side
-// that can either have a type or nothing
+// that can either have a type or nothing. Similar to Doom, cells and tags can have types
+// that control dynamic behaviour. Note that at runtime, no parameters are considered static,
+// all should be modifiable.
+
+// Any side can be universally identified by an offset on the map,
+// which is floor(x / map.w) + (x mod map.w) 
 
 // Note: All directionality in this game is East - North - West - South
 // 0° degrees in a circle is pointing east as well.
@@ -22,7 +27,7 @@ typedef u8 m_orientation;
 
 //Possible flags. Note: Which ones are actually gonna be implemented, I'm not sure
 //Just balling around ideas so far
-typedef enum SideFlags : u32
+typedef enum m_side_flags : u32
 {
 	PASSABLE =         0x0001,
 	TRANSLUCENT =      0x0002,
@@ -35,32 +40,29 @@ typedef enum SideFlags : u32
 	DOOR_ANIM =        0x0100,
 	SCROLL_V =		   0x0200,
 	SCROLL_H =         0x0400,
-	ANIM =			   0x0800,
-	FULLHEIGHT =       0x1000,
-	MIRR_H =           0x2000,
-	MIRR_V =           0x4000
-} SideFlags;
+	MIRR_H =           0x0800,
+	MIRR_V =           0x1000
+} m_side_flags;
 
-typedef enum FloorFlags : u16
+// The floor flags. Some flags may be contradictory, e.g. a "Multiple" Trigger
+// overrides a "Once" trigger. In this case, a certain flag wins.
+typedef enum
 {
-	TRIGGER_ONCE =	   0x01,
-	TRIGGER_MULTIPLE = 0x02,
-	HURT_SMALL =       0x04,
-	HURT_BIG =         0x08
-} FloorFlags;
+	M_FLOOR_TRIGGER_ONCE     = 0x0001,
+	M_FLOOR_TRIGGER_MULTIPLE = 0x0002
+} m_floor_flags;
 
-typedef struct Floor
+typedef struct
 {
-	FloorFlags flags;
-	u16 floor_id;
-	u16 param1, param2;
-} Floor;
+	u16 type;
+	u32 target;
+	m_floor_flags flags;
+} m_floor;
 
-typedef enum DoorFlags : u16
+typedef enum DoorFlags
 {
 	PLAYER_ACTIVATE = 1,
-	MONSTER_ACTIVATE = 2,
-	LINKED = 4
+	MONSTER_ACTIVATE = 2
 } DoorFlags;
 
 typedef struct DoorParams
@@ -68,9 +70,8 @@ typedef struct DoorParams
 	u8 openspeed, closespeed; //the ticks needed to reach one increment in game units
 	u8 staytime;			  //the amount of (half-)seconds that a door stays open
 	DoorFlags door_flags;
-	u32 linked_to;
 
-	u8 status; //0: closed/inactive, 1: opening, 2: open, 3: opened
+	u8 state; //0: closed/inactive, 1: opening, 2: open, 3: opened
 	i16 scroll; //from 0 - 255, represents how open the door is, with 128 representing half
 	i16 timer_staycounter;
 	u8 timer_ticks;
@@ -78,9 +79,12 @@ typedef struct DoorParams
 
 typedef struct Side
 {
-	u16 type;			//what type of side to use, what "texture", 0 for backfaces/no wall
-	SideFlags flags;	//flags such as translucency or what have you, to be expanded
-	u32 side_id;
+	u16 type;
+	u32 tag;
+	u32 target;
+	u8 state;
+	bool solid;
+	m_side_flags flags;
 	union
 	{
 		struct			//default params
@@ -95,11 +99,13 @@ typedef struct Side
 
 typedef struct Cell
 {
-	Floor floor;
+	m_floor floor;
 	Side e;
 	Side n;
 	Side w;
 	Side s;
 } Cell;
 
-Side* m_get_side(Cell* cell, m_orientation orientation);
+Side* m_cell_get_side(Cell* cell, m_orientation orientation);
+
+typedef Side** m_tag_array;

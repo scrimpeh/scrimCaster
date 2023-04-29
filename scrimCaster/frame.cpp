@@ -1,8 +1,7 @@
-#include "frame.h"
+#include <frame.h>
 
-#include "watch.h"
 
-#include "SDL/SDL_timer.h"
+#include <SDL/SDL_timer.h>
 
 bool frame_cap_rate = false;
 double frame_cap_desired = 60.0;

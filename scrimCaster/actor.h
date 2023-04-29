@@ -61,7 +61,7 @@ typedef struct Actor
 	//they can be used for whatever makes sense for the type
 	u16 hp;
 	u8 animation_frame;
-	u8 status;
+	u8 state;
 	u8 timer;
 	u32 flags;
 } Actor;

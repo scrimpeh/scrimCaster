@@ -39,13 +39,13 @@ const float SPRITE_RATIO_END = 8e-4f;
 
 ActorSprite sprite_slot_buffer[MAX_SPRITES];
 
-extern Map map;
+extern Map m_map;
 extern ActorList particles, projectiles, tempEnemies;
 
 extern u16 viewport_w, viewport_h, viewport_w_half;
 
 extern float viewport_x, viewport_y, viewport_angle;
-extern Map map;
+extern Map m_map;
 extern u8 viewport_x_fov, viewport_x_fov_half;
 
 extern float projection_dist;
@@ -59,15 +59,15 @@ void DrawSprites(SDL_Surface* toDraw)
 	SDL_Rect spr_rect;
 	const static ActorList* const actorLists[] =
 	{ 
-		&map.levelPickups, 
+		&m_map.levelPickups, 
 		&projectiles, 
 		&particles, 
 		&tempEnemies 
 	};
 	const static ActorArray* const actorArrays[] =
 	{ 
-		&map.levelEnemies, 
-		&map.levelObjs 
+		&m_map.levelEnemies, 
+		&m_map.levelObjs 
 	};
 
 	//First off, populate the sprite buffer

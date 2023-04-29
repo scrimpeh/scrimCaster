@@ -1,24 +1,16 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-#include "cell.h"
-#include "actorcontainers.h"
-
-typedef struct GridPos
-{
-	i16 x; i16 y;
-} GridPos;
+#include <cell.h>
+#include <actorcontainers.h>
 
 typedef struct MapInfo
 {
-	char mapName[32];
-	u32 mapIndex;
+	char name[32];
 	u8 txSetCount;	//Textures
 	const char** txSets;
 	const char* skyname;
-	const char* floorname;
-	const char* mus;
 } MapInfo;
 
 typedef struct Map
@@ -33,14 +25,20 @@ typedef struct Map
 	ActorList levelPickups;
 } Map;
 
-Cell* GetCell(double x, double y);
-Cell* GetCell(GridPos gp);
-GridPos GetGridPosition(double x, double y);
+typedef struct
+{
+	Side** sides;
+	u32 count;
+} m_taglist;
 
-u32 AsMapOffset(i16 x, i16 y, m_orientation o);
-Side* FromMapOffset(u32 offset);
+void m_load();
+void m_unload();
 
-void LoadMap();
-void UnloadMap();
+extern Map m_map;
 
-extern Map map;
+Cell* m_get_cell(u16 x, u16 y);
+Side* m_get_side(u16 x, u16 y, m_orientation o);
+m_taglist* m_get_tags(u32 target);
+
+static i32 m_create_tags();
+static void m_destroy_tags();

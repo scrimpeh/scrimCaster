@@ -1,25 +1,24 @@
-#include "render.h"
+#include <render.h>
 
-#include "automap.h"
-#include "camera.h"
-#include "input.h"
-#include "renderconstants.h"
-#include "renderdebug.h"
-#include "renderutil.h"
-#include "scan.h"
-#include "sprite.h"
-#include "watch.h"
+#include <automap.h>
+#include <camera.h>
+#include <input.h>
+#include <renderconstants.h>
+#include <renderdebug.h>
+#include <renderutil.h>
+#include <scan.h>
+#include <sprite.h>
 
 // These are decoupled from the window width and height and should equal to or smaller than the window
 u16 viewport_w;
 u16 viewport_h;
 
-extern i32 displayWidth;
-extern i32 displayHeight;
+extern i32 win_w;
+extern i32 win_h;
 
 extern TTF_Font* ttf_font_debug;
 
-extern SDL_Window* mainWindow;
+extern SDL_Window* win_main;
 SDL_Surface* viewportSurface = NULL;
 SDL_Surface* mainWindowSurface = NULL;
 
@@ -76,7 +75,7 @@ void r_draw_crosshair(SDL_Surface* target)
 void r_draw()
 {
 	// Do the rendering pipeline
-	show_map = input.map;
+	show_map = input.m_map;
 
 	scan_draw(viewportSurface);
 	DrawSprites(viewportSurface);
@@ -88,7 +87,7 @@ void r_draw()
 	rd_render_debug(viewportSurface);
 	
 	SDL_BlitScaled(viewportSurface, NULL, mainWindowSurface, NULL);
-	SDL_UpdateWindowSurface(mainWindow);
+	SDL_UpdateWindowSurface(win_main);
 }
 
 i16 r_hud_px_h(float x)

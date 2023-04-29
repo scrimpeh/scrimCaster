@@ -5,7 +5,7 @@
 
 #include <math.h>
 
-extern Map map;
+extern Map m_map;
 
 const float MAXSLOPE = 1e+8f;
 
@@ -31,14 +31,14 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 		for (i16 y_cell = grid_y; y_cell != next_grid_y; y_cell += g_is_north(orientation) ? -1 : 1)
 		{
 			// Out-of-bounds check
-			if (y_cell < 0 || y_cell >= map.h || grid_x < 0 || grid_x >= map.w)
+			if (y_cell < 0 || y_cell >= m_map.h || grid_x < 0 || grid_x >= m_map.w)
 				return;
 
-			const Cell* cell = &map.cells[map.w * y_cell + grid_x];
+			const Cell* cell = &m_map.cells[m_map.w * y_cell + grid_x];
 			const Side* side = g_is_north(orientation) ? &cell->n : &cell->s;
 			const bool edge =
 				(g_is_north(orientation) && y_cell == 0) ||
-				(g_is_south(orientation) && y_cell == map.h - 1);
+				(g_is_south(orientation) && y_cell == m_map.h - 1);
 
 			if (edge || side->type)
 			{
@@ -71,14 +71,14 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 		grid_y = next_grid_y;
 
 		// Out-of-bounds check
-		if (grid_y < 0 || grid_y >= map.h || grid_x < 0 || grid_x >= map.w)
+		if (grid_y < 0 || grid_y >= m_map.h || grid_x < 0 || grid_x >= m_map.w)
 			return;
 
-		const Cell* cell = &map.cells[map.w * grid_y + grid_x];
+		const Cell* cell = &m_map.cells[m_map.w * grid_y + grid_x];
 		const Side* side = g_is_west(orientation) ? &cell->w : &cell->e;
 		const bool edge =
 			(g_is_west(orientation) && grid_x == 0) ||
-			(g_is_east(orientation) && grid_x == map.w - 1);
+			(g_is_east(orientation) && grid_x == m_map.w - 1);
 			
 		if (edge || side->type)
 		{

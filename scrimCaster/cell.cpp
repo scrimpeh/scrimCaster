@@ -1,6 +1,6 @@
 #include "cell.h"
 
-Side* m_get_side(Cell* cell, m_orientation orientation)
+Side* m_cell_get_side(Cell* cell, m_orientation orientation)
 {
 	switch (orientation)
 	{

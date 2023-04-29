@@ -3480,9 +3480,9 @@ typedef void (APIENTRYP PFNGLGETNUNIFORMDVARBPROC) (GLuint program, GLint locati
 typedef void (APIENTRYP PFNGLGETNMAPDVARBPROC) (GLenum target, GLenum query, GLsizei bufSize, GLdouble *v);
 typedef void (APIENTRYP PFNGLGETNMAPFVARBPROC) (GLenum target, GLenum query, GLsizei bufSize, GLfloat *v);
 typedef void (APIENTRYP PFNGLGETNMAPIVARBPROC) (GLenum target, GLenum query, GLsizei bufSize, GLint *v);
-typedef void (APIENTRYP PFNGLGETNPIXELMAPFVARBPROC) (GLenum map, GLsizei bufSize, GLfloat *values);
-typedef void (APIENTRYP PFNGLGETNPIXELMAPUIVARBPROC) (GLenum map, GLsizei bufSize, GLuint *values);
-typedef void (APIENTRYP PFNGLGETNPIXELMAPUSVARBPROC) (GLenum map, GLsizei bufSize, GLushort *values);
+typedef void (APIENTRYP PFNGLGETNPIXELMAPFVARBPROC) (GLenum m_map, GLsizei bufSize, GLfloat *values);
+typedef void (APIENTRYP PFNGLGETNPIXELMAPUIVARBPROC) (GLenum m_map, GLsizei bufSize, GLuint *values);
+typedef void (APIENTRYP PFNGLGETNPIXELMAPUSVARBPROC) (GLenum m_map, GLsizei bufSize, GLushort *values);
 typedef void (APIENTRYP PFNGLGETNPOLYGONSTIPPLEARBPROC) (GLsizei bufSize, GLubyte *pattern);
 typedef void (APIENTRYP PFNGLGETNCOLORTABLEARBPROC) (GLenum target, GLenum format, GLenum type, GLsizei bufSize, void *table);
 typedef void (APIENTRYP PFNGLGETNCONVOLUTIONFILTERARBPROC) (GLenum target, GLenum format, GLenum type, GLsizei bufSize, void *image);
@@ -3501,9 +3501,9 @@ GLAPI void APIENTRY glGetnUniformdvARB (GLuint program, GLint location, GLsizei 
 GLAPI void APIENTRY glGetnMapdvARB (GLenum target, GLenum query, GLsizei bufSize, GLdouble *v);
 GLAPI void APIENTRY glGetnMapfvARB (GLenum target, GLenum query, GLsizei bufSize, GLfloat *v);
 GLAPI void APIENTRY glGetnMapivARB (GLenum target, GLenum query, GLsizei bufSize, GLint *v);
-GLAPI void APIENTRY glGetnPixelMapfvARB (GLenum map, GLsizei bufSize, GLfloat *values);
-GLAPI void APIENTRY glGetnPixelMapuivARB (GLenum map, GLsizei bufSize, GLuint *values);
-GLAPI void APIENTRY glGetnPixelMapusvARB (GLenum map, GLsizei bufSize, GLushort *values);
+GLAPI void APIENTRY glGetnPixelMapfvARB (GLenum m_map, GLsizei bufSize, GLfloat *values);
+GLAPI void APIENTRY glGetnPixelMapuivARB (GLenum m_map, GLsizei bufSize, GLuint *values);
+GLAPI void APIENTRY glGetnPixelMapusvARB (GLenum m_map, GLsizei bufSize, GLushort *values);
 GLAPI void APIENTRY glGetnPolygonStippleARB (GLsizei bufSize, GLubyte *pattern);
 GLAPI void APIENTRY glGetnColorTableARB (GLenum target, GLenum format, GLenum type, GLsizei bufSize, void *table);
 GLAPI void APIENTRY glGetnConvolutionFilterARB (GLenum target, GLenum format, GLenum type, GLsizei bufSize, void *image);
@@ -4549,7 +4549,7 @@ typedef void (APIENTRYP PFNGLGETHISTOGRAMPARAMETERXVOESPROC) (GLenum target, GLe
 typedef void (APIENTRYP PFNGLGETLIGHTXOESPROC) (GLenum light, GLenum pname, GLfixed *params);
 typedef void (APIENTRYP PFNGLGETMAPXVOESPROC) (GLenum target, GLenum query, GLfixed *v);
 typedef void (APIENTRYP PFNGLGETMATERIALXOESPROC) (GLenum face, GLenum pname, GLfixed param);
-typedef void (APIENTRYP PFNGLGETPIXELMAPXVPROC) (GLenum map, GLint size, GLfixed *values);
+typedef void (APIENTRYP PFNGLGETPIXELMAPXVPROC) (GLenum m_map, GLint size, GLfixed *values);
 typedef void (APIENTRYP PFNGLGETTEXGENXVOESPROC) (GLenum coord, GLenum pname, GLfixed *params);
 typedef void (APIENTRYP PFNGLGETTEXLEVELPARAMETERXVOESPROC) (GLenum target, GLint level, GLenum pname, GLfixed *params);
 typedef void (APIENTRYP PFNGLINDEXXOESPROC) (GLfixed component);
@@ -4569,7 +4569,7 @@ typedef void (APIENTRYP PFNGLMULTITEXCOORD3XVOESPROC) (GLenum texture, const GLf
 typedef void (APIENTRYP PFNGLMULTITEXCOORD4XVOESPROC) (GLenum texture, const GLfixed *coords);
 typedef void (APIENTRYP PFNGLNORMAL3XVOESPROC) (const GLfixed *coords);
 typedef void (APIENTRYP PFNGLPASSTHROUGHXOESPROC) (GLfixed token);
-typedef void (APIENTRYP PFNGLPIXELMAPXPROC) (GLenum map, GLint size, const GLfixed *values);
+typedef void (APIENTRYP PFNGLPIXELMAPXPROC) (GLenum m_map, GLint size, const GLfixed *values);
 typedef void (APIENTRYP PFNGLPIXELSTOREXPROC) (GLenum pname, GLfixed param);
 typedef void (APIENTRYP PFNGLPIXELTRANSFERXOESPROC) (GLenum pname, GLfixed param);
 typedef void (APIENTRYP PFNGLPIXELZOOMXOESPROC) (GLfixed xfactor, GLfixed yfactor);
@@ -4654,7 +4654,7 @@ GLAPI void APIENTRY glGetHistogramParameterxvOES (GLenum target, GLenum pname, G
 GLAPI void APIENTRY glGetLightxOES (GLenum light, GLenum pname, GLfixed *params);
 GLAPI void APIENTRY glGetMapxvOES (GLenum target, GLenum query, GLfixed *v);
 GLAPI void APIENTRY glGetMaterialxOES (GLenum face, GLenum pname, GLfixed param);
-GLAPI void APIENTRY glGetPixelMapxv (GLenum map, GLint size, GLfixed *values);
+GLAPI void APIENTRY glGetPixelMapxv (GLenum m_map, GLint size, GLfixed *values);
 GLAPI void APIENTRY glGetTexGenxvOES (GLenum coord, GLenum pname, GLfixed *params);
 GLAPI void APIENTRY glGetTexLevelParameterxvOES (GLenum target, GLint level, GLenum pname, GLfixed *params);
 GLAPI void APIENTRY glIndexxOES (GLfixed component);
@@ -4674,7 +4674,7 @@ GLAPI void APIENTRY glMultiTexCoord3xvOES (GLenum texture, const GLfixed *coords
 GLAPI void APIENTRY glMultiTexCoord4xvOES (GLenum texture, const GLfixed *coords);
 GLAPI void APIENTRY glNormal3xvOES (const GLfixed *coords);
 GLAPI void APIENTRY glPassThroughxOES (GLfixed token);
-GLAPI void APIENTRY glPixelMapx (GLenum map, GLint size, const GLfixed *values);
+GLAPI void APIENTRY glPixelMapx (GLenum m_map, GLint size, const GLfixed *values);
 GLAPI void APIENTRY glPixelStorex (GLenum pname, GLfixed param);
 GLAPI void APIENTRY glPixelTransferxOES (GLenum pname, GLfixed param);
 GLAPI void APIENTRY glPixelZoomxOES (GLfixed xfactor, GLfixed yfactor);

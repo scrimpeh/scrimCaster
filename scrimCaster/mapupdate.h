@@ -1,16 +1,16 @@
 #pragma once
 
+#include "common.h"
 #include "map.h"
 
-typedef struct SideList
+typedef struct m_active_tag_list
 {
-	Side* side;
-	SideList* next;
-} CellList;
+	u32 tag;
+	m_active_tag_list* next;
+} m_active_tag_list;
 
-void UpdateSides(u32 timeStep);
-SideList* AddActiveSide(Side* s);
-void RemoveActiveSide(SideList* curr, SideList* prev);
-void ClearActiveSides();
+void mu_update(u32 t_delta);
+void mu_activate_tag(u32 tag);
+void mu_clear();
 
-static bool UpdateDoor(Side* const side, u32 timeStep);
+static bool mu_update_side(Side* const side, u32 timeStep);

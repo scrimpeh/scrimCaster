@@ -1,6 +1,8 @@
 #pragma once
 
-#include "actor.h"
+#include <common.h>
+
+#include <actor.h>
 
 //Various containers for actor types. Presumably, should have both a fixed "array type" container (simple), and
 //a linked list / variable size container (less simple)

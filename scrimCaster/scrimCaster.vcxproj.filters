@@ -106,13 +106,7 @@
     <ClInclude Include="scrimCaster.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="types.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="common.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="debug.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="geometry.h">
@@ -131,7 +125,7 @@
     <ClInclude Include="automap.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="watch.h">
+    <ClInclude Include="debugutil\watch.h">
       <Filter>Source Files\debugutil</Filter>
     </ClInclude>
     <ClInclude Include="renderdebug.h">
@@ -232,7 +226,7 @@
     <ClCompile Include="automap.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="watch.cpp">
+    <ClCompile Include="debugutil\watch.cpp">
       <Filter>Source Files\debugutil</Filter>
     </ClCompile>
     <ClCompile Include="renderdebug.cpp">

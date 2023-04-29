@@ -1,37 +1,39 @@
-#include "types.h"
-#include "window.h"
-#include "SDL/SDL.h"
+#include <window.h>
 
-#include "mouselook.h"
-#include "render.h"
+#include <mouselook.h>
+#include <render.h>
 
-SDL_Window* mainWindow = NULL;
-SDL_PixelFormat* mainWindowFmt = NULL;
-i32 displayWidth = 1024;			//Subject to config files
-i32 displayHeight = 768;
-i32 windowPosX = SDL_WINDOWPOS_UNDEFINED;
-i32 windowPosY = SDL_WINDOWPOS_UNDEFINED;
-u32 windowMode = SDL_WINDOW_SHOWN;
+#include <SDL/SDL.h>
+
+const static SDL_WindowFlags win_modes[] = 
+{
+	SDL_WINDOW_SHOWN, 
+	SDL_WINDOW_BORDERLESS, 
+	SDL_WINDOW_FULLSCREEN 
+};
+
+SDL_Window* win_main = NULL;
+SDL_PixelFormat* win_main_format = NULL;
+i32 win_w = 1024;
+i32 win_h = 768;
+i32 win_x = SDL_WINDOWPOS_UNDEFINED;
+i32 win_y = SDL_WINDOWPOS_UNDEFINED;
+u32 win_mode = SDL_WINDOW_SHOWN;
 
 extern bool suspend_mouselook;
 extern bool inMenu;
 
 extern SDL_Surface* mainWindowSurface;
 
-i32 CreateMainWindow()
+i32 win_create()
 {
-	mainWindow = SDL_CreateWindow("scrimCaster", 
-		windowPosX, windowPosY,
-		displayWidth, displayHeight,
-		windowMode );
-	
-	mainWindowSurface = SDL_GetWindowSurface(mainWindow);
-	mainWindowFmt = mainWindowSurface->format;
-	
-	return mainWindow == 0;
+	win_main = SDL_CreateWindow("scrimCaster", win_x, win_y,win_w, win_h, win_mode);
+	mainWindowSurface = SDL_GetWindowSurface(win_main);
+	win_main_format = mainWindowSurface->format;
+	return !win_main;
 }
 
-void ProcessWindowEvent(const SDL_Event* evt)
+void win_process_event(const SDL_Event* evt)
 {
 	SDL_assert(evt->type == SDL_WINDOWEVENT);
 	switch (evt->window.event)
@@ -48,25 +50,19 @@ void ProcessWindowEvent(const SDL_Event* evt)
 //Changes the Window Mode, returns 0 on success, 1 on error
 //windowMode is either windowed border (0), windowed noborder (1) or fullscreen (2),
 //in which case the other two parameters do not matter
-i32 ChangeWindowMode(i32 newWidth, i32 newHeight, WindowMode newWindowMode)
+i32 win_set_mode(i32 w, i32 h, win_display_mode mode)
 {
-	const static SDL_WindowFlags windowModes[] = {
-		SDL_WINDOW_SHOWN, SDL_WINDOW_BORDERLESS, SDL_WINDOW_FULLSCREEN };
+	win_w = w;
+	win_h = h;
+	win_mode = win_modes[mode];
 
-	auto newWinMode = (u32)newWindowMode;
-	SDL_assert(newWinMode < SDL_arraysize(windowModes));
-
-	displayWidth = newWidth;
-	displayHeight = newHeight;
-	windowMode = windowModes[newWinMode];
-
-	//Now recreate the window
-	DestroyMainWindow();
-	return CreateMainWindow();
+	// Recreate the window
+	win_destroy();
+	return win_create();
 }
 
-void DestroyMainWindow()
+void win_destroy()
 {
-	SDL_DestroyWindow(mainWindow);
-	mainWindow = NULL;
+	SDL_DestroyWindow(win_main);
+	win_main = NULL;
 }

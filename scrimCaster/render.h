@@ -6,11 +6,11 @@
 // In 2D space, to be independent of pixel sizes, sizes are treated as floats in [0., 1.[
 // with the value denoting how far the are from the edge of the screen
 
-#include "common.h"
+#include <common.h>
 
-#include "geometry.h"
+#include <geometry.h>
 
-#include "SDL/SDL_render.h"
+#include <SDL/SDL_render.h>
 
 extern u16 viewport_w;
 extern u16 viewport_h;

@@ -508,21 +508,21 @@ extern DECLSPEC int SDLCALL Mix_ReserveChannels(int num);
    represent the group of all the channels).
    Returns true if everything was OK.
  */
-extern DECLSPEC int SDLCALL Mix_GroupChannel(int which, int tag);
+extern DECLSPEC int SDLCALL Mix_GroupChannel(int which, int target);
 /* Assign several consecutive channels to a group */
-extern DECLSPEC int SDLCALL Mix_GroupChannels(int from, int to, int tag);
+extern DECLSPEC int SDLCALL Mix_GroupChannels(int from, int to, int target);
 /* Finds the first available channel in a group of channels,
    returning -1 if none are available.
  */
-extern DECLSPEC int SDLCALL Mix_GroupAvailable(int tag);
+extern DECLSPEC int SDLCALL Mix_GroupAvailable(int target);
 /* Returns the number of channels in a group. This is also a subtle
    way to get the total number of channels when 'tag' is -1
  */
-extern DECLSPEC int SDLCALL Mix_GroupCount(int tag);
+extern DECLSPEC int SDLCALL Mix_GroupCount(int target);
 /* Finds the "oldest" sample playing in a group of channels */
-extern DECLSPEC int SDLCALL Mix_GroupOldest(int tag);
+extern DECLSPEC int SDLCALL Mix_GroupOldest(int target);
 /* Finds the "most recent" (i.e. last) sample playing in a group of channels */
-extern DECLSPEC int SDLCALL Mix_GroupNewer(int tag);
+extern DECLSPEC int SDLCALL Mix_GroupNewer(int target);
 
 /* Play an audio chunk on a specific channel.
    If the specified channel is -1, play on the first free channel.
@@ -552,7 +552,7 @@ extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
-extern DECLSPEC int SDLCALL Mix_HaltGroup(int tag);
+extern DECLSPEC int SDLCALL Mix_HaltGroup(int target);
 extern DECLSPEC int SDLCALL Mix_HaltMusic(void);
 
 /* Change the expiration delay for a particular channel.
@@ -566,7 +566,7 @@ extern DECLSPEC int SDLCALL Mix_ExpireChannel(int channel, int ticks);
    will take.
  */
 extern DECLSPEC int SDLCALL Mix_FadeOutChannel(int which, int ms);
-extern DECLSPEC int SDLCALL Mix_FadeOutGroup(int tag, int ms);
+extern DECLSPEC int SDLCALL Mix_FadeOutGroup(int target, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeOutMusic(int ms);
 
 /* Query the fading status of a channel */

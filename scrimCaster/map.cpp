@@ -4,9 +4,6 @@
 #include "gfxloader.h"
 #include "mapupdate.h"
 
-#include "SDL/SDL_log.h"
-#include "SDL/SDL_assert.h"
-
 /* On scrolling doors:
  * When activated, a door switches from 'SOLID' into 'TRANSLUCENT' as well as other flags that need changing.
  * param1 shall define the scrollspeed (in terms of ticks per val)
@@ -16,8 +13,7 @@
  * scroll shall define "how open" the door is, i.e. it determines the ratio between open and not open
  */
 
-bool mapLoaded;
-Map map;
+Map m_map;
 Cell* cellptr = NULL;
 
 const char* tx = "test.png";
@@ -28,64 +24,43 @@ extern ActorVector levelEnemies;
 
 Cell cellgrid[16][16];
 
-Cell* GetCell(GridPos gp)
-{
-	SDL_assert(gp.x >= 0 && gp.x < map.w);
-	SDL_assert(gp.y >= 0 && gp.y < map.h);
+u32 m_max_tag;
+m_taglist* m_tags;
+bool* m_tag_active;
 
-	return &map.cells[gp.y * map.w + gp.x];
+Cell* m_get_cell(u16 x, u16 y)
+{
+	SDL_assert(x < m_map.w && y < m_map.h);
+	return &m_map.cells[m_map.w * y + x];
 }
 
-Cell* GetCell(double x, double y)
+Side* m_get_side(u16 x, u16 y, m_orientation o)
 {
-	const i16 offset_x = (i16)SDL_floor(x / M_CELLSIZE);
-	const i16 offset_y = (i16)SDL_floor(y / M_CELLSIZE);
-
-	return &map.cells[offset_y*map.w + offset_x];
+	return m_cell_get_side(m_get_cell(x, y), o);
 }
 
-GridPos GetGridPosition(double x, double y)
-{
-	return { 
-		(i16)SDL_floor(x / M_CELLSIZE), 
-		(i16)SDL_floor(y / M_CELLSIZE) 
-	};
-}
-
-u32 AsMapOffset(i16 x, i16 y, m_orientation o)
-{
-	SDL_assert(o < 4);
-	return ((y * map.w) + x) * 4 + o;
-};
-
-Side* FromMapOffset(u32 offset)
-{
-	return m_get_side(&map.cells[offset / 4], offset % 4);
-};
-
-void LoadMap()
+void m_load()
 {
 	u8 i, j, n;
-	map.w = 16;
-	map.h = 16;
-	map.cells = cellgrid[0];
-	map.info.txSetCount = 1;
-	map.info.txSets = tx_sets;
-	map.info.floorname = none;
-	map.info.skyname = none;
-	map.info.mus = none;
+	u32 target = 1;
+	m_map.w = 16;
+	m_map.h = 16;
+	m_map.cells = cellgrid[0];
+	m_map.info.txSetCount = 1;
+	m_map.info.txSets = tx_sets;
+	m_map.info.skyname = none;
 
-	SDL_assert(map.info.txSetCount > 0);
+	SDL_assert(m_map.info.txSetCount > 0);
 
-	for (u32 i = 0; i < map.info.txSetCount; ++i)
+	for (u32 i = 0; i < m_map.info.txSetCount; ++i)
 	{
-		LoadMapTexture(map.info.txSets[i]);
+		LoadMapTexture(m_map.info.txSets[i]);
 	}
 
 	for (i = 0; i < 8; ++i)
 		for (j = 0; j < 8; ++j)
 			for (n = 0; n < 4; ++n)
-				m_get_side(&cellgrid[i][j], n)->type = 0;
+				m_cell_get_side(&cellgrid[i][j], n)->type = 0;
 
 	//make rudimentary walls
 	{
@@ -117,9 +92,9 @@ void LoadMap()
 		for (u8 i = 0; i < 2; ++i)
 		{
 			cellgrid[3 + i][6].e.type = 4;
-			cellgrid[3 + i][6].e.flags = SideFlags(PASSABLE | TRANSLUCENT);
+			cellgrid[3 + i][6].e.flags = m_side_flags(PASSABLE | TRANSLUCENT);
 			cellgrid[3 + i][7].w.type = 4;
-			cellgrid[3 + i][7].w.flags = SideFlags(PASSABLE | TRANSLUCENT);
+			cellgrid[3 + i][7].w.flags = m_side_flags(PASSABLE | TRANSLUCENT);
 		}
 
 
@@ -131,7 +106,7 @@ void LoadMap()
 		cellgrid[1][3].s.type = 1;
 		cellgrid[1][3].w.type = 1;
 		cellgrid[2][4].w.type = 5;
-		cellgrid[2][4].w.flags = SideFlags(MIRR_H | SCROLL_H);
+		cellgrid[2][4].w.flags = m_side_flags(MIRR_H | SCROLL_H);
 		cellgrid[2][4].w.param1 = -8;
 		cellgrid[2][0].e.type = 5;
 		cellgrid[3][1].e.type = 1;
@@ -158,7 +133,9 @@ void LoadMap()
 		cellgrid[7][4].e.type = 1;
 		cellgrid[7][4].w.type = 3;
 
-		cellgrid[4][2].w.type = 2;
+		cellgrid[4][2].w.type = 1;
+		cellgrid[4][2].w.target = 1;
+		cellgrid[6][1].w.door.door_flags = PLAYER_ACTIVATE;
 		cellgrid[5][2].w.type = 2;
 		cellgrid[6][2].w.type = 2;
 		cellgrid[4][1].e.type = 2;
@@ -173,28 +150,30 @@ void LoadMap()
 
 		cellgrid[6][1].s.type = 5;
 		cellgrid[6][1].s.flags = DOOR_V;
-		cellgrid[6][1].s.door.status = 0;
+		cellgrid[6][1].s.door.state = 0;
 		cellgrid[6][1].s.door.openspeed = 12;
 		cellgrid[6][1].s.door.staytime = 12;
 		cellgrid[6][1].s.door.closespeed = 12;
-		cellgrid[6][1].s.door.door_flags = DoorFlags(LINKED | PLAYER_ACTIVATE); //double sided
-		cellgrid[6][1].s.door.linked_to = AsMapOffset(1, 7, M_NORTH);
+		cellgrid[6][1].s.door.door_flags = PLAYER_ACTIVATE;
+		cellgrid[6][1].s.tag = target++;
+		cellgrid[6][1].s.target = cellgrid[6][1].s.tag;
 
 		cellgrid[7][1].n.type = 5;
 		cellgrid[7][1].n.flags = DOOR_V;
-		cellgrid[7][1].n.door.status = 0;
+		cellgrid[7][1].n.door.state = 0;
 		cellgrid[7][1].n.door.openspeed = 1;
 		cellgrid[7][1].n.door.staytime = 12;
 		cellgrid[7][1].n.door.closespeed = 1;
-		cellgrid[7][1].n.door.door_flags = DoorFlags(LINKED | PLAYER_ACTIVATE); //double sided
-		cellgrid[7][1].n.door.linked_to = AsMapOffset(1, 6, M_SOUTH);
+		cellgrid[7][1].n.door.door_flags = PLAYER_ACTIVATE;
+		cellgrid[7][1].n.tag = cellgrid[6][1].s.tag;
+		cellgrid[7][1].n.target = cellgrid[6][1].s.tag;
 
 	}
 
 	Actor pil;
 	pil.type = PILLAR;
 
-	auto al = &map.levelObjs;
+	auto al = &m_map.levelObjs;
 	ActorArrayMake(al, 5);
 	
 	pil.x = 300;
@@ -247,12 +226,90 @@ void LoadMap()
 
 	//cellptr = (Cell*)SDL_malloc(sizeof(Cell) * 32 * 32);
 	//SDL_assert(cellptr);
+	m_create_tags();
 };
 
-void UnloadMap()
+void m_unload()
 {
-	ActorArrayDestroy(&map.levelObjs);
+	ActorArrayDestroy(&m_map.levelObjs);
 	ActorVectorDestroy(&levelEnemies);
-	ClearActiveSides();
+	mu_clear();
+	m_destroy_tags();
 	//SDL_free(cellptr);
 };
+
+static i32 m_create_tags()
+{
+	// Count the total number of tags and allocate an array to hold the tag information
+	m_max_tag = 0;
+	for (u16 y = 0; y < m_map.h; y++)
+		for (u16 x = 0; x < m_map.w; x++)
+			for (u8 orientation = 0; orientation < 4; orientation++)
+				m_max_tag = SDL_max(m_get_side(x, y, orientation)->tag, m_max_tag);
+
+	const u32 tag_count = m_max_tag + 1;
+
+	m_tags = (m_taglist*)SDL_malloc(sizeof(m_taglist) * tag_count);
+	if (!m_tags)
+		return -1;
+
+	// Find out how many sides are tagged per tag
+	for (u32 i = 0; i <= m_max_tag; i++)
+		m_tags[i].count = 0;
+	for (u16 y = 0; y < m_map.h; y++)
+		for (u16 x = 0; x < m_map.w; x++)
+			for (u8 orientation = 0; orientation < 4; orientation++)
+				m_tags[m_get_side(x, y, orientation)->tag].count++;
+
+	// Allocate space for the tag lists
+	for (u32 i = 1; i <= m_max_tag; i++)
+		if (!(m_tags[i].sides = (Side**)SDL_malloc(sizeof(Side*) * m_tags[i].count)))
+			return -2;
+
+	// Now iterate through the map and build the side list for each tag
+	u32* side_indices = (u32*)SDL_malloc(sizeof(u32) * tag_count);
+	for (u32 i = 1; i <= m_max_tag; i++)
+		side_indices[i] = 0;
+
+	for (u16 y = 0; y < m_map.h; y++)
+	{
+		for (u16 x = 0; x < m_map.w; x++)
+		{
+			for (u8 orientation = 0; orientation < 4; orientation++)
+			{
+				Side* side = m_get_side(x, y, orientation);
+				if (side->tag)
+				{
+					u32 next_tag = side_indices[side->tag]++;
+					m_tags[side->tag].sides[next_tag] = side;
+				}
+			}
+		}
+	}
+
+	SDL_free(side_indices);
+
+	// TEMP/TODO: This should be handled by mapupdate
+	m_tag_active = (bool*) SDL_malloc(sizeof(bool) * tag_count);
+	if (!m_tag_active)
+		return -3;
+	for (u32 i = 0; i <= m_max_tag; i++)
+		m_tag_active[i] = false;
+
+	return 0;
+}
+
+static void m_destroy_tags()
+{
+	for (u32 i = 1; i <= m_max_tag; i++)
+		SDL_free(m_tags[i].sides);
+	SDL_free(m_tags);
+	SDL_free(m_tag_active);
+	m_max_tag = 0;
+}
+
+m_taglist* m_get_tags(u32 target)
+{
+	SDL_assert(target <= m_max_tag);
+	return &m_tags[target];
+}

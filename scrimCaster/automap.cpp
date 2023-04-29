@@ -27,8 +27,8 @@ static float r_map_intercept_y;
 
 void am_init()
 {
-	am_center_x = (float)map.w * M_CELLSIZE / 2;
-	am_center_y = (float)map.h * M_CELLSIZE / 2;
+	am_center_x = (float)m_map.w * M_CELLSIZE / 2;
+	am_center_y = (float)m_map.h * M_CELLSIZE / 2;
 }
 
 void am_draw(SDL_Surface* target)
@@ -40,9 +40,9 @@ void am_draw(SDL_Surface* target)
 
 	const float viewport_ratio = (float)viewport_w / viewport_h;
 	const float am_x_min = AM_MARIGN * viewport_ratio;
-	const float am_x_max = (map.w * M_CELLSIZE - AM_MARIGN) * viewport_ratio;
+	const float am_x_max = (m_map.w * M_CELLSIZE - AM_MARIGN) * viewport_ratio;
 	const float am_y_min = AM_MARIGN;
-	const float am_y_max = map.h * M_CELLSIZE - AM_MARIGN;
+	const float am_y_max = m_map.h * M_CELLSIZE - AM_MARIGN;
 
 	am_x = SDL_min(SDL_max(am_x, am_x_min), am_x_max);
 	am_y = SDL_min(SDL_max(am_y, am_y_min), am_y_max);
@@ -53,7 +53,7 @@ void am_draw(SDL_Surface* target)
 
 static void am_draw_cell(SDL_Surface* target, i16 grid_x, i16 grid_y)
 {
-	const Cell* cell = map.cells + grid_y * map.h + grid_x;
+	const Cell* cell = m_map.cells + grid_y * m_map.h + grid_x;
 	am_draw_side(target, grid_x, grid_y, &cell->e, SIDE_ORIENTATION_EAST);
 	am_draw_side(target, grid_x, grid_y, &cell->n, SIDE_ORIENTATION_NORTH);
 	am_draw_side(target, grid_x, grid_y, &cell->w, SIDE_ORIENTATION_WEST);
@@ -126,8 +126,8 @@ static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side
 
 static void am_draw_map(SDL_Surface* target)
 {
-	for (u16 y = 0; y < map.h; y++)
-		for (u16 x = 0; x < map.w; x++)
+	for (u16 y = 0; y < m_map.h; y++)
+		for (u16 x = 0; x < m_map.w; x++)
 			am_draw_cell(target, x, y);
 }
 
@@ -170,10 +170,10 @@ void am_draw_actors(SDL_Surface* target)
 {
 	am_draw_actor(target, &player);
 
-	for (u32 i = 0; i < map.levelObjs.count; i++)
-		am_draw_actor(target, &map.levelObjs.actor[i]);
-	for (u32 i = 0; i < map.levelEnemies.count; i++)
-		am_draw_actor(target, &map.levelEnemies.actor[i]);
+	for (u32 i = 0; i < m_map.levelObjs.count; i++)
+		am_draw_actor(target, &m_map.levelObjs.actor[i]);
+	for (u32 i = 0; i < m_map.levelEnemies.count; i++)
+		am_draw_actor(target, &m_map.levelEnemies.actor[i]);
 }
 
 static bool am_collect_intercept(const g_intercept* intercept)

@@ -1,5 +1,4 @@
-#include "types.h"
-#include "actorcontainers.h"
+#include <actorcontainers.h>
 
 void ActorListMake(ActorList* al, u32 capacity)
 {

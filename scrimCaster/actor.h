@@ -23,7 +23,7 @@ typedef struct Bounds
 } Bounds;
 
 //Actor types are named by some flag, and then an offset
-typedef enum TypeOffset : u16
+typedef enum TypeOffset
 {
 	NONE     = 0x0000,
 	ENEMY    = 0x0100,
@@ -34,7 +34,7 @@ typedef enum TypeOffset : u16
 	OTHER    = 0x2000
 } TypeOffset;
 
-typedef enum ActorType : u16
+typedef enum ActorType
 {
 	BLANK = 0,
 	PLAYER = 1,
@@ -48,11 +48,7 @@ typedef enum ActorType : u16
 typedef struct Actor
 {
 	//Universal types, common for all actors
-	union 
-	{
-		ActorType type;
-		struct { u8 actor_index; u8 actor_class; };
-	};
+	ActorType type;
 	double x, y; //The position of an actor is given as cartesian coordinates.
 	double speed, strafe; //momentum, forward and backward
 	angle_d angle;

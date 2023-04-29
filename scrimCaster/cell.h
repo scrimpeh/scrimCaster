@@ -86,16 +86,7 @@ typedef struct Side
 	u8 state;
 	bool solid;
 	m_side_flags flags;
-	union
-	{
-		struct			//default params
-		{
-			u8 scroll_x, scroll_y;
-			u32 param1, param2;
-		};
-
-		DoorParams door;
-	};
+	DoorParams door;
 } Side;
 
 typedef struct Cell

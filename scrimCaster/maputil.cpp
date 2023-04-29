@@ -1,10 +1,8 @@
-#include "types.h"
-#include "maputil.h"
-#include "renderconstants.h"
+#include <maputil.h>
 
-#include "SDL/SDL_assert.h"
-#include "SDL/SDL_log.h"
-#include "math.h"
+#include <renderconstants.h>
+
+#include <math.h>
 
 
 const float MAXSLOPE = 1e+8f;

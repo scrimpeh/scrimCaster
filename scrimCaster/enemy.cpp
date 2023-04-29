@@ -39,9 +39,7 @@ void UpdateEnemies(u32 timeStep)
 	{
 		Actor* cur_enemy = levelEnemies.content[i];
 
-		SDL_assert(cur_enemy->actor_index < SDL_arraysize(update_enemy_functions));
-
-		if (update_enemy_functions[cur_enemy->actor_index](timeStep, cur_enemy))
+		if (update_enemy_functions[cur_enemy->type](timeStep, cur_enemy))
 		{
 			SDL_free(cur_enemy);	
 			--levelEnemies.count;

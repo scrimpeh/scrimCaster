@@ -1,13 +1,13 @@
-#include "types.h"
-#include "game.h"
-#include "map.h"
-#include "mapupdate.h"
-#include "player.h"
-#include "camera.h"
-#include "input.h"
-#include "mouselook.h"
-#include "actorcontainers.h"
-#include "enemy.h"
+#include <game.h>
+
+#include <actorcontainers.h>
+#include <camera.h>
+#include <input.h>
+#include <enemy.h>
+#include <map.h>
+#include <mapupdate.h>
+#include <mouselook.h>
+#include <player.h>
 
 // On game Objects:
 /* Do we want a unified Actor system, or break up several types

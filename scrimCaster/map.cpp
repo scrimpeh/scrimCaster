@@ -104,13 +104,13 @@ void m_load()
 		cellgrid[1][1].e.type = 3;
 		cellgrid[1][1].s.type = 1;
 		cellgrid[1][1].s.flags = SCROLL_H;
-		cellgrid[1][1].s.param1 = 8;
+		// cellgrid[1][1].s.param1 = 8;
 		cellgrid[0][2].s.type = 5;
 		cellgrid[1][3].s.type = 1;
 		cellgrid[1][3].w.type = 1;
 		cellgrid[2][4].w.type = 5;
 		cellgrid[2][4].w.flags = m_side_flags(MIRR_H | SCROLL_H);
-		cellgrid[2][4].w.param1 = -8;
+		// cellgrid[2][4].w.param1 = -8;
 		cellgrid[2][0].e.type = 5;
 		cellgrid[3][1].e.type = 1;
 		cellgrid[3][1].n.type = 1;

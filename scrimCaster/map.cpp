@@ -1,8 +1,9 @@
-#include "map.h"
+#include <map.h>
 
-#include "actor.h"
-#include "gfxloader.h"
-#include "mapupdate.h"
+#include <actor.h>
+#include <gfxloader.h>
+#include <mapupdate.h>
+#include <texture.h>
 
 /* On scrolling doors:
  * When activated, a door switches from 'SOLID' into 'TRANSLUCENT' as well as other flags that need changing.
@@ -52,6 +53,8 @@ void m_load()
 
 	SDL_assert(m_map.info.txSetCount > 0);
 
+	tx_load(&m_map);
+
 	for (u32 i = 0; i < m_map.info.txSetCount; ++i)
 	{
 		LoadMapTexture(m_map.info.txSets[i]);
@@ -62,7 +65,7 @@ void m_load()
 			for (n = 0; n < 4; ++n)
 				m_cell_get_side(&cellgrid[i][j], n)->type = 0;
 
-	//make rudimentary walls
+	// Make rudimentary walls
 	{
 		for (u8 i = 0; i < 7; ++i)
 		{
@@ -168,6 +171,10 @@ void m_load()
 		cellgrid[7][1].n.tag = cellgrid[6][1].s.tag;
 		cellgrid[7][1].n.target = cellgrid[6][1].s.tag;
 
+		_m_flood_fill(0, 0, 7, false);
+		_m_flood_fill(9, 1, 6, false);
+		_m_flood_fill(0, 0, 6, true);
+		_m_flood_fill(9, 1, 7, true);
 	}
 
 	Actor pil;
@@ -312,4 +319,39 @@ m_taglist* m_get_tags(u32 target)
 {
 	SDL_assert(target <= m_max_tag);
 	return &m_tags[target];
+}
+
+static void _m_flood_fill(u16 x, u16 y, u16 type, bool floor)
+{
+	const m_flat* cell = &m_get_cell(x, y)->flat;
+	_m_flood_fill_inner(x, y, type, floor ? cell->floor_type : cell->ceil_type, floor);
+}
+
+static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor)
+{
+	if (x >= m_map.w || y >= m_map.h)
+		return;
+	Cell* cell = m_get_cell(x, y);
+	m_flat* flat = &cell->flat;
+	if (floor)
+	{
+		if (flat->floor_type != initial)
+			return;
+		flat->floor_type = type;
+	}
+	else
+	{
+		if (flat->ceil_type != initial)
+			return;
+		flat->ceil_type = type;
+	}
+
+	if (!cell->e.type)
+		_m_flood_fill_inner(x + 1, y, type, initial, floor);
+	if (!cell->n.type)
+		_m_flood_fill_inner(x, y - 1, type, initial, floor);
+	if (!cell->w.type)
+		_m_flood_fill_inner(x - 1, y, type, initial, floor);
+	if (!cell->s.type)
+		_m_flood_fill_inner(x, y + 1, type, initial, floor);
 }

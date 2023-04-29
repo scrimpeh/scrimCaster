@@ -1,31 +1,25 @@
-#include "scan.h"
+#include <scan.h>
 
-#include "colormap.h"
-#include "map.h"
-#include "maputil.h"
-#include "mathutil.h"
-#include "camera.h"
-#include "geometry.h"
-#include "render.h"
-#include "renderconstants.h"
+#include <colormap.h>
+#include <map.h>
+#include <maputil.h>
+#include <camera.h>
+#include <geometry.h>
+#include <render.h>
+#include <renderconstants.h>
+#include <texture.h>
+#include <util/mathutil.h>
 
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
 
+#define HALFSIZE (TX_SIZE / 2)
 
-const float WALL_OFF = 8e-4f;
-#define HALFSIZE (TEX_SIZE / 2)
-
-extern u64 ticks;
 
 extern Map m_map;
 extern u8 viewport_x_fov;
 u8 viewport_x_fov_half;
 
-// For drawing textures
-extern u8 fillCount;
-extern u8 MAX_TEXTURE_BUF;
-extern SDL_Surface* mapTextureBuffer[];
 
 u16 viewport_w_half;
 
@@ -132,19 +126,15 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Get the texture
 	const Side* side = map_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
-	const u8 tx_index = side->type & 0x00FF;
-	u8 tx_sheet = (side->type & 0xFF00) >> 8;
-	if (tx_sheet >= fillCount) 
-		tx_sheet = 0;
-
-	const u16 tex_x = intercept->side_col + (tx_index & 0x0F) * TEX_SIZE;
-	const u16 tex_y = (tx_index & 0xF0) * (TEX_SIZE >> 4);
-
-	const u32* tex_px = (u32*)mapTextureBuffer[tx_sheet]->pixels;	
-	const u32* const tx = tex_px + (tex_y * TEX_MAP_SIZE + tex_x);
+	const u32* const tx_slice = tx_get_slice(side, intercept->column);
  
-	float tex_y_px = wall_y >= 0 ? 0 : HALFSIZE - (((float)viewport_h / wall_h) * HALFSIZE);
-	const float inc_ratio = (TEX_SIZE / (wall_h + WALL_OFF));
+	float slice_px = wall_y >= 0 ? 0 : HALFSIZE - ((float)viewport_h / wall_h) * HALFSIZE;
+	// Due to what seems to be floating point rounding errors, the slice read increment is slightly larger
+	// than it should be, leading to occasionally reading a texture slightly out of binds. 
+	// The clean method to solve this problem would probably be to calculate the texture y offset
+	// ad-hoc when we need it, but this might be slightly slower. We just reduce the increment
+	// by a small amount instead, which helps to avoid this issue.
+	const double slice_inc = TX_SIZE / ((float)wall_h + 8e-4);
 
 	// Now draw the texture slice
 	i32 y_top = SDL_max(0, wall_y);
@@ -157,7 +147,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			offset = (float)side->door.timer_ticks /
 			( side->door.state & 2 ? -side->door.closespeed : side->door.openspeed );
 
-		tex_y_px += side->door.scroll + offset;
+		slice_px += side->door.scroll + offset;
 
 		wall_h = (i32)(projection_dist * (M_CELLHEIGHT - side->door.scroll) / distance_corrected);
 		y_end = SDL_min(viewport_h, wall_y + wall_h + 1);
@@ -171,8 +161,8 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 	{
-		tex_px = tx + (u8)tex_y_px * TEX_MAP_SIZE;
-		u32 tex_col = *tex_px;
+		// TODO: all textures are currently TEX_MAP_SIZE units wide. this should hopefully become obsolete
+		u32 tex_col = *(tx_slice + ((u32)slice_px) * TEX_MAP_SIZE);
 		if (tex_col != COLOR_KEY)
 		{
 			// Darken walls oriented E/W slightly
@@ -185,7 +175,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		render_px += viewport_w;
 		z_buffer_px += viewport_w;
-		tex_y_px += inc_ratio;
+		slice_px += slice_inc;
 	}
 
 	u32* floor_render_px_top = (u32*)target->pixels + ((y_top - 1) * viewport_w) + col;
@@ -213,16 +203,10 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		const i16 cell_x = (i16)(fmodf(floorf(xa), (float)(M_CELLSIZE)));
 		const i16 cell_y = (i16)(fmodf(floorf(ya), (float)(M_CELLSIZE)));
 
-		if ((grid_xa & 1) ^ (grid_ya & 1))
-		{
-			*floor_render_px_top = *((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE));
-			*floor_render_px_bottom = *((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE));
-		}
-		else
-		{
-			*floor_render_px_top = cm_map(*((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE)), CM_GET(0, 0, 0), 0.12f);
-			*floor_render_px_bottom = cm_map(*((u32*)mapTextureBuffer[0]->pixels + (cell_y * TEX_MAP_SIZE + cell_x + 6 * TEX_SIZE)), CM_GET(0, 0, 0), 0.12f);
-		}
+		const m_flat* flat = &m_get_cell(grid_xa, grid_ya)->flat;
+
+		*floor_render_px_bottom = tx_get_point(flat, cell_x, cell_y, true);
+		*floor_render_px_top = tx_get_point(flat, cell_x, cell_y, false);
 
 		floor_render_px_top -= viewport_w;
 		floor_render_px_bottom += viewport_w;

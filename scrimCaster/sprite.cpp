@@ -1,12 +1,10 @@
-#include "sprite.h"
+#include <sprite.h>
 
-#include "map.h"
-#include "mathutil.h"
-#include "renderconstants.h"
+#include <map.h>
+#include <renderconstants.h>
+#include <util/mathutil.h>
 
 #include <math.h>
-#include "SDL/SDL_assert.h"
-#include "SDL/SDL_log.h"
 
 // I'm not sure if we want a set sprite buffer, rather than statically allocating it.
 // Then, qsort only works on arrays, and we need some fixed bounds on that.

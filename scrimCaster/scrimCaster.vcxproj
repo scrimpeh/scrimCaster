@@ -312,7 +312,8 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="init.h" />
     <ClInclude Include="mapupdate.h" />
     <ClInclude Include="maputil.h" />
-    <ClInclude Include="mathutil.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="util\mathutil.h" />
     <ClInclude Include="renderconstants.h" />
     <ClInclude Include="frame.h" />
     <ClInclude Include="game.h" />
@@ -329,7 +330,6 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="scrimCaster.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="ttf.h" />
-    <ClInclude Include="timer.h" />
     <ClInclude Include="debugutil\watch.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
@@ -352,7 +352,8 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="map.cpp" />
     <ClCompile Include="mapupdate.cpp" />
     <ClCompile Include="maputil.cpp" />
-    <ClCompile Include="mathutil.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="util\mathutil.cpp" />
     <ClCompile Include="mouselook.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render.cpp" />
@@ -363,7 +364,6 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="scrimCaster.cpp" />
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="sprite.cpp" />
-    <ClCompile Include="timer.cpp" />
     <ClCompile Include="ttf.cpp" />
     <ClCompile Include="debugutil\watch.cpp" />
     <ClCompile Include="window.cpp" />

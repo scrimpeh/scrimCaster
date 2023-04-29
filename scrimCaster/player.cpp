@@ -1,13 +1,10 @@
-#include "player.h"
+#include <player.h>
 
-#include "input.h"
-#include "map.h"
-#include "maputil.h"
-#include "mapupdate.h"
-#include "mathutil.h"
-
-#include "SDL/SDL_assert.h"
-#include "SDL/SDL_log.h"
+#include <input.h>
+#include <map.h>
+#include <maputil.h>
+#include <mapupdate.h>
+#include <util/mathutil.h>
 
 extern Input input, input_tf;
 Actor player;

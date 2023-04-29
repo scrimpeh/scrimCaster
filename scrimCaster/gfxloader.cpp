@@ -1,10 +1,11 @@
 #include <gfxloader.h>
 #include <renderconstants.h>
+#include <texture.h>
 
 #include <SDL/SDL_image.h>
 
-const char* txPath = "tx\\map\\";
-const char* sprPath = "tx\\spr\\world\\";
+const char* txPath = "tx/map/";
+const char* sprPath = "tx/spr/world/";
 
 const char* worldSpriteFilenames[] = 
 {
@@ -26,21 +27,21 @@ char pathBuffer[256];
 
 extern SDL_PixelFormat* win_main_format;
 
-//Try load the surface at the filename and load it to the destination buffer.
-//Internal function, to be called by exported functions
-static SDL_Surface* LoadSurface(const char* pathname)
+#define TX_LOAD_PATH_BUF_SIZE 512
+static char tx_load_path_buf[TX_LOAD_PATH_BUF_SIZE];
+
+SDL_Surface* gfx_load(const char* name)
 {
-	SDL_Surface *surf = NULL, *surf_opt = NULL;
+	tx_load_path_buf[0] = '\0';
+	u32 pos = SDL_strlcat(tx_load_path_buf, app_dir, TX_LOAD_PATH_BUF_SIZE);
+	SDL_strlcat(tx_load_path_buf, name, TX_LOAD_PATH_BUF_SIZE - pos);
 
-	//Prepare filename
-	surf = IMG_Load(pathname);
-
-	if (surf)
-		surf_opt = SDL_ConvertSurface(surf, win_main_format, NULL);
-
+	SDL_Surface* surf = IMG_Load(tx_load_path_buf);
+	if (!surf)
+		return NULL;
+	SDL_Surface* surf_optimized = SDL_ConvertSurface(surf, win_main_format, NULL);
 	SDL_FreeSurface(surf);
-
-	return surf_opt;
+	return surf_optimized;
 }
 
 i32 LoadGlobalSurfaces()
@@ -58,9 +59,9 @@ static i32 LoadWorldSprites()
 	for (u8 i = 0; i < WORLD_SPRITE_BUF; ++i)
 	{
 		SDL_memset(pathBuffer, '\0', pathBufSize);
-		SDL_snprintf(pathBuffer, pathBufSize, "%s%s%s", app_dir, sprPath, worldSpriteFilenames[i]);
+		SDL_snprintf(pathBuffer, pathBufSize, "%s%s", sprPath, worldSpriteFilenames[i]);
 
-		surf = LoadSurface(pathBuffer);
+		surf = gfx_load(pathBuffer);
 		if (surf)
 		{
 			worldSpriteBuffer[i] = surf;
@@ -76,12 +77,12 @@ i32 LoadMapTexture(const char* filename)
 	SDL_Surface* surf = NULL;
 
 	SDL_memset(pathBuffer, '\0', sizeof(pathBuffer));
-	SDL_snprintf(pathBuffer, sizeof(pathBuffer), "%s%s%s", app_dir, txPath, filename);
+	SDL_snprintf(pathBuffer, sizeof(pathBuffer), "%s%s", txPath, filename);
 	const char* z = pathBuffer;
 
 	if (fillCount < MAX_TEXTURE_BUF)
 	{
-		surf = LoadSurface(pathBuffer);
+		surf = gfx_load(pathBuffer);
 		if (surf)
 		{
 			SDL_SetColorKey(surf, 1, COLOR_KEY);
@@ -94,6 +95,7 @@ i32 LoadMapTexture(const char* filename)
 
 void UnloadMapTextures()
 {
+	tx_unload();
 	for (u32 i = 0; i < MAX_TEXTURE_BUF; ++i)
 		SDL_FreeSurface(mapTextureBuffer[i]);
 	fillCount = 0;

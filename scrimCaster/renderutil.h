@@ -2,12 +2,12 @@
 
 // Utility functions for rendering
 
-#include "common.h"
+#include <common.h>
 
-#include "colormap.h"
+#include <colormap.h>
 
-#include "SDL/SDL_ttf.h"
-#include "SDL/SDL_video.h"
+#include <SDL/SDL_ttf.h>
+#include <SDL/SDL_video.h>
 
 // Temporary function, to quickly get something visible on screen
 // should be replaced by a proper solution

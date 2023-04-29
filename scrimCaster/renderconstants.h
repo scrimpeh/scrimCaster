@@ -1,8 +1,8 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-#include "colormap.h"
+#include <colormap.h>
 
 #define ATAN_INTERNAL(a, halfcircle, circle) ((a) < (halfcircle) ? (a) : (-(circle)) + (a))
 #define ATAN_RAD(a) ATAN_INTERNAL(a, M_PI, M_PI * 2)

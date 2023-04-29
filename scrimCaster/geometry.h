@@ -44,7 +44,7 @@ typedef struct g_intercept {
 	float y;
 	i16 map_x;
 	i16 map_y;
-	u8 side_col;
+	u8 column;
 } g_intercept;
 
 // Callback that handles encountered intercepts, front-to-back.. The usual rendering pipeline involves

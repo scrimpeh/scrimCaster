@@ -42,3 +42,7 @@ m_taglist* m_get_tags(u32 target);
 
 static i32 m_create_tags();
 static void m_destroy_tags();
+
+// Development function, flood-fills a floor with a certain type
+static void _m_flood_fill(u16 x, u16 y, u16 type, bool floor);
+static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor);

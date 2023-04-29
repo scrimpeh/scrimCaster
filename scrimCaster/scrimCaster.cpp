@@ -28,7 +28,11 @@
 // [ ] Reorganize source files to match VS structure
 // [ ] Floor rendering (I think I might actually know how)
 // [ ] Skybox texture with cylinder projection or similar
-// [ ] HW Acceleration using SDL_Video
+// [ ] Optimize performance with the following methods (otpional)
+//     - [ ] Multithread renderer
+//     - [ ] Rotate surfaces by 90° so data is read and written sequentially
+//     - [ ] Use SDL_render for scaling
+//     - [ ] Misc
 
 char* app_dir = NULL;
 

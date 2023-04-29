@@ -54,10 +54,11 @@ typedef enum
 
 typedef struct
 {
-	u16 type;
+	u16 floor_type;
+	u16 ceil_type;
 	u32 target;
 	m_floor_flags flags;
-} m_floor;
+} m_flat;
 
 typedef enum DoorFlags
 {
@@ -99,7 +100,7 @@ typedef struct Side
 
 typedef struct Cell
 {
-	m_floor floor;
+	m_flat flat;
 	Side e;
 	Side n;
 	Side w;

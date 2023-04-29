@@ -1,12 +1,12 @@
 #pragma once
 
-#include "common.h"
-#include "map.h"
+#include <common.h>
+#include <map.h>
 
 typedef struct m_active_tag_list
 {
 	u32 tag;
-	m_active_tag_list* next;
+	struct m_active_tag_list* next;
 } m_active_tag_list;
 
 void mu_update(u32 t_delta);

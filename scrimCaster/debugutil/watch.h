@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
 // This module facilities to let other parts of the program watch RAM values
 // They are read from RAM

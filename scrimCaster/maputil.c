@@ -1,12 +1,9 @@
 #include <maputil.h>
 
+#include <map.h>
 #include <renderconstants.h>
 
 #include <math.h>
-
-
-const float MAXSLOPE = 1e+8f;
-extern Map m_map;
 
 Cell* map_get_cell(u16 grid_x, u16 grid_y)
 {

@@ -1,11 +1,11 @@
-#include "automap.h"
+#include <automap.h>
 
-#include "camera.h"
-#include "enemy.h"
-#include "map.h"
-#include "player.h"
-#include "render.h"
-#include "renderutil.h"
+#include <camera.h>
+#include <enemy.h>
+#include <map.h>
+#include <player.h>
+#include <render.h>
+#include <renderutil.h>
 
 
 // Cap the automap to the bounds of the map and inside this zone.
@@ -156,13 +156,11 @@ void am_draw_actor(SDL_Surface* target, Actor* actor)
 	}
 
 	const Bounds bounds = GetActorBounds(actor->type);
-	SDL_Rect r = 
-	{ 
-		am_map_h(actor->x - bounds.x), 
-		am_map_v(actor->y - bounds.y), 
-		am_map_distance(bounds.x * 2), 
-		am_map_distance(bounds.y * 2) 
-	};
+	SDL_Rect r;
+	r.x = am_map_h(actor->x - bounds.x);
+	r.y = am_map_v(actor->y - bounds.y);
+	r.w = am_map_distance(bounds.x * 2);
+	r.h = am_map_distance(bounds.y * 2);
 	SDL_FillRect(target, &r, actor->type == PLAYER ? CM_GET(255, 255, 0) : CM_GET(255, 0, 255));
 }
 

@@ -1,11 +1,9 @@
-#include "geometry.h"
+#include <geometry.h>
 
-#include "map.h"
-#include "renderconstants.h"
+#include <map.h>
+#include <renderconstants.h>
 
 #include <math.h>
-
-extern Map m_map;
 
 const float MAXSLOPE = 1e+8f;
 
@@ -49,17 +47,15 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 				x_inv += ((y_cell_side * M_CELLSIZE) - y_inv) / slope;
 				y_inv = (float)(y_cell_side * M_CELLSIZE);
 
-				g_intercept intercept =
-				{
-					g_is_north(orientation) ? SIDE_ORIENTATION_NORTH : SIDE_ORIENTATION_SOUTH,
-					g_get_intercept_type(side, edge),
-					angle,
-					x_inv,
-					y_inv,
-					grid_x,
-					y_cell,
-					g_is_north(orientation) ? (u32)floorf(x_inv) % TEX_SIZE : TEX_SIZE - 1 - (u32)floorf(x_inv) % TEX_SIZE
-				};
+				g_intercept intercept;
+				intercept.orientation = g_is_north(orientation) ? SIDE_ORIENTATION_NORTH : SIDE_ORIENTATION_SOUTH;
+				intercept.type = g_get_intercept_type(side, edge);
+				intercept.angle = angle;
+				intercept.x = x_inv;
+				intercept.y = y_inv;
+				intercept.map_x = grid_x;
+				intercept.map_y = y_cell;
+				intercept.column = g_is_north(orientation) ? (u32)floorf(x_inv) % TEX_SIZE : TEX_SIZE - 1 - (u32)floorf(x_inv) % TEX_SIZE;
 
 				// Add the intercept
 				if (!intercept_collector(&intercept))
@@ -82,24 +78,23 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 			
 		if (edge || side->type)
 		{
-			g_intercept intercept =
-			{
-				g_is_west(orientation) ? SIDE_ORIENTATION_WEST : SIDE_ORIENTATION_EAST,
-				g_get_intercept_type(side, edge),
-				angle,
-				x,
-				y,
-				grid_x,
-				grid_y,
-				g_is_east(orientation) ? (u32)floorf(y) % TEX_SIZE : TEX_SIZE - 1 - (u32)floorf(y) % TEX_SIZE
-			};
+			g_intercept intercept;
+			intercept.orientation = g_is_west(orientation) ? SIDE_ORIENTATION_WEST : SIDE_ORIENTATION_EAST;
+			intercept.type = g_get_intercept_type(side, edge);
+			intercept.angle = angle;
+			intercept.x = x;
+			intercept.y = y;
+			intercept.map_x = grid_x;
+			intercept.map_y = grid_y;
+			intercept.column = g_is_east(orientation) ? (u32)floorf(y) % TEX_SIZE : TEX_SIZE - 1 - (u32)floorf(y) % TEX_SIZE;
+
 			// Add the intercept
 			if (!intercept_collector(&intercept))
 				return;
 		}
 
 		// Didn't find anything
-		dx = g_is_east(orientation) ? float(M_CELLSIZE) : float(-M_CELLSIZE);
+		dx = g_is_east(orientation) ? (float)M_CELLSIZE : (float)-M_CELLSIZE;
 		grid_x += g_is_east(orientation) ? 1 : -1;
 	}
 }

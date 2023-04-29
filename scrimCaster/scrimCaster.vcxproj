@@ -157,6 +157,8 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x86\LICENSE.freetype.txt" "$(Targe
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)SDL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -335,39 +337,39 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="actor.cpp" />
-    <ClCompile Include="actorcontainers.cpp" />
-    <ClCompile Include="angle.cpp" />
-    <ClCompile Include="automap.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="cell.cpp" />
-    <ClCompile Include="cleanup.cpp" />
-    <ClCompile Include="colormap.cpp" />
-    <ClCompile Include="enemy.cpp" />
-    <ClCompile Include="frame.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="gfxloader.cpp" />
-    <ClCompile Include="init.cpp" />
-    <ClCompile Include="input.cpp" />
-    <ClCompile Include="inputmap.cpp" />
-    <ClCompile Include="map.cpp" />
-    <ClCompile Include="mapupdate.cpp" />
-    <ClCompile Include="maputil.cpp" />
-    <ClCompile Include="texture.cpp" />
-    <ClCompile Include="util\mathutil.cpp" />
-    <ClCompile Include="mouselook.cpp" />
-    <ClCompile Include="player.cpp" />
-    <ClCompile Include="render.cpp" />
-    <ClCompile Include="renderconstants.cpp" />
-    <ClCompile Include="renderdebug.cpp" />
-    <ClCompile Include="renderutil.cpp" />
-    <ClCompile Include="scan.cpp" />
-    <ClCompile Include="scrimCaster.cpp" />
-    <ClCompile Include="geometry.cpp" />
-    <ClCompile Include="sprite.cpp" />
-    <ClCompile Include="ttf.cpp" />
-    <ClCompile Include="debugutil\watch.cpp" />
-    <ClCompile Include="window.cpp" />
+    <ClCompile Include="actor.c" />
+    <ClCompile Include="actorcontainers.c" />
+    <ClCompile Include="angle.c" />
+    <ClCompile Include="automap.c" />
+    <ClCompile Include="camera.c" />
+    <ClCompile Include="cell.c" />
+    <ClCompile Include="cleanup.c" />
+    <ClCompile Include="colormap.c" />
+    <ClCompile Include="debugutil\watch.c" />
+    <ClCompile Include="enemy.c" />
+    <ClCompile Include="frame.c" />
+    <ClCompile Include="game.c" />
+    <ClCompile Include="gfxloader.c" />
+    <ClCompile Include="init.c" />
+    <ClCompile Include="input.c" />
+    <ClCompile Include="inputmap.c" />
+    <ClCompile Include="map.c" />
+    <ClCompile Include="mapupdate.c" />
+    <ClCompile Include="maputil.c" />
+    <ClCompile Include="texture.c" />
+    <ClCompile Include="util\mathutil.c" />
+    <ClCompile Include="mouselook.c" />
+    <ClCompile Include="player.c" />
+    <ClCompile Include="render.c" />
+    <ClCompile Include="renderconstants.c" />
+    <ClCompile Include="renderdebug.c" />
+    <ClCompile Include="renderutil.c" />
+    <ClCompile Include="scan.c" />
+    <ClCompile Include="scrimCaster.c" />
+    <ClCompile Include="geometry.c" />
+    <ClCompile Include="sprite.cpcp" />
+    <ClCompile Include="ttf.c" />
+    <ClCompile Include="window.c" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libsdl\SDL2-2.0.4\lib\x64\SDL2.lib" />

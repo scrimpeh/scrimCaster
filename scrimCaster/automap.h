@@ -1,13 +1,13 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
 // Responsible for drawing the map
 
-#include "actor.h"
-#include "geometry.h"
+#include <actor.h>
+#include <geometry.h>
 
-#include "SDL/SDL_video.h"
+#include <SDL/SDL_video.h>
 
 void am_init();
 void am_draw(SDL_Surface* target);

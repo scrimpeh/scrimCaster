@@ -1,4 +1,5 @@
 #include <actor.h>
+
 #include <actorcontainers.h>
 #include <map.h>
 #include <renderconstants.h>
@@ -18,7 +19,7 @@ extern ActorVector levelEnemies;
 //or perhaps even an external file
 const Bounds NullBounds = { 0., 0. };
 const Bounds PlayerBounds = { (double)M_CELLSIZE / 8, (double)M_CELLSIZE / 8 };
-const Bounds PillarBounds = PlayerBounds;
+const Bounds PillarBounds = { (double)M_CELLSIZE / 8, (double)M_CELLSIZE / 8 };
 
 const static ActorList* const actorLists[] =
 	{ /*&currentMap.levelPickups, &projectiles, &particles,*/ &tempEnemies };
@@ -27,10 +28,6 @@ const static ActorArray* const actorArrays[] =
 const static ActorVector* const actorVectors[] =
 	{ &levelEnemies };
 
-Bounds GetActorBounds(const Actor* actor)
-{
-	return GetActorBounds(actor->type);
-}
 
 Bounds GetActorBounds(ActorType type)
 {
@@ -55,15 +52,9 @@ Bounds GetActorBounds(ActorType type)
 		case PLAYER:
 			return PlayerBounds;
 		default:
-			return { 0., 0. };
+			return (Bounds) { 0., 0. };
 		}
 	}
-}
-
-//Transforms an actor index into an offset for sprite arrays and such
-u32 GetActorSpriteIndex(const Actor* actor)
-{
-	return GetActorSpriteIndex(actor->type);
 }
 
 u32 GetEnemySpriteIndex(u8 type)
@@ -123,29 +114,37 @@ u32 GetActorSpriteIndex(ActorType type)
 
 Bounds GetEnemyBounds(u8 type)
 {
-	static const Bounds bounds[] = { NullBounds, PillarBounds };
-	return bounds[type];
+	static const Bounds* bounds[] = 
+	{ 
+		&NullBounds,
+		&PillarBounds
+	};
+	return *bounds[type];
 }
 
 Bounds GetProjBounds(u8 type)
 {
-	return{ 0, 0 };
+	return (Bounds) { 0, 0 };
 }
 
 Bounds GetLevelObjBounds(u8 type)
 {
-	static const Bounds bounds[] = { NullBounds, PillarBounds };
-	return bounds[type];
+	static const Bounds* bounds[] = 
+	{ 
+		&NullBounds, 
+		&PillarBounds 
+	};
+	return *bounds[type];
 }
 
 Bounds GetPickupBounds(u8 type)
 {
-	return { 0, 0 };
+	return (Bounds) { 0, 0 };
 }
 
 Bounds GetOtherBounds(u8 type)
 {
-	return { 0, 0 };
+	return (Bounds) { 0, 0 };
 }
 
 
@@ -153,7 +152,8 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 {
 	double d_x = *p_dx;
 
-	if (d_x == 0) return false;
+	if (d_x == 0) 
+		return false;
 
 	const double bounds_x = curBounds.x * (d_x >= 0 ? 1 : -1);
 	const i16 x_start = (i16)SDL_floor((actor->x - bounds_x) / M_CELLSIZE);					 //Draw a line on the actor's movement plane
@@ -166,7 +166,7 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 	const i8 inc = x_start > x_end ? -1 : 1;
 	for (i16 x = x_start; x != x_end; x += inc)
 	{
-		//Todo: This might be optimized by just adding to pointers directly.
+		// Todo: This might be optimized by just adding to pointers directly.
 		const Cell cell_top = cells[y_top * m_map.w + x];
 		const Cell cell_bottom = cells[y_bottom * m_map.w + x];
 
@@ -176,8 +176,9 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 		if ((side_top.type && !(side_top.flags  & PASSABLE)) ||
 			(side_bottom.type && !(side_bottom.flags & PASSABLE)))
 		{
-			double new_x = double(x*M_CELLSIZE) - bounds_x;
-			if (d_x >= 0) new_x += double(M_CELLSIZE) - MIN_WALL_DIST;
+			double new_x = (double)(x * M_CELLSIZE) - bounds_x;
+			if (d_x >= 0) 
+				new_x += (double)(M_CELLSIZE) - MIN_WALL_DIST;
 			*p_dx = new_x - actor->x;
 			return true;
 		}
@@ -190,7 +191,8 @@ static bool CollideVerticalWall(const Actor* actor, double* p_dy)
 {
 	double d_y = *p_dy;
 
-	if (d_y == 0) return false;
+	if (d_y == 0) 
+		return false;
 
 	const double bounds_y = curBounds.y * (d_y >= 0 ? 1 : -1);
 	const i16 y_start = (i16)SDL_floor((actor->y - bounds_y) / M_CELLSIZE);					 //Draw a line on the actor's movement plane
@@ -212,8 +214,9 @@ static bool CollideVerticalWall(const Actor* actor, double* p_dy)
 		if ((side_left.type  && !(side_left.flags  & PASSABLE)) ||
 			(side_right.type && !(side_right.flags & PASSABLE)))
 		{
-			double new_y = double(y*M_CELLSIZE) - bounds_y;
-			if (d_y >= 0) new_y += double(M_CELLSIZE) - MIN_WALL_DIST;
+			double new_y = (double)(y * M_CELLSIZE) - bounds_y;
+			if (d_y >= 0) 
+				new_y += (double)(M_CELLSIZE) - MIN_WALL_DIST;
 			*p_dy = new_y - actor->y;
 			return true;
 		}
@@ -226,7 +229,8 @@ static bool IntersectActor(Actor* mover, const Actor* obstacle, bool vertical, d
 {
 	//perhaps split up the actor to actor collision in two methods for horizontal
 	//and vertical
-	if (mover == obstacle) return false;
+	if (mover == obstacle) 
+		return false;
 
 	Bounds obstacleBounds = GetActorBounds(obstacle->type);
 

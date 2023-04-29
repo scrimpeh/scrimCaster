@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
 // A cell is the basic unit a map is comprised of.
 // Each cell has a uniform size in game units and four walls on the interior side
@@ -27,7 +27,7 @@ typedef u8 m_orientation;
 
 //Possible flags. Note: Which ones are actually gonna be implemented, I'm not sure
 //Just balling around ideas so far
-typedef enum m_side_flags : u32
+typedef enum
 {
 	PASSABLE =         0x0001,
 	TRANSLUCENT =      0x0002,

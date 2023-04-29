@@ -7,7 +7,7 @@
 //Various containers for actor types. Presumably, should have both a fixed "array type" container (simple), and
 //a linked list / variable size container (less simple)
 
-typedef struct ActorArray
+typedef struct
 {
 	u32 count;
 	Actor* actor;
@@ -16,18 +16,18 @@ typedef struct ActorArray
 typedef struct ActorNode
 {
 	Actor* content;
-	ActorNode* next;
-	ActorNode* prev;
+	struct ActorNode* next;
+	struct ActorNode* prev;
 } ActorNode;
 
-typedef struct ActorList
+typedef struct
 {
 	u32 count, capacity;
 	ActorNode* first;
 	ActorNode* last;
 } ActorList;
 
-typedef struct ActorVector
+typedef struct
 {
 	Actor** content;
 	u32 count, capacity;

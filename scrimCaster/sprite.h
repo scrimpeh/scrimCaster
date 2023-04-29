@@ -1,10 +1,11 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-#include "SDL/SDL_surface.h"
-#include "actor.h"
-#include "actorcontainers.h"
+#include <actor.h>
+#include <actorcontainers.h>
+
+#include <SDL/SDL_surface.h>
 
 #define MAXWIDTH 256 // Maximum width of a sprite in the sheet
 
@@ -15,7 +16,7 @@ typedef struct ActorSprite
 	double relative_angle;
 } ActorSprite;
 
-typedef enum Anchor : u8
+typedef enum Anchor
 {
 	CENTER = 0,
 	FLOOR = 1,
@@ -44,19 +45,11 @@ typedef struct ActorSpriteSheet
 	const ActorFrameSheet *animation_frames;
 } ActorSpriteSheet;
 
-static inline bool ActorOnScreen(const Actor* actor, u32 *ds_index);
-static void PopulateSpriteBufferList(const ActorList* actors, u32 *ds_index);
-static void PopulateSpriteBufferArray(const ActorArray* actors, u32 *ds_index);
+static inline bool ActorOnScreen(const Actor* actor, u32* ds_index);
+static void PopulateSpriteBufferList(const ActorList* actors, u32* ds_index);
+static void PopulateSpriteBufferArray(const ActorArray* actors, u32* ds_index);
 
 void DrawSprites(SDL_Surface* toDraw);
 static i32 SpriteDistSort(const void* p1, const void* p2);
 
 static inline WorldSprite GetWorldSprite(const ActorSprite* a);
-
-static inline double SubtractAngle(double a, double b);
-static inline double AddAngle(double a, double b);
-static inline double SubtractAngle(double a, u8 b);
-static inline double AddAngle(double a, u8 b);
-
-static inline double NormalizeAngleUp(double a);
-static inline double NormalizeAngleDown(double a);

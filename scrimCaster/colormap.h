@@ -9,9 +9,9 @@
 // All colors in this executable are 32-bit RGBA colors, which are 8 bits each.
 // Alpha is handled separately as a float ranging from 0.0 to 1.0
 
-#include "common.h"
+#include <common.h>
 
-#include "SDL/SDL_video.h"
+#include <SDL/SDL_video.h>
 
 typedef u32 cm_color;
 typedef u8 cm_channel;
@@ -32,6 +32,6 @@ void cm_to_sdl_color(SDL_Color* color, cm_color source);
 
 static cm_channel cm_mix_channel(cm_channel source, cm_channel target, float alpha);
 
-static bool r_clip_line(i32 w, i32 h, i32 x_a, i32 y_a, i32 x_b, i32 y_b);
+static bool r_clip_line(i32 w, i32 h, i32* x_a, i32* y_a, i32* x_b, i32* y_b);
 static inline u8 r_clip_code(i32 w, i32 h, i32 x, i32 y);
 

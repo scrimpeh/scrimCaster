@@ -112,9 +112,6 @@
     <ClInclude Include="colormap.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="angle.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="util\mathutil.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
@@ -136,106 +133,109 @@
     <ClInclude Include="texture.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="angle.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="scrimCaster.cpp">
+    <ClCompile Include="scrimCaster.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="window.cpp">
+    <ClCompile Include="window.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="render.cpp">
+    <ClCompile Include="render.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="ttf.cpp">
+    <ClCompile Include="ttf.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
+    <ClCompile Include="game.c">
       <Filter>Source Files\game</Filter>
     </ClCompile>
-    <ClCompile Include="camera.cpp">
+    <ClCompile Include="camera.c">
       <Filter>Source Files\game</Filter>
     </ClCompile>
-    <ClCompile Include="scan.cpp">
+    <ClCompile Include="scan.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="frame.cpp">
+    <ClCompile Include="frame.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="input.cpp">
+    <ClCompile Include="input.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="inputmap.cpp">
+    <ClCompile Include="inputmap.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="cell.cpp">
+    <ClCompile Include="cell.c">
       <Filter>Source Files\game\map</Filter>
     </ClCompile>
-    <ClCompile Include="map.cpp">
+    <ClCompile Include="map.c">
       <Filter>Source Files\game\map</Filter>
     </ClCompile>
-    <ClCompile Include="gfxloader.cpp">
+    <ClCompile Include="gfxloader.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="mouselook.cpp">
+    <ClCompile Include="mouselook.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="actor.cpp">
+    <ClCompile Include="actor.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="actorcontainers.cpp">
+    <ClCompile Include="actorcontainers.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="sprite.cpp">
+    <ClCompile Include="sprite.cpcp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="renderconstants.cpp">
+    <ClCompile Include="renderconstants.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="mapupdate.cpp">
+    <ClCompile Include="mapupdate.c">
       <Filter>Source Files\game\map</Filter>
     </ClCompile>
-    <ClCompile Include="maputil.cpp">
+    <ClCompile Include="maputil.c">
       <Filter>Source Files\game\map</Filter>
     </ClCompile>
-    <ClCompile Include="init.cpp">
+    <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cleanup.cpp">
+    <ClCompile Include="cleanup.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="enemy.cpp">
+    <ClCompile Include="enemy.c">
       <Filter>Source Files\game</Filter>
     </ClCompile>
-    <ClCompile Include="geometry.cpp">
+    <ClCompile Include="geometry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="colormap.cpp">
+    <ClCompile Include="colormap.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="angle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="util\mathutil.cpp">
+    <ClCompile Include="util\mathutil.c">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="renderutil.cpp">
+    <ClCompile Include="renderutil.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="automap.cpp">
+    <ClCompile Include="automap.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="debugutil\watch.cpp">
-      <Filter>Source Files\debugutil</Filter>
-    </ClCompile>
-    <ClCompile Include="renderdebug.cpp">
+    <ClCompile Include="renderdebug.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="player.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="texture.cpp">
+    <ClCompile Include="texture.c">
       <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="debugutil\watch.c">
+      <Filter>Source Files\debugutil</Filter>
+    </ClCompile>
+    <ClCompile Include="angle.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

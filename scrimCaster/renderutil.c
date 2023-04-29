@@ -14,7 +14,9 @@ void r_draw_text(SDL_Surface* target, const char* str, i32 x, i32 y, TTF_Font* f
 	if (!target || !font)
 		return;
 
-	SDL_Rect r = { x, y, 0, 0 };
+	SDL_Rect r = { 0 };
+	r.x = x;
+	r.y = y;
 	SDL_Color sdl_color;
 	cm_to_sdl_color(&sdl_color, color);
 	SDL_Surface* text = TTF_RenderText_Solid(font, str, sdl_color);

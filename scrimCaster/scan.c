@@ -41,17 +41,17 @@ i32 scan_init()
 	viewport_x_fov_half = viewport_x_fov / 2;
 	projection_dist = viewport_w_half / tanf(TO_RADF(viewport_x_fov_half));
 
-	angle_offsets = (float*)SDL_malloc(sizeof(float) * viewport_w);
+	angle_offsets = SDL_malloc(sizeof(float) * viewport_w);
 	if (!angle_offsets)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR,"Couldn't initialize offset buffer! %s", SDL_GetError());
 		return -1;
 	}
 
-	for (u16 i = 0; i < viewport_w; ++i)
+	for (u16 i = 0; i < viewport_w; i++)
 		angle_offsets[i] = atanf((i - viewport_w_half) / projection_dist);
 
-	z_buffer = (float*)SDL_malloc(sizeof(float) * viewport_w * viewport_h);
+	z_buffer = SDL_malloc(sizeof(float) * viewport_w * viewport_h);
 	if (!z_buffer) 
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize Z Buffer! %s", SDL_GetError());
@@ -73,7 +73,7 @@ void scan_close()
 
 static inline bool collect_intercept(const g_intercept* intercept)
 {
-	g_intercept_stack* store_intercept = (g_intercept_stack*) SDL_malloc(sizeof(g_intercept_stack));
+	g_intercept_stack* store_intercept = SDL_malloc(sizeof(g_intercept_stack));
 	if (!store_intercept)
 		return false;
 	SDL_memcpy(&store_intercept->intercept, intercept, sizeof(g_intercept));
@@ -85,18 +85,13 @@ static inline bool collect_intercept(const g_intercept* intercept)
 void scan_draw(SDL_Surface* target)
 {
 	// Clear Z Buffer
-	for (u64 i = 0; i < (u64)viewport_w * viewport_h; i++)
+	for (u64 i = 0; i < (u64) viewport_w * viewport_h; i++)
 		z_buffer[i] = FLT_MAX;
 
 	const float angle_rad = TO_RADF(viewport_angle);
 	for (u16 col = 0; col < viewport_w; col++)
 	{
-		float angle = angle_rad - angle_offsets[col];
-		while (angle < 0)
-			angle += (float)PI_2_1;
-		while (angle >= PI_2_1)
-			angle -= (float)PI_2_1;
-
+		const float angle = angle_normalize_rad_f(angle_rad - angle_offsets[col]);
 		g_cast(viewport_x, viewport_y, angle, collect_intercept);
 
 		while (intercept_stack) 
@@ -121,14 +116,14 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	const float distance_corrected = distance * cosf(relative_angle);
 
 	// Get the wall parameters
-	i32 wall_h = (i32)(projection_dist * M_CELLHEIGHT / distance_corrected);
+	i32 wall_h = (i32) (projection_dist * M_CELLHEIGHT / distance_corrected);
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
 	const Side* side = map_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
 	const u32* const tx_slice = tx_get_slice(side, intercept->column);
  
-	float slice_px = wall_y >= 0 ? 0 : HALFSIZE - ((float)viewport_h / wall_h) * HALFSIZE;
+	float slice_px = wall_y >= 0 ? 0 : HALFSIZE - ((float) viewport_h / wall_h) * HALFSIZE;
 	// Due to what seems to be floating point rounding errors, the slice read increment is slightly larger
 	// than it should be, leading to occasionally reading a texture slightly out of binds. 
 	// The clean method to solve this problem would probably be to calculate the texture y offset
@@ -144,16 +139,16 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	{
 		float offset = 0.;
 		if (side->door.state & 1)
-			offset = (float)side->door.timer_ticks /
+			offset = (float) side->door.timer_ticks /
 			( side->door.state & 2 ? -side->door.closespeed : side->door.openspeed );
 
 		slice_px += side->door.scroll + offset;
 
-		wall_h = (i32)(projection_dist * (M_CELLHEIGHT - side->door.scroll) / distance_corrected);
+		wall_h = (i32) (projection_dist * (M_CELLHEIGHT - side->door.scroll) / distance_corrected);
 		y_end = SDL_min(viewport_h, wall_y + wall_h + 1);
 	}
 
-	u32* render_px = (u32*)target->pixels;
+	u32* render_px = (u32*) target->pixels;
 	float* z_buffer_px = z_buffer;
 
 	render_px += (y_top * viewport_w) + col;
@@ -162,7 +157,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 	{
 		// TODO: all textures are currently TEX_MAP_SIZE units wide. this should hopefully become obsolete
-		u32 tex_col = *(tx_slice + ((u32)slice_px) * TEX_MAP_SIZE);
+		u32 tex_col = *(tx_slice + ((u32) slice_px) * TEX_MAP_SIZE);
 		if (tex_col != COLOR_KEY)
 		{
 			// Darken walls oriented E/W slightly
@@ -178,8 +173,8 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		slice_px += slice_inc;
 	}
 
-	u32* floor_render_px_top = (u32*)target->pixels + ((y_top - 1) * viewport_w) + col;
-	u32* floor_render_px_bottom = (u32*)target->pixels + ((viewport_h - y_top) * viewport_w) + col;
+	u32* floor_render_px_top = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
+	u32* floor_render_px_bottom = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
 
 	// Now draw the ceiling and floor
 	// For this, we invert the projection and cosine correction to get the wall height
@@ -197,11 +192,11 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		float ya;
 		math_vec_cast_f(x, y, intercept->angle, d, &xa, &ya);
 
-		const i16 grid_xa = (i16)(floorf(xa / M_CELLSIZE));
-		const i16 grid_ya = (i16)(floorf(ya / M_CELLSIZE));
+		const i16 grid_xa = (i16) (floorf(xa / M_CELLSIZE));
+		const i16 grid_ya = (i16) (floorf(ya / M_CELLSIZE));
 
-		const i16 cell_x = (i16)(fmodf(floorf(xa), (float)(M_CELLSIZE)));
-		const i16 cell_y = (i16)(fmodf(floorf(ya), (float)(M_CELLSIZE)));
+		const i16 cell_x = (i16) (fmodf(floorf(xa), (float)(M_CELLSIZE)));
+		const i16 cell_y = (i16) (fmodf(floorf(ya), (float)(M_CELLSIZE)));
 
 		const m_flat* flat = &m_get_cell(grid_xa, grid_ya)->flat;
 

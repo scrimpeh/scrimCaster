@@ -1,4 +1,4 @@
-#include "watch.h"
+#include <debugutil/watch.h>
 
 rd_watch_list* rd_watches = NULL;
 static i32 id = 1;
@@ -27,7 +27,7 @@ i32 watch_add_new(u32 count, ...)
 	if (!watch_check_unique(&new_watch))
 		return -2;
 
-	rd_watch_list* list = (rd_watch_list*)SDL_malloc(sizeof(rd_watch_list));
+	rd_watch_list* list = SDL_malloc(sizeof(rd_watch_list));
 	list->content = new_watch;
 	list->next = NULL;
 

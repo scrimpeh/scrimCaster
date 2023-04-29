@@ -17,8 +17,7 @@
 Map m_map;
 Cell* cellptr = NULL;
 
-const char* tx = "test.png";
-const char* tx_sets[] = { tx };
+const char* tx_sets[] = { "test.png" };
 const char* none = "";
 
 extern ActorVector levelEnemies;
@@ -95,9 +94,9 @@ void m_load()
 		for (u8 i = 0; i < 2; ++i)
 		{
 			cellgrid[3 + i][6].e.type = 4;
-			cellgrid[3 + i][6].e.flags = m_side_flags(PASSABLE | TRANSLUCENT);
+			cellgrid[3 + i][6].e.flags = (m_side_flags)(PASSABLE | TRANSLUCENT);
 			cellgrid[3 + i][7].w.type = 4;
-			cellgrid[3 + i][7].w.flags = m_side_flags(PASSABLE | TRANSLUCENT);
+			cellgrid[3 + i][7].w.flags = (m_side_flags)(PASSABLE | TRANSLUCENT);
 		}
 
 
@@ -109,7 +108,7 @@ void m_load()
 		cellgrid[1][3].s.type = 1;
 		cellgrid[1][3].w.type = 1;
 		cellgrid[2][4].w.type = 5;
-		cellgrid[2][4].w.flags = m_side_flags(MIRR_H | SCROLL_H);
+		cellgrid[2][4].w.flags = (m_side_flags)(MIRR_H | SCROLL_H);
 		// cellgrid[2][4].w.param1 = -8;
 		cellgrid[2][0].e.type = 5;
 		cellgrid[3][1].e.type = 1;
@@ -180,7 +179,7 @@ void m_load()
 	Actor pil;
 	pil.type = PILLAR;
 
-	auto al = &m_map.levelObjs;
+	ActorArray* al = &m_map.levelObjs;
 	ActorArrayMake(al, 5);
 	
 	pil.x = 300;
@@ -204,7 +203,7 @@ void m_load()
 	al->actor[4] = pil;
 
 	ActorVectorMake(&levelEnemies, 32);
-	Actor* z = (Actor*)SDL_malloc(sizeof(Actor));
+	Actor* z = SDL_malloc(sizeof(Actor));
 	SDL_memset(z, 0, sizeof(Actor));
 	z->x = 300;
 	z->y = 200;
@@ -213,7 +212,7 @@ void m_load()
 	z->type = DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
-	z = (Actor*)SDL_malloc(sizeof(Actor));
+	z = SDL_malloc(sizeof(Actor));
 	SDL_memset(z, 0, sizeof(Actor));
 	z->x = 400;
 	z->y = 200;
@@ -222,7 +221,7 @@ void m_load()
 	z->type = DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 	
-	z = (Actor*)SDL_malloc(sizeof(Actor));
+	z = SDL_malloc(sizeof(Actor));
 	SDL_memset(z, 0, sizeof(Actor));
 	z->x = 8;
 	z->y = 200;
@@ -231,7 +230,7 @@ void m_load()
 	z->type = DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
-	//cellptr = (Cell*)SDL_malloc(sizeof(Cell) * 32 * 32);
+	//cellptr = SDL_malloc(sizeof(Cell) * 32 * 32);
 	//SDL_assert(cellptr);
 	m_create_tags();
 };
@@ -256,7 +255,7 @@ static i32 m_create_tags()
 
 	const u32 tag_count = m_max_tag + 1;
 
-	m_tags = (m_taglist*)SDL_malloc(sizeof(m_taglist) * tag_count);
+	m_tags = SDL_malloc(sizeof(m_taglist) * tag_count);
 	if (!m_tags)
 		return -1;
 
@@ -270,11 +269,11 @@ static i32 m_create_tags()
 
 	// Allocate space for the tag lists
 	for (u32 i = 1; i <= m_max_tag; i++)
-		if (!(m_tags[i].sides = (Side**)SDL_malloc(sizeof(Side*) * m_tags[i].count)))
+		if (!(m_tags[i].sides = SDL_malloc(sizeof(Side*) * m_tags[i].count)))
 			return -2;
 
 	// Now iterate through the map and build the side list for each tag
-	u32* side_indices = (u32*)SDL_malloc(sizeof(u32) * tag_count);
+	u32* side_indices = SDL_malloc(sizeof(u32) * tag_count);
 	for (u32 i = 1; i <= m_max_tag; i++)
 		side_indices[i] = 0;
 
@@ -297,7 +296,7 @@ static i32 m_create_tags()
 	SDL_free(side_indices);
 
 	// TEMP/TODO: This should be handled by mapupdate
-	m_tag_active = (bool*) SDL_malloc(sizeof(bool) * tag_count);
+	m_tag_active = SDL_malloc(sizeof(bool) * tag_count);
 	if (!m_tag_active)
 		return -3;
 	for (u32 i = 0; i <= m_max_tag; i++)

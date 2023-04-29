@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-#include "actor.h"
-#include "geometry.h"
+#include <actor.h>
+#include <geometry.h>
 
 extern Actor player;
 

@@ -19,7 +19,7 @@ static inline bool collect_intercept(const g_intercept* intercept);
 
 typedef struct g_intercept_stack
 {
-	g_intercept_stack* next;
+	struct g_intercept_stack* next;
 	g_intercept intercept;
 } g_intercept_stack;
 

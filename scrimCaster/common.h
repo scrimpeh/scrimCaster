@@ -1,10 +1,9 @@
 #pragma once
 
-// TODO: Inline types.h
-// TODO: Add '#include <stdbool.h>' when switching project to C
+// Common typedefs
 
-// Common typedefs, the usual
 #include <SDL/SDL_stdinc.h>
+#include <stdbool.h>
 
 typedef uint8_t u8, byte;
 typedef uint16_t u16;

@@ -30,8 +30,8 @@ Actor* ActorListNew(ActorList* al)
 	if (al->count >= al->capacity)
 		return NULL;
 
-	Actor* a =      (Actor*)SDL_malloc(sizeof(Actor));
-	ActorNode* an = (ActorNode*)SDL_malloc(sizeof(ActorNode));
+	Actor* a = SDL_malloc(sizeof(Actor));
+	ActorNode* an = SDL_malloc(sizeof(ActorNode));
 	an->content = a;
 	an->next = NULL;
 	an->prev = al->last;
@@ -46,7 +46,7 @@ Actor* ActorListNew(ActorList* al)
 
 bool ActorListRemove(ActorList* al, Actor* a)
 {
-	//Removal not implemented yet
+	// Removal not implemented yet
 	return false;
 }
 

@@ -1,4 +1,4 @@
-#include "mapupdate.h"
+#include <mapupdate.h>
 
 #define DOOR_SCROLL_MAX (M_CELLHEIGHT - 4)
 #define DOOR_TICKS_PER_SEC 60
@@ -54,7 +54,7 @@ void mu_activate_tag(u32 tag)
 	if (!m_tag_active[tag])
 	{
 		m_tag_active[tag] = true;
-		m_active_tag_list* new_tag = (m_active_tag_list*) SDL_malloc(sizeof(m_active_tag_list));
+		m_active_tag_list* new_tag = SDL_malloc(sizeof(m_active_tag_list));
 		new_tag->next = m_active_tags;
 		new_tag->tag = tag;
 		m_active_tags = new_tag;
@@ -91,7 +91,7 @@ static bool mu_update_side(Side* side, u32 delta)
 		SDL_assert(0);
 		break;
 	case 0:		// Activated
-		side->flags = m_side_flags(side->flags | DOOR_OPEN);
+		side->flags = (m_side_flags)(side->flags | DOOR_OPEN);
 		params->timer_ticks = 0;
 		++side->state;
 		return false;
@@ -100,7 +100,7 @@ static bool mu_update_side(Side* side, u32 delta)
 		params->timer_ticks = ticks % params->openspeed;
 
 		if (params->scroll > PLAYER_HEIGHT)
-			side->flags = m_side_flags(side->flags | DOOR_PASSABLE);
+			side->flags = (m_side_flags)(side->flags | DOOR_PASSABLE);
 
 		if (params->scroll > DOOR_SCROLL_MAX - 1)
 		{
@@ -126,11 +126,11 @@ static bool mu_update_side(Side* side, u32 delta)
 		params->timer_ticks = ticks % params->closespeed;
 
 		if (params->scroll < PLAYER_HEIGHT)
-			side->flags = m_side_flags(side->flags & DOOR_IMPASSABLE);
+			side->flags = (m_side_flags)(side->flags & DOOR_IMPASSABLE);
 
 		if (params->scroll <= 0)
 		{
-			side->flags = m_side_flags(side->flags & DOOR_CLOSED);
+			side->flags = (m_side_flags)(side->flags & DOOR_CLOSED);
 			params->scroll = 0;
 			++side->state;
 			return false;

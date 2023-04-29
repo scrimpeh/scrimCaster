@@ -18,8 +18,8 @@ extern char* app_dir;
 //note that 256 is really optimistic and can probably be reduced
 //by a lot
 u8 fillCount = 0;						
-const u8 MAX_TEXTURE_BUF = 16;
-const u8 WORLD_SPRITE_BUF = SDL_arraysize(worldSpriteFilenames);
+#define MAX_TEXTURE_BUF 16
+#define WORLD_SPRITE_BUF 1
 SDL_Surface* mapTextureBuffer[MAX_TEXTURE_BUF];
 SDL_Surface* worldSpriteBuffer[WORLD_SPRITE_BUF];
 						

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
 // On actor types
 /* Actor types:
@@ -62,7 +62,6 @@ typedef struct Actor
 	u32 flags;
 } Actor;
 
-u32 GetActorSpriteIndex(const Actor* actor);
 u32 GetActorSpriteIndex(ActorType type);
 
 u32 GetEnemySpriteIndex(u8 type);
@@ -72,7 +71,6 @@ u32 GetPickupSpriteIndex(u8 type);
 u32 GetParticleSpriteIndex(u8 type);
 u32 GetOtherSpriteIndex(u8 type);
 
-Bounds GetActorBounds(const Actor* actor);
 Bounds GetActorBounds(ActorType type);
 
 Bounds GetEnemyBounds(u8 type);

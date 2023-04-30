@@ -54,11 +54,6 @@ void m_load()
 
 	tx_map_load(m_map.info.txSetCount, m_map.info.txSets);
 
-	for (u32 i = 0; i < m_map.info.txSetCount; ++i)
-	{
-		LoadMapTexture(m_map.info.txSets[i]);
-	}
-
 	for (i = 0; i < 8; ++i)
 		for (j = 0; j < 8; ++j)
 			for (n = 0; n < 4; ++n)
@@ -241,6 +236,7 @@ void m_unload()
 	ActorVectorDestroy(&levelEnemies);
 	mu_clear();
 	m_destroy_tags();
+	tx_unload();
 	//SDL_free(cellptr);
 };
 

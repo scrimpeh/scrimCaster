@@ -2,8 +2,8 @@
 
 #include <camera.h>
 #include <gfxloader.h>
-#include <input.h>
-#include <mouselook.h>
+#include <input/input.h>
+#include <input/mouselook.h>
 #include <render.h>
 #include <ttf.h>
 #include <window.h>
@@ -49,9 +49,9 @@ i32 InitGame(i32 argc, char** argv)
 	}
 
 	SDL_Log("Loading surfaces...");
-	LoadGlobalSurfaces();
+	gfx_load_global();
 	InitializeInput();
-	SetMouselook(true, 2.0);
+	mouselook_set_properties(true, 2.0);
 	SetViewportFov(90);
 
 	if (r_init(360, 240))

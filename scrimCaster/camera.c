@@ -1,8 +1,8 @@
-#include "camera.h"
+#include <camera.h>
 
-#include "actor.h"
-#include "input.h"
-#include "scan.h"
+#include <actor.h>
+#include <input/input.h>
+#include <scan.h>
 
 const u8 VIEWPORT_FOV_MIN = 20;
 const u8 VIEWPORT_FOV_MAX = 170;

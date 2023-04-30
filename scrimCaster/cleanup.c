@@ -14,7 +14,7 @@ void CleanUp()
 {
 	r_close();
 	m_unload();
-	UnloadAllTextures();
+	gfx_unload();
 	SDL_free(app_dir);
 	win_destroy();
 

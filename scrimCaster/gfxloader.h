@@ -5,8 +5,8 @@
 #include <SDL/SDL_video.h>
 
 SDL_Surface* gfx_load(const char* filename);
-i32 LoadGlobalSurfaces();
-i32 LoadMapTexture(const char* filename);
-void UnloadMapTextures();
-void UnloadAllTextures();
-static i32 LoadWorldSprites();
+
+i32 gfx_load_global();
+void gfx_unload();
+
+static i32 gfx_load_sprites();

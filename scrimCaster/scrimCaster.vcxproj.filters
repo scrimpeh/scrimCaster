@@ -55,10 +55,10 @@
     <ClInclude Include="frame.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="input.h">
+    <ClInclude Include="input\input.h">
       <Filter>Source Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="inputmap.h">
+    <ClInclude Include="input\inputmap.h">
       <Filter>Source Files\input</Filter>
     </ClInclude>
     <ClInclude Include="cell.h">
@@ -70,7 +70,7 @@
     <ClInclude Include="gfxloader.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="mouselook.h">
+    <ClInclude Include="input\mouselook.h">
       <Filter>Source Files\input</Filter>
     </ClInclude>
     <ClInclude Include="actor.h">
@@ -162,10 +162,10 @@
     <ClCompile Include="frame.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="input.c">
+    <ClCompile Include="input\input.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="inputmap.c">
+    <ClCompile Include="input\inputmap.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="cell.c">
@@ -177,7 +177,7 @@
     <ClCompile Include="gfxloader.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="mouselook.c">
+    <ClCompile Include="input\mouselook.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="actor.c">

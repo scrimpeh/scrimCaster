@@ -1,5 +1,5 @@
-#include <input.h>
-#include <inputmap.h>
+#include <input/input.h>
+#include <input/inputmap.h>
 
 #include <SDL/SDL_events.h>
 

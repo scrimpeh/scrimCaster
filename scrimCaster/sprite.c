@@ -49,7 +49,7 @@ extern float projection_dist;
 
 extern float* z_buffer;
 
-extern SDL_Surface* worldSpriteBuffer[];
+extern SDL_Surface* gfx_ws_buffer[];
 
 void DrawSprites(SDL_Surface* target)
 {
@@ -108,8 +108,8 @@ void DrawSprites(SDL_Surface* target)
 		const i32 y_diff = y_end - y_start;
 		const float y_inc = ws.coords.h / (float) spr_rect.h - SPRITE_RATIO_END;
 
-		const u16 spritesheet_width = worldSpriteBuffer[ws.spritesheet]->w;
-		const u32* spr_ptr_begin = (u32*)worldSpriteBuffer[ws.spritesheet]->pixels +
+		const u16 spritesheet_width = gfx_ws_buffer[ws.spritesheet]->w;
+		const u32* spr_ptr_begin = (u32*) gfx_ws_buffer[ws.spritesheet]->pixels +
 			(ws.coords.y * spritesheet_width) + ws.coords.x;
 
 		float sprcol_x = spr_rect.x >= 0 ? 0 : -spr_rect.x * x_inc;

@@ -148,7 +148,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Get the texture
 	const Side* side = map_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
-	const u32* const tx_slice = tx_get_slice(side, intercept->column);
+	const tx_slice slice = tx_get_slice(side, intercept->column);
 
 	// Now draw the texture slice
 	i32 y_top = SDL_max(0, wall_y);
@@ -168,9 +168,8 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 	{
-		// TODO: all textures are currently TEX_MAP_SIZE units wide. this should hopefully become obsolete
 		const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, scan_get_slice_y_start(side));
-		u32 tex_col = *(tx_slice + (slice_px * TEX_MAP_SIZE));
+		u32 tex_col = *(slice + slice_px);
 		if (tex_col != COLOR_KEY)
 		{
 			// Darken walls oriented E/W slightly

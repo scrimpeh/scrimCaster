@@ -1,6 +1,6 @@
 #include <window.h>
 
-#include <mouselook.h>
+#include <input/mouselook.h>
 #include <render.h>
 
 #include <SDL/SDL.h>
@@ -39,10 +39,10 @@ void win_process_event(const SDL_Event* evt)
 	switch (evt->window.event)
 	{
 	case SDL_WINDOWEVENT_FOCUS_GAINED:
-		SuspendMouselook(inMenu);
+		mouselook_suspend(inMenu);
 		break;
 	case SDL_WINDOWEVENT_FOCUS_LOST:
-		SuspendMouselook(true);
+		mouselook_suspend(true);
 		break;
 	}
 }

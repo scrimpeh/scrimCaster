@@ -4,8 +4,6 @@
 
 #include <SDL_video.h>
 
-extern SDL_Surface* mapTextureBuffer[];
-
 static const char* TX_PATH = "tx/map/";
 
 #define TX_PATH_BUF_SIZE 512
@@ -89,23 +87,11 @@ void tx_unload()
 	tx_map_textures = NULL;
 }
 
-const u32* tx_get_slice(const Side* side, u8 column)
+const tx_slice tx_get_slice(const Side* side, u8 column)
 {
-	// What was I thinking...
 	const u16 type = side->type;
-	const u8 tx_index = type & 0x00FF;
-	const u8 tx_sheet = (type & 0xFF00) >> 8;
-	const SDL_Surface* tx_surface = mapTextureBuffer[tx_sheet];
-
-	const u16 textures_per_row = tx_surface->w / TX_SIZE;
-
-	const u16 tile_y = tx_index / textures_per_row;
-	const u16 tile_x = tx_index % textures_per_row;
-
-	const u16 px_y = tile_y * TX_SIZE;
-	const u16 px_x = tile_x * TX_SIZE + column;
-
-	return (u32*)tx_surface->pixels + px_y * tx_surface->w + px_x;
+	const tx_block block = tx_map_textures + type * TX_PX_SIZE;
+	return block + column * TX_SIZE;
 }
 
 const u32 tx_get_point(const m_flat* flat, u8 x, u8 y, bool floor)
@@ -114,23 +100,9 @@ const u32 tx_get_point(const m_flat* flat, u8 x, u8 y, bool floor)
 	const tx_block block = tx_map_textures + type * TX_PX_SIZE;
 	const tx_slice slice = block + x * TX_SIZE;
 	return *(slice + y);
-
-	// const u8 tx_index = type & 0x00FF;
-	// const u8 tx_sheet = (type & 0xFF00) >> 8;
-	// const SDL_Surface* tx_surface = mapTextureBuffer[tx_sheet];
-	// 
-	// const u16 textures_per_row = tx_surface->w / TX_SIZE;
-	// 
-	// const u16 tile_y = tx_index / textures_per_row;
-	// const u16 tile_x = tx_index % textures_per_row;
-
-	// const u16 px_y = tile_y * TX_SIZE + y;
-	// const u16 px_x = tile_x * TX_SIZE + x;
-	// 
-	// return *((u32*)tx_surface->pixels + px_y * tx_surface->w + px_x);
 }
 
-const void tx_strip_blit(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end)
+const void tx_blit_slice(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end)
 {
 	// TODO
 }

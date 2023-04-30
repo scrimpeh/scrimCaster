@@ -4,8 +4,8 @@
 #include <frame.h>
 #include <game.h>
 #include <init.h>
-#include <input.h>
-#include <mouselook.h>
+#include <input/input.h>
+#include <input/mouselook.h>
 #include <render.h>
 #include <window.h>
 
@@ -58,7 +58,7 @@ i32 main(i32 argc, char** argv)
 			switch (evt.type)
 			{
 			case SDL_MOUSEMOTION:
-				ProcessMouseMotionEvent(&evt);
+				mouselook_process_event(&evt);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:

@@ -2,11 +2,11 @@
 
 #include <actorcontainers.h>
 #include <camera.h>
-#include <input.h>
 #include <enemy.h>
+#include <input/input.h>
+#include <input/mouselook.h>
 #include <map.h>
 #include <mapupdate.h>
-#include <mouselook.h>
 #include <player.h>
 
 // On game Objects:
@@ -66,7 +66,7 @@ extern Input input, input_tf;
 
 void SetMenu(bool open)
 {
-	SuspendMouselook(open);
+	mouselook_suspend(open);
 	inMenu = open;
 }
 

@@ -18,7 +18,10 @@
 
 i32 tx_map_load(u32 count, const char** tx_set_names);
 
-
+// A texture is basically a flat array of 32-bit integers arranged vertically in strips
+// Size information is kept externally, since it's e.g. implictly known for textures
+typedef u32* tx_block;
+typedef u32* tx_slice;
 
 
 void tx_unload();
@@ -27,17 +30,14 @@ void tx_unload();
 // Automatically handles getting the correct vertical slice, but vertical mirroring needs to be done at the drawing side
 // The purpose of this function is to shunt off all special jank cases into a separate function
 // though somehow this needs to handle both slices and floors
-const u32* tx_get_slice(const Side* side, u8 column);
+const tx_slice tx_get_slice(const Side* side, u8 column);
 const u32 tx_get_point(const m_flat* flat, u8 x, u8 y, bool floor);
 
 
-// A texture is basically a flat array of 32-bit integers arranged vertically in strips
-// Size information is kept externally, since it's e.g. implictly known for textures
-typedef u32* tx_block;
-typedef u32* tx_slice;
+
 
 
 // Tentative, might as well add a blit function here later
-const void tx_strip_blit(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end);
+const void tx_blit_slice(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end);
 
 static void tx_copy(const SDL_Surface* source, const SDL_Rect* r, tx_block target);

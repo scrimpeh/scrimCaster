@@ -63,10 +63,9 @@ static i32 LoadWorldSprites()
 
 		surf = gfx_load(pathBuffer);
 		if (surf)
-		{
 			worldSpriteBuffer[i] = surf;
-		}
-		else return -1;
+		else 
+			return -1;
 	}
 	return 0;
 };

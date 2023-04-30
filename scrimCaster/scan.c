@@ -139,9 +139,11 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	const float distance = math_dist_f(x, y, intercept->x, intercept->y);
 	const float distance_corrected = distance * cosf(angle);
 
-	// Round down the wall height to the nearest multiple of two so there's an equal number of pixels
+	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
 	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
-	i32 wall_h = (i32) (projection_dist * M_CELLHEIGHT / distance_corrected) & ~1;
+	i32 wall_h = (i32) (projection_dist * M_CELLHEIGHT / distance_corrected);
+	if (wall_h & 1)
+		wall_h++;
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
@@ -217,3 +219,4 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		floor_render_px_bottom += viewport_w;
 	}
 }
+

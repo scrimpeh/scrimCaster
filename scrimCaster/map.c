@@ -52,7 +52,7 @@ void m_load()
 
 	SDL_assert(m_map.info.txSetCount > 0);
 
-	tx_load(&m_map);
+	tx_map_load(m_map.info.txSetCount, m_map.info.txSets);
 
 	for (u32 i = 0; i < m_map.info.txSetCount; ++i)
 	{

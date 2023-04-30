@@ -18,8 +18,8 @@ extern ActorVector levelEnemies;
 //This should presumably be offloaded to a separate file, either a source file 
 //or perhaps even an external file
 const Bounds NullBounds = { 0., 0. };
-const Bounds PlayerBounds = { (double)M_CELLSIZE / 8, (double)M_CELLSIZE / 8 };
-const Bounds PillarBounds = { (double)M_CELLSIZE / 8, (double)M_CELLSIZE / 8 };
+const Bounds PlayerBounds = { 8., 8. };
+const Bounds PillarBounds = { 8., 8. };
 
 const static ActorList* const actorLists[] =
 	{ /*&currentMap.levelPickups, &projectiles, &particles,*/ &tempEnemies };

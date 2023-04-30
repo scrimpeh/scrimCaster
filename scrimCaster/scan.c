@@ -135,9 +135,9 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	// -> this is gonna become spaghetti code super fast.
 
 	// Do triangular correction on the distance
-	const angle_rad_f relative_angle = TO_RADF(viewport_angle) - intercept->angle;
+	const angle_rad_f angle = TO_RADF(viewport_angle) - intercept->angle;
 	const float distance = math_dist_f(x, y, intercept->x, intercept->y);
-	const float distance_corrected = distance * cosf(relative_angle);
+	const float distance_corrected = distance * cosf(angle);
 
 	// Round down the wall height to the nearest multiple of two so there's an equal number of pixels
 	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
@@ -195,9 +195,9 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
-		u16 height = viewport_h - (2 * y_px);
+		const u16 height = viewport_h - (2 * y_px);
 		float d = (projection_dist * M_CELLHEIGHT) / height;
-		d /= cosf(relative_angle);
+		d /= cosf(angle);
 		float xa;
 		float ya;
 		math_vec_cast_f(x, y, intercept->angle, d, &xa, &ya);

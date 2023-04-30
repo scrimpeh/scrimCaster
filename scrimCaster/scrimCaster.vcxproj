@@ -367,7 +367,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="scan.c" />
     <ClCompile Include="scrimCaster.c" />
     <ClCompile Include="geometry.c" />
-    <ClCompile Include="sprite.cpcp" />
+    <ClCompile Include="sprite.c" />
     <ClCompile Include="ttf.c" />
     <ClCompile Include="window.c" />
   </ItemGroup>

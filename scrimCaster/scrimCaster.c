@@ -23,11 +23,12 @@
 // [ ] Decals (Dynamic and static)
 // [X] Unified, general-purpose ray caster / geometry interceptor
 // [ ] Code cleanup
-// [ ] Port to C (C99 or newer)
+// [X] Port to C (C99 or newer)
 // [ ] Update SDL to newest
 // [ ] Reorganize source files to match VS structure
 // [ ] Floor rendering (I think I might actually know how)
 // [ ] Skybox texture with cylinder projection or similar
+// [ ] Use non-cosine corrected distance in Z-Buffer
 // [ ] Optimize performance with the following methods (otpional)
 //     - [ ] Multithread renderer
 //     - [ ] Rotate surfaces by 90° so data is read and written sequentially

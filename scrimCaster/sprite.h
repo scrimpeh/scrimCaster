@@ -9,14 +9,14 @@
 
 #define MAXWIDTH 256 // Maximum width of a sprite in the sheet
 
-typedef struct ActorSprite
+typedef struct
 {
 	const Actor* actor;
-	double dist;
-	double relative_angle;
+	double distance;
+	double angle;
 } ActorSprite;
 
-typedef enum Anchor
+typedef enum
 {
 	CENTER = 0,
 	FLOOR = 1,
@@ -26,7 +26,7 @@ typedef enum Anchor
 
 // Defines a sprite as to draw on screen, static struct, should only be used
 // for data definition
-typedef struct WorldSprite
+typedef struct
 {
 	u16 spritesheet;
 	SDL_Rect coords;	//The coordinates on the sprite sheet
@@ -34,13 +34,13 @@ typedef struct WorldSprite
 	i16 offset;
 } WorldSprite;
 
-typedef struct ActorFrameSheet
+typedef struct
 {
 	u8 angles;
 	const WorldSprite *sprites;
 } ActorFrameSheet;
 
-typedef struct ActorSpriteSheet
+typedef struct
 {
 	const ActorFrameSheet *animation_frames;
 } ActorSpriteSheet;

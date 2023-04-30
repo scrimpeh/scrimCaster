@@ -43,7 +43,6 @@ extern ActorList particles, projectiles, tempEnemies;
 extern u16 viewport_w, viewport_h, viewport_w_half;
 
 extern float viewport_x, viewport_y, viewport_angle;
-extern Map m_map;
 extern u8 viewport_x_fov, viewport_x_fov_half;
 
 extern float projection_dist;
@@ -52,7 +51,7 @@ extern float* z_buffer;
 
 extern SDL_Surface* worldSpriteBuffer[];
 
-void DrawSprites(SDL_Surface* toDraw)
+void DrawSprites(SDL_Surface* target)
 {
 	SDL_Rect spr_rect;
 	const static ActorList* const actorLists[] =
@@ -88,34 +87,26 @@ void DrawSprites(SDL_Surface* toDraw)
 
 		const i16 h_offset = ws.anchor == FLOORCEIL ? 0 :
 			(i16)((projection_dist * ws.offset +
-			((M_CELLHEIGHT / 2) + (ws.coords.h / 2) * ws.anchor == FLOOR ? 1 : -1) / ds->dist));
+			((M_CELLHEIGHT / 2) + (ws.coords.h / 2) * ws.anchor == FLOOR ? 1 : -1) / ds->distance));
 
-		const double angle = ds->relative_angle - 
-			(ds->relative_angle > 180 ? 360 : 0)
-			- viewport_x_fov_half;
+		const double angle = angle_normalize_deg_d(ds->angle - viewport_x_fov_half);
 
-		spr_rect.w = (i32)((projection_dist * ws.coords.w) / ds->dist);
+		spr_rect.w = (i32) ((projection_dist * ws.coords.w) / ds->distance);
 		//if (spr_rect.w > max_width) spr_rect.w = max_width;
-		spr_rect.h = (i32)((projection_dist * height) / ds->dist);
-		spr_rect.x = (i32)(tan(TO_RAD(angle))*projection_dist) + (viewport_w_half) - (spr_rect.w / 2);
+		spr_rect.h = (i32) ((projection_dist * height) / ds->distance);
+		spr_rect.x = (i32) (tan(TO_RAD(angle)) * projection_dist) + viewport_w_half - (spr_rect.w / 2);
 		spr_rect.y = h_offset + ((viewport_h - spr_rect.h) / 2);
-
-		// Shouldn't happen - todo, investigate what's going wrong
-		if (spr_rect.x >= viewport_w || spr_rect.y >= viewport_h) 
-			continue;
-		if (spr_rect.x + spr_rect.w < 0 || spr_rect.y + spr_rect.h < 0) 
-			continue;
 
 		// The idea: Make a loop running through all the pixel columns, clipping accordingly at the edges:
 		// If and only if the sprite needs to be masked, blit into a specialty area first
 		const i32 x_start = SDL_max(spr_rect.x, 0);
 		const i32 x_end = SDL_min(spr_rect.x + spr_rect.w, viewport_w);
-		const float x_inc = ws.coords.w / (float)(spr_rect.w) - SPRITE_RATIO_END;
+		const float x_inc = ws.coords.w / (float) spr_rect.w - SPRITE_RATIO_END;
 
 		const i32 y_start = SDL_max(spr_rect.y, 0);
 		const i32 y_end = SDL_min(spr_rect.y + spr_rect.h, viewport_h);
 		const i32 y_diff = y_end - y_start;
-		const float y_inc = ws.coords.h / (float)(spr_rect.h) - SPRITE_RATIO_END;
+		const float y_inc = ws.coords.h / (float) spr_rect.h - SPRITE_RATIO_END;
 
 		const u16 spritesheet_width = worldSpriteBuffer[ws.spritesheet]->w;
 		const u32* spr_ptr_begin = (u32*)worldSpriteBuffer[ws.spritesheet]->pixels +
@@ -125,12 +116,12 @@ void DrawSprites(SDL_Surface* toDraw)
 		for (i32 x_i = x_start; x_i < x_end; ++x_i)
 		{
 			float sprcol_y = spr_rect.y >= 0 ? 0 : -spr_rect.y * y_inc;
-			u32* render_px = (u32*)toDraw->pixels + (y_start * viewport_w) + x_i;
-			const u32* const ws_px = (u32*)spr_ptr_begin + (u16)sprcol_x;
+			u32* render_px = (u32*) target->pixels + (y_start * viewport_w) + x_i;
+			const u32* const ws_px = (u32*) spr_ptr_begin + (u16)sprcol_x;
 			for (i32 y_i = y_start; y_i < y_end; ++y_i)
 			{
-				const u32 spr_col = *(ws_px + (u16)sprcol_y * spritesheet_width);
-				if (spr_col != COLOR_KEY && z_buffer[y_i * viewport_w + x_i] > ds->dist)
+				const u32 spr_col = *(ws_px + (u16) sprcol_y * spritesheet_width);
+				if (spr_col != COLOR_KEY && z_buffer[y_i * viewport_w + x_i] > ds->distance)
 					*render_px = spr_col;
 				sprcol_y += y_inc;
 				render_px += viewport_w;
@@ -161,7 +152,7 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 
 	const double dx = actor->x - viewport_x;
 	const double dy = actor->y - viewport_y;
-	const double slope = angle_get_deg_d(dx, dy * -1);
+	const double slope = angle_get_deg_d(dx, -dy);
 
 	const double fov_min_full = angle_normalize_deg_d(viewport_angle - viewport_x_fov);
 	const double fov_max_full = angle_normalize_deg_d(viewport_angle + viewport_x_fov);
@@ -195,8 +186,8 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 
 	ActorSprite as = { 0 };
 	as.actor = actor;
-	as.dist = distance_corrected; 
-	as.relative_angle = angle_to_sprite;
+	as.distance = distance_corrected; 
+	as.angle = angle_to_sprite;
 	if (drawsprite)
 	{
 		setsprite:
@@ -211,7 +202,7 @@ static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
 	// Sanity check if the sprite gets way too large
 	if (spr_width > viewport_w * 128)
 		return false;
-	const double px_angle_ratio = (double)viewport_x_fov / viewport_w;
+	const double px_angle_ratio = (double) viewport_x_fov / viewport_w;
 	const double err_angle = px_angle_ratio * spr_width;
 
 	goto setsprite;
@@ -266,9 +257,9 @@ static i32 SpriteDistSort(const void* p1, const void* p2)
 	const ActorSprite* const d1 = (ActorSprite*)p1;
 	const ActorSprite* const d2 = (ActorSprite*)p2;
 
-	if (d1->dist > d2->dist) 
+	if (d1->distance > d2->distance) 
 		return  1;
-	if (d1->dist < d2->dist) 
+	if (d1->distance < d2->distance) 
 		return -1;
 	return 0;
 }

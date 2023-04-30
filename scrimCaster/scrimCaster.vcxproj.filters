@@ -186,7 +186,7 @@
     <ClCompile Include="actorcontainers.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="sprite.cpcp">
+    <ClCompile Include="sprite.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="renderconstants.c">

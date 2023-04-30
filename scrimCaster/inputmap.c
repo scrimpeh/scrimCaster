@@ -31,6 +31,8 @@ void LoadInitialBindings()
 	scancode_map[SDL_SCANCODE_LCTRL] = offsetof(Input, fire);
 
 	scancode_map[SDL_SCANCODE_TAB] = offsetof(Input, m_map);
+
+	scancode_map[SDL_SCANCODE_PAUSE] = offsetof(Input, pause);
 } 
 
 u8 GetMapping(SDL_Keycode kc)

@@ -8,6 +8,12 @@
 
 #include "SDL/SDL_surface.h"
 
+typedef struct g_intercept_stack
+{
+	struct g_intercept_stack* next;
+	g_intercept intercept;
+} g_intercept_stack;
+
 i32 scan_init();
 void scan_close();
 
@@ -17,11 +23,5 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 static inline bool collect_intercept(const g_intercept* intercept);
 
-typedef struct g_intercept_stack
-{
-	struct g_intercept_stack* next;
-	g_intercept intercept;
-} g_intercept_stack;
-
-float scan_distance_to_height(float distance);
-float scan_pixel_to_distance(u16 y);
+static u8 scan_get_tx_slice_y(i64 wall_h, i64 y, u8 start_y);
+static u8 scan_get_slice_y_start(const Side* side);

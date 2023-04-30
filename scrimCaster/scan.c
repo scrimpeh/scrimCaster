@@ -104,6 +104,30 @@ void scan_draw(SDL_Surface* target)
 	}
 }
 
+static u8 scan_get_slice_y_start(const Side* side)
+{
+	if (!side->flags & DOOR_V)
+		return 0;
+	return side->door.scroll;
+}
+
+static u8 scan_get_tx_slice_y(i64 wall_h, i64 y, u8 start_y)
+{
+	const i64 wall_y = (viewport_h - wall_h) / 2;
+	const i64 y_rel = y - wall_y;
+	const float tx = (float) y_rel / wall_h * TX_SIZE;
+	return (u8) tx + start_y;
+}
+
+static i32 scan_get_wall_height(i16 height, float distance, angle_rad_f angle)
+{
+	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
+	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
+	distance *= cosf(angle);
+	i32 h = (i32) projection_dist * height / distance;
+	return h + (h & 1);
+}
+
 static void scan_draw_column(SDL_Surface* target, float x, float y, const g_intercept* intercept, u16 col)
 {
 	// For doors, we basically have to work out how open the door is (presumably as a ratio between
@@ -115,21 +139,14 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	const float distance = math_dist_f(x, y, intercept->x, intercept->y);
 	const float distance_corrected = distance * cosf(relative_angle);
 
-	// Get the wall parameters
-	i32 wall_h = (i32) (projection_dist * M_CELLHEIGHT / distance_corrected);
+	// Round down the wall height to the nearest multiple of two so there's an equal number of pixels
+	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
+	i32 wall_h = (i32) (projection_dist * M_CELLHEIGHT / distance_corrected) & ~1;
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
 	const Side* side = map_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
 	const u32* const tx_slice = tx_get_slice(side, intercept->column);
- 
-	float slice_px = wall_y >= 0 ? 0 : HALFSIZE - ((float) viewport_h / wall_h) * HALFSIZE;
-	// Due to what seems to be floating point rounding errors, the slice read increment is slightly larger
-	// than it should be, leading to occasionally reading a texture slightly out of binds. 
-	// The clean method to solve this problem would probably be to calculate the texture y offset
-	// ad-hoc when we need it, but this might be slightly slower. We just reduce the increment
-	// by a small amount instead, which helps to avoid this issue.
-	const double slice_inc = TX_SIZE / ((float)wall_h + 8e-4);
 
 	// Now draw the texture slice
 	i32 y_top = SDL_max(0, wall_y);
@@ -137,15 +154,8 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	if (side->flags & DOOR_V)
 	{
-		float offset = 0.;
-		if (side->door.state & 1)
-			offset = (float) side->door.timer_ticks /
-			( side->door.state & 2 ? -side->door.closespeed : side->door.openspeed );
-
-		slice_px += side->door.scroll + offset;
-
-		wall_h = (i32) (projection_dist * (M_CELLHEIGHT - side->door.scroll) / distance_corrected);
-		y_end = SDL_min(viewport_h, wall_y + wall_h + 1);
+		const i32 door_h = (i32) (wall_h * ((M_CELLHEIGHT - side->door.scroll) / (float)(M_CELLHEIGHT)));
+		y_end = SDL_min(viewport_h, wall_y + door_h);
 	}
 
 	u32* render_px = (u32*) target->pixels;
@@ -157,12 +167,13 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 	{
 		// TODO: all textures are currently TEX_MAP_SIZE units wide. this should hopefully become obsolete
-		u32 tex_col = *(tx_slice + ((u32) slice_px) * TEX_MAP_SIZE);
+		const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, scan_get_slice_y_start(side));
+		u32 tex_col = *(tx_slice + (slice_px * TEX_MAP_SIZE));
 		if (tex_col != COLOR_KEY)
 		{
 			// Darken walls oriented E/W slightly
 			if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
-				tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.12f);
+				tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.125f);
 
 			*render_px = tex_col;
 			*z_buffer_px = distance_corrected;
@@ -170,11 +181,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		render_px += viewport_w;
 		z_buffer_px += viewport_w;
-		slice_px += slice_inc;
 	}
-
-	u32* floor_render_px_top = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
-	u32* floor_render_px_bottom = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
 
 	// Now draw the ceiling and floor
 	// For this, we invert the projection and cosine correction to get the wall height
@@ -183,7 +190,10 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	if (intercept->type == G_INTERCEPT_NON_SOLID)
 		return;
 
-	for (u32 y_px = y_top - 1; y_px != -1; y_px--)
+	u32* floor_render_px_top = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
+	u32* floor_render_px_bottom = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
+
+	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
 		u16 height = viewport_h - (2 * y_px);
 		float d = (projection_dist * M_CELLHEIGHT) / height;

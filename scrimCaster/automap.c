@@ -38,7 +38,7 @@ void am_draw(SDL_Surface* target)
 	am_x = am_follow ? player.x : am_center_x;
 	am_y = am_follow ? player.y : am_center_y;
 
-	const float viewport_ratio = (float)viewport_w / viewport_h;
+	const float viewport_ratio = (float) viewport_w / viewport_h;
 	const float am_x_min = AM_MARIGN * viewport_ratio;
 	const float am_x_max = (m_map.w * M_CELLSIZE - AM_MARIGN) * viewport_ratio;
 	const float am_y_min = AM_MARIGN;

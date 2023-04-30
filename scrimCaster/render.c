@@ -13,22 +13,18 @@
 u16 viewport_w;
 u16 viewport_h;
 
-extern i32 win_w;
-extern i32 win_h;
-
 extern TTF_Font* ttf_font_debug;
 
 extern SDL_Window* win_main;
-SDL_Surface* viewportSurface = NULL;
-SDL_Surface* mainWindowSurface = NULL;
+SDL_Surface* r_surface_viewport = NULL;
+SDL_Surface* r_surface_win = NULL;
 
 extern u64 frame_count;
 extern float frame_fps;
 
-extern ActorVector levelEnemies;
-
-bool show_map = false;
-bool draw_crosshair = true;
+bool r_show_map = false;
+bool r_show_crosshair = true;
+bool r_draw_background = false;
 
 i32 r_init(u16 w, u16 h)
 {
@@ -37,8 +33,8 @@ i32 r_init(u16 w, u16 h)
 	viewport_w = w;
 	viewport_h = h;
 
-	viewportSurface = SDL_CreateRGBSurface(0, viewport_w, viewport_h, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
-	if (!viewportSurface)
+	r_surface_viewport = SDL_CreateRGBSurface(0, viewport_w, viewport_h, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
+	if (!r_surface_viewport)
 	{
 		SDL_LogError(SDL_LOG_PRIORITY_CRITICAL, "Couldn't initialize viewport! %s", SDL_GetError());
 		return -1;
@@ -58,8 +54,8 @@ i32 r_init(u16 w, u16 h)
 void r_close()
 {
 	scan_close();
-	SDL_FreeSurface(viewportSurface);
-	viewportSurface = NULL;
+	SDL_FreeSurface(r_surface_viewport);
+	r_surface_viewport = NULL;
 }
 
 void r_draw_crosshair(SDL_Surface* target)
@@ -75,18 +71,23 @@ void r_draw_crosshair(SDL_Surface* target)
 void r_draw()
 {
 	// Do the rendering pipeline
-	show_map = input.m_map;
+	r_show_map = input.m_map;
 
-	scan_draw(viewportSurface);
-	DrawSprites(viewportSurface);
-	if (show_map)
-		am_draw(viewportSurface);
-	else if (draw_crosshair) 
-		r_draw_crosshair(viewportSurface);
+
+	// Optional HOM avoidance
+	if (r_draw_background)
+		SDL_FillRect(r_surface_viewport, NULL, COLOR_KEY);
+
+	scan_draw(r_surface_viewport);
+	DrawSprites(r_surface_viewport);
+	if (r_show_map)
+		am_draw(r_surface_viewport);
+	else if (r_show_crosshair) 
+		r_draw_crosshair(r_surface_viewport);
 	
-	rd_render_debug(viewportSurface);
+	rd_render_debug(r_surface_viewport);
 	
-	SDL_BlitScaled(viewportSurface, NULL, mainWindowSurface, NULL);
+	SDL_BlitScaled(r_surface_viewport, NULL, r_surface_win, NULL);
 	SDL_UpdateWindowSurface(win_main);
 }
 

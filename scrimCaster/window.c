@@ -23,13 +23,13 @@ u32 win_mode = SDL_WINDOW_SHOWN;
 extern bool suspend_mouselook;
 extern bool inMenu;
 
-extern SDL_Surface* mainWindowSurface;
+extern SDL_Surface* r_surface_win;
 
 i32 win_create()
 {
 	win_main = SDL_CreateWindow("scrimCaster", win_x, win_y,win_w, win_h, win_mode);
-	mainWindowSurface = SDL_GetWindowSurface(win_main);
-	win_main_format = mainWindowSurface->format;
+	r_surface_win = SDL_GetWindowSurface(win_main);
+	win_main_format = r_surface_win->format;
 	return !win_main;
 }
 

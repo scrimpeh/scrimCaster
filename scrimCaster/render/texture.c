@@ -1,14 +1,19 @@
-#include <texture.h>
+#include <render/texture.h>
 
-#include <gfxloader.h>
+#include <render/gfxloader.h>
 
-#include <SDL_video.h>
+#include <SDL/SDL_video.h>
+
+// TODO: This currently mixes the general texture format, and map textures as used
+// for sides and flats.
+// This hould be separated
 
 static const char* TX_PATH = "tx/map/";
 
 #define TX_PATH_BUF_SIZE 512
-#define TX_PX_SIZE (TX_SIZE * TX_SIZE)
 char tx_path_buf[TX_PATH_BUF_SIZE];
+
+#define TX_PX_SIZE (TX_SIZE * TX_SIZE)
 
 tx_block tx_map_textures = NULL;
 
@@ -63,7 +68,7 @@ i32 tx_map_load(u32 count, const char** tx_set_names)
 		r.h = TX_SIZE;
 		tx_copy(surface, &r, current_texture);
 		current_texture += TX_PX_SIZE;
-		if ((r.y + TX_SIZE) > surface->h)
+		if ((r.y + TX_SIZE) > surface->h && (r.x + TX_SIZE) > surface->w)
 			current_surface++;
 	}
 
@@ -73,11 +78,21 @@ i32 tx_map_load(u32 count, const char** tx_set_names)
 	return 0;
 }
 
-static void tx_copy(const SDL_Surface* source, const SDL_Rect* r, tx_block target)
+void tx_copy(const SDL_Surface* source, const SDL_Rect* r, tx_block target)
 {
+	SDL_Rect source_rect;
+	if (r)
+		SDL_memcpy(&source_rect, r, sizeof(SDL_Rect));
+	else
+	{
+		source_rect.x = 0;
+		source_rect.y = 0;
+		source_rect.w = source->w;
+		source_rect.h = source->h;
+	}
 	u64 offs = 0;
-	for (u32 x = r->x; x < r->x + r->w; x++)
-		for (u32 y = r->y; y < r->y + r->h; y++)
+	for (u32 x = source_rect.x; x < source_rect.x + source_rect.w; x++)
+		for (u32 y = source_rect.y; y < source_rect.y + source_rect.h; y++)
 			target[offs++] = *((u32*) source->pixels + y * source->w + x);
 }
 
@@ -102,7 +117,7 @@ const u32 tx_get_point(const m_flat* flat, u8 x, u8 y, bool floor)
 	return *(slice + y);
 }
 
-const void tx_blit_slice(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end)
+const void tx_blit_slice(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end, float* z_buffer, tx_blit_slice_z_buffer_access z_bufferr_access)
 {
 	// TODO
 }

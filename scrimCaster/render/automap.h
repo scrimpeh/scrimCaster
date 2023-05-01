@@ -6,6 +6,7 @@
 
 #include <actor.h>
 #include <geometry.h>
+#include <render/colormap.h>
 
 #include <SDL/SDL_video.h>
 
@@ -23,3 +24,5 @@ static bool am_collect_intercept(const g_intercept* intercept);
 
 static i32 am_map_h(float x);
 static i32 am_map_v(float y);
+
+static cm_color am_get_color(const Side* side);

@@ -34,13 +34,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="window.h">
+    <ClInclude Include="render\window.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="render.h">
+    <ClInclude Include="render\render.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="ttf.h">
+    <ClInclude Include="render\ttf.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
@@ -49,10 +49,10 @@
     <ClInclude Include="camera.h">
       <Filter>Source Files\game</Filter>
     </ClInclude>
-    <ClInclude Include="scan.h">
+    <ClInclude Include="render\scan.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="frame.h">
+    <ClInclude Include="render\frame.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="input\input.h">
@@ -67,7 +67,7 @@
     <ClInclude Include="map.h">
       <Filter>Source Files\game\map</Filter>
     </ClInclude>
-    <ClInclude Include="gfxloader.h">
+    <ClInclude Include="render\gfxloader.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="input\mouselook.h">
@@ -79,10 +79,10 @@
     <ClInclude Include="actorcontainers.h">
       <Filter>Source Files\game\actor</Filter>
     </ClInclude>
-    <ClInclude Include="sprite.h">
+    <ClInclude Include="render\sprite.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="renderconstants.h">
+    <ClInclude Include="render\renderconstants.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="mapupdate.h">
@@ -109,45 +109,48 @@
     <ClInclude Include="geometry.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="colormap.h">
+    <ClInclude Include="render\colormap.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="util\mathutil.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="automap.h">
+    <ClInclude Include="render\automap.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="debugutil\watch.h">
       <Filter>Source Files\debugutil</Filter>
     </ClInclude>
-    <ClInclude Include="renderdebug.h">
+    <ClInclude Include="render\renderdebug.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
       <Filter>Source Files\game\actor</Filter>
     </ClInclude>
-    <ClInclude Include="renderutil.h">
+    <ClInclude Include="render\renderutil.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="texture.h">
+    <ClInclude Include="render\texture.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="angle.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="render\skybox.h">
+      <Filter>Source Files\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="window.c">
+    <ClCompile Include="render\window.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="render.c">
+    <ClCompile Include="render\render.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="ttf.c">
+    <ClCompile Include="render\ttf.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="game.c">
@@ -156,10 +159,10 @@
     <ClCompile Include="camera.c">
       <Filter>Source Files\game</Filter>
     </ClCompile>
-    <ClCompile Include="scan.c">
+    <ClCompile Include="render\scan.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="frame.c">
+    <ClCompile Include="render\frame.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="input\input.c">
@@ -174,7 +177,7 @@
     <ClCompile Include="map.c">
       <Filter>Source Files\game\map</Filter>
     </ClCompile>
-    <ClCompile Include="gfxloader.c">
+    <ClCompile Include="render\gfxloader.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="input\mouselook.c">
@@ -186,10 +189,10 @@
     <ClCompile Include="actorcontainers.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="sprite.c">
+    <ClCompile Include="render\sprite.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="renderconstants.c">
+    <ClCompile Include="render\renderconstants.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="mapupdate.c">
@@ -210,25 +213,25 @@
     <ClCompile Include="geometry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="colormap.c">
+    <ClCompile Include="render\colormap.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="util\mathutil.c">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="renderutil.c">
+    <ClCompile Include="render\renderutil.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="automap.c">
+    <ClCompile Include="render\automap.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="renderdebug.c">
+    <ClCompile Include="render\renderdebug.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="player.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="texture.c">
+    <ClCompile Include="render\texture.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="debugutil\watch.c">
@@ -236,6 +239,9 @@
     </ClCompile>
     <ClCompile Include="angle.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="render\skybox.c">
+      <Filter>Source Files\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

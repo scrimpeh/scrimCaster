@@ -1,4 +1,4 @@
-#include <render.h>
+#include <render/render.h>
 
 #include <camera.h>
 #include <input/input.h>
@@ -12,6 +12,7 @@
 // These are decoupled from the window width and height and should equal to or smaller than the window
 u16 viewport_w;
 u16 viewport_h;
+u8 viewport_x_fov;
 
 extern TTF_Font* ttf_font_debug;
 

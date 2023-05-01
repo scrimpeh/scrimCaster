@@ -1,6 +1,6 @@
 #include <player.h>
 
-#include <input.h>
+#include <input/input.h>
 #include <map.h>
 #include <maputil.h>
 #include <mapupdate.h>

@@ -7,6 +7,9 @@ Input input;
 Input input_tf;
 Input input_lf;
 
+i64 input_mwheel_acc = 0;
+i64 input_mwheel = 0;
+
 void InitializeInput() 
 {
 	SDL_Log("Loading key bindings...");
@@ -20,8 +23,13 @@ void GetInput(SDL_Event* evt)
 	case SDL_KEYDOWN:
 	case SDL_KEYUP:
 	{
-		u8 input_offset = GetMapping(evt->key.keysym.sym);
+		const u8 input_offset = GetMapping(evt->key.keysym.sym);
 		*((u8*) &input + input_offset) = evt->key.state == SDL_PRESSED;
+		break;
+	}
+	case SDL_MOUSEWHEEL:
+	{
+		input_mwheel_acc += evt->wheel.y;
 		break;
 	}
 	}
@@ -41,4 +49,7 @@ void FilterInput()
 	}
 
 	input_lf = input;
+
+	input_mwheel = input_mwheel_acc;
+	input_mwheel_acc = 0;
 }

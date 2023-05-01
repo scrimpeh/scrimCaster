@@ -4,7 +4,7 @@
 
 #include <common.h>
 
-#include <colormap.h>
+#include <render/colormap.h>
 
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_video.h>

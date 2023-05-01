@@ -39,7 +39,7 @@ typedef enum g_intercept_type
 typedef struct g_intercept {
 	g_side_orientation orientation;
 	g_intercept_type type;
-	float angle;
+	angle_rad_f angle;
 	float x;
 	float y;
 	i16 map_x;

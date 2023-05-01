@@ -8,9 +8,9 @@
 typedef struct MapInfo
 {
 	char name[32];
-	u8 txSetCount;	//Textures
-	const char** txSets;
-	const char* skyname;
+	u8 texture_set_count;
+	const char** texture_sets;
+	u16 sky;
 } MapInfo;
 
 typedef struct Map
@@ -46,3 +46,4 @@ static void m_destroy_tags();
 // Development function, flood-fills a floor with a certain type
 static void _m_flood_fill(u16 x, u16 y, u16 type, bool floor);
 static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor);
+static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const Side* side);

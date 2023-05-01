@@ -1,13 +1,13 @@
 #include <scrimCaster.h>
 
 #include <cleanup.h>
-#include <frame.h>
 #include <game.h>
 #include <init.h>
 #include <input/input.h>
 #include <input/mouselook.h>
-#include <render.h>
-#include <window.h>
+#include <render/frame.h>
+#include <render/render.h>
+#include <render/window.h>
 
 #include <SDL/SDL.h>
 
@@ -26,14 +26,18 @@
 // [X] Port to C (C99 or newer)
 // [ ] Update SDL to newest
 // [ ] Reorganize source files to match VS structure
-// [ ] Floor rendering (I think I might actually know how)
-// [ ] Skybox texture with cylinder projection or similar
-// [ ] Use non-cosine corrected distance in Z-Buffer
+// [X] Floor rendering (I think I might actually know how)
+// [X] Skybox texture with cylinder projection or similar
 // [ ] Optimize performance with the following methods (otpional)
 //     - [ ] Multithread renderer
 //     - [ ] Rotate surfaces by 90° so data is read and written sequentially
 //     - [ ] Use SDL_render for scaling
-//     - [ ] Misc
+//     - [ ] General optimizations
+// [ ] Cell lighting
+//     - [ ] Smooth light blending between adjacent cells
+//     - [ ] Dynamic lighting
+// [ ] Add some proper textures
+// [ ] Material system, with animated textures and more
 
 char* app_dir = NULL;
 

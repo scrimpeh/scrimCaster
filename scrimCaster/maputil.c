@@ -1,7 +1,7 @@
 #include <maputil.h>
 
 #include <map.h>
-#include <renderconstants.h>
+#include <render/renderconstants.h>
 
 #include <math.h>
 

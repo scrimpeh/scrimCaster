@@ -1,9 +1,9 @@
 #include <cleanup.h>
 
-#include <gfxloader.h>
 #include <map.h>
-#include <render.h>
-#include <window.h>
+#include <render/gfxloader.h>
+#include <render/render.h>
+#include <render/window.h>
 
 #include <SDL/SDL.h>
 

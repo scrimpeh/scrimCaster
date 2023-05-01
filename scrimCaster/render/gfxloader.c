@@ -1,6 +1,7 @@
 #include <gfxloader.h>
 
 #include <renderconstants.h>
+#include <render/skybox.h>
 
 #include <SDL/SDL_image.h>
 
@@ -44,7 +45,11 @@ SDL_Surface* gfx_load(const char* name)
 i32 gfx_load_global()
 {
 	gfx_unload();
-	return gfx_load_sprites();
+	if (gfx_load_sprites())
+		return -1;
+	if (r_sky_load_global())
+		return -1;
+	return 0;
 }
 
 static i32 gfx_load_sprites()
@@ -71,6 +76,7 @@ void gfx_unload()
 		SDL_FreeSurface(gfx_ws_buffer[i]);
 		gfx_ws_buffer[i] = NULL;
 	}
+	r_sky_unload();
 }
 
 

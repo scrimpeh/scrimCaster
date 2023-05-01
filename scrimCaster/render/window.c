@@ -1,7 +1,7 @@
-#include <window.h>
+#include <render/window.h>
 
 #include <input/mouselook.h>
-#include <render.h>
+#include <render/render.h>
 
 #include <SDL/SDL.h>
 

@@ -1,11 +1,13 @@
-#include <automap.h>
+#include <render/automap.h>
 
 #include <camera.h>
 #include <enemy.h>
+#include <input/input.h>
 #include <map.h>
 #include <player.h>
-#include <render.h>
-#include <renderutil.h>
+#include <render/render.h>
+#include <render/renderutil.h>
+#include <render/skybox.h>
 
 
 // Cap the automap to the bounds of the map and inside this zone.
@@ -18,12 +20,18 @@ float am_center_x = 0.f;
 float am_center_y = 0.f;
 bool am_follow = true;
 
+static const float AM_ZOOM_MIN = 0.5;
+static const float AM_ZOOM_MAX = 3;
+static const float AM_ZOOM_INC = 0.25;
+
 static float am_cell_size;
 static float am_x;
 static float am_y;
 
 static float r_map_intercept_x;
 static float r_map_intercept_y;
+
+extern i64 input_mwheel;
 
 void am_init()
 {
@@ -33,16 +41,22 @@ void am_init()
 
 void am_draw(SDL_Surface* target)
 {
+	// It's sorta ugly to process input at the same point while drawing,
+	// but this is the most convenient place to do it
+	am_zoom += AM_ZOOM_INC * input_mwheel;
+	am_zoom = SDL_max(SDL_min(AM_ZOOM_MAX, am_zoom), AM_ZOOM_MIN);
+
 	am_cell_size = (1.0 / 16) * am_zoom;
 
 	am_x = am_follow ? player.x : am_center_x;
 	am_y = am_follow ? player.y : am_center_y;
 
 	const float viewport_ratio = (float) viewport_w / viewport_h;
-	const float am_x_min = AM_MARIGN * viewport_ratio;
-	const float am_x_max = (m_map.w * M_CELLSIZE - AM_MARIGN) * viewport_ratio;
-	const float am_y_min = AM_MARIGN;
-	const float am_y_max = m_map.h * M_CELLSIZE - AM_MARIGN;
+	const float am_margin_zoom = AM_MARIGN / am_zoom;
+	const float am_x_min = am_margin_zoom * viewport_ratio;
+	const float am_x_max = (m_map.w * M_CELLSIZE - am_margin_zoom) * viewport_ratio;
+	const float am_y_min = am_margin_zoom;
+	const float am_y_max = m_map.h * M_CELLSIZE - am_margin_zoom;
 
 	am_x = SDL_min(SDL_max(am_x, am_x_min), am_x_max);
 	am_y = SDL_min(SDL_max(am_y, am_y_min), am_y_max);
@@ -119,8 +133,7 @@ static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side
 		break;
 	}
 
-	// TODO: More advanced side rendering
-	r_draw_line(target, x_a, y_a, x_b, y_b, CM_GET(255, 255, 128));
+	r_draw_line(target, x_a, y_a, x_b, y_b, am_get_color(side));
 }
 
 
@@ -179,6 +192,14 @@ static bool am_collect_intercept(const g_intercept* intercept)
 	// This is not re-entrant, and I'd rather have a closure, but oh well
 	r_map_intercept_x = intercept->x;
 	r_map_intercept_y = intercept->y;
-
 	return intercept->type == G_INTERCEPT_NON_SOLID;
+}
+
+static cm_color am_get_color(const Side* side)
+{
+	if (side->type == TX_SKY)
+		return CM_GET(192, 255, 255);
+	if (side->flags & PASSABLE)
+		return CM_GET(192, 192, 192);
+	return CM_GET(255, 255, 128);
 }

@@ -14,6 +14,7 @@
 
 extern u16 viewport_w;
 extern u16 viewport_h;
+extern u8 viewport_x_fov;
 
 i32 r_init(u16 w, u16 h);
 

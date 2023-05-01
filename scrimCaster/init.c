@@ -1,17 +1,17 @@
 #include <init.h>
 
 #include <camera.h>
-#include <gfxloader.h>
 #include <input/input.h>
 #include <input/mouselook.h>
-#include <render.h>
-#include <ttf.h>
-#include <window.h>
+#include <render/gfxloader.h>
+#include <render/render.h>
+#include <render/ttf.h>
+#include <render/window.h>
 
 #include <SDL/SDL.h>
 
 
-#define VER_NUM "0.01"
+#define VER_NUM "0.02"
 #ifdef _MSC_VER
 #define INTRO_MSG ("Starting scrimCaster v." VER_NUM ", compiled on: " __TIMESTAMP__)
 #else
@@ -49,7 +49,12 @@ i32 InitGame(i32 argc, char** argv)
 	}
 
 	SDL_Log("Loading surfaces...");
-	gfx_load_global();
+	if (gfx_load_global())
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Fatal Error: Couldn't load global graphics. %s", SDL_GetError());
+		return -1;
+	}
+
 	InitializeInput();
 	mouselook_set_properties(true, 2.0);
 	SetViewportFov(90);

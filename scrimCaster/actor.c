@@ -2,7 +2,7 @@
 
 #include <actorcontainers.h>
 #include <map.h>
-#include <renderconstants.h>
+#include <render/renderconstants.h>
 
 #define WALL_COLLISION 1
 #define ACTOR_COLLISION 2

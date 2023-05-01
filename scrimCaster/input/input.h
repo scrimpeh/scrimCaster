@@ -28,6 +28,8 @@ typedef struct Input
 extern Input input;
 extern Input input_tf;
 
+extern i64 input_mwheel;
+
 void InitializeInput();
 void GetInput(SDL_Event* evt);
 void FilterInput();

@@ -1,9 +1,10 @@
 #include <map.h>
 
 #include <actor.h>
-#include <gfxloader.h>
 #include <mapupdate.h>
-#include <texture.h>
+#include <render/gfxloader.h>
+#include <render/texture.h>
+#include <render/skybox.h>
 
 /* On scrolling doors:
  * When activated, a door switches from 'SOLID' into 'TRANSLUCENT' as well as other flags that need changing.
@@ -46,13 +47,12 @@ void m_load()
 	m_map.w = 16;
 	m_map.h = 16;
 	m_map.cells = cellgrid[0];
-	m_map.info.txSetCount = 1;
-	m_map.info.txSets = tx_sets;
-	m_map.info.skyname = none;
+	m_map.info.texture_set_count = 1;
+	m_map.info.texture_sets = tx_sets;
+	m_map.info.sky = 0;
 
-	SDL_assert(m_map.info.txSetCount > 0);
-
-	tx_map_load(m_map.info.txSetCount, m_map.info.txSets);
+	tx_map_load(m_map.info.texture_set_count, m_map.info.texture_sets);
+	r_sky_set_current(m_map.info.sky);
 
 	for (i = 0; i < 8; ++i)
 		for (j = 0; j < 8; ++j)
@@ -63,89 +63,78 @@ void m_load()
 	{
 		for (u8 i = 0; i < 7; ++i)
 		{
-			cellgrid[0][i].n.type = 1;
-			cellgrid[6][i].s.type = 1;
-			cellgrid[i][0].w.type = 1;
+			cellgrid[0][i].n.type = 2;
+			cellgrid[6][i].s.type = 2;
+			cellgrid[i][0].w.type = 2;
 		}
 		cellgrid[4][0].w.type = 0;
 
-		cellgrid[0][0].w.type = 2;
+		cellgrid[0][0].w.type = 3;
 
-		cellgrid[0][6].e.type = 3;
-		cellgrid[2][6].e.type = 1;
-		cellgrid[6][6].e.type = 3;
-		cellgrid[5][6].e.type = 1;
-		cellgrid[2][7].w.type = 1;
-		cellgrid[5][7].w.type = 1;
+		cellgrid[0][6].e.type = 4;
+		cellgrid[2][6].e.type = 2;
+		cellgrid[6][6].e.type = 4;
+		cellgrid[5][6].e.type = 2;
+		cellgrid[2][7].w.type = 2;
+		cellgrid[5][7].w.type = 2;
 		for (u8 i = 0; i < 4; ++i)
-			cellgrid[2 + i][9].e.type = 1;
+			cellgrid[2 + i][9].e.type = 2;
 		for (u8 i = 0; i < 3; ++i)
 		{
-			cellgrid[2][7 + i].n.type = 1;
-			cellgrid[5][7 + i].s.type = 1;
+			cellgrid[2][7 + i].n.type = 2;
+			cellgrid[5][7 + i].s.type = 2;
 		}
-		cellgrid[3][9].e.type = 5;
-		cellgrid[4][9].e.type = 5;
-		for (u8 i = 0; i < 2; ++i)
-		{
-			cellgrid[3 + i][6].e.type = 4;
-			cellgrid[3 + i][6].e.flags = (m_side_flags)(PASSABLE | TRANSLUCENT);
-			cellgrid[3 + i][7].w.type = 4;
-			cellgrid[3 + i][7].w.flags = (m_side_flags)(PASSABLE | TRANSLUCENT);
-		}
+		cellgrid[3][9].e.type = 6;
+		cellgrid[4][9].e.type = 6;
 
-
-		cellgrid[1][1].e.type = 3;
-		cellgrid[1][1].s.type = 1;
+		cellgrid[1][1].e.type = 4;
+		cellgrid[1][1].s.type = 2;
 		cellgrid[1][1].s.flags = SCROLL_H;
 		// cellgrid[1][1].s.param1 = 8;
-		cellgrid[0][2].s.type = 5;
-		cellgrid[1][3].s.type = 1;
-		cellgrid[1][3].w.type = 1;
-		cellgrid[2][4].w.type = 5;
+		cellgrid[0][2].s.type = 6;
+		cellgrid[1][3].s.type = 2;
+		cellgrid[1][3].w.type = 2;
+		cellgrid[2][4].w.type = 6;
 		cellgrid[2][4].w.flags = (m_side_flags)(MIRR_H | SCROLL_H);
 		// cellgrid[2][4].w.param1 = -8;
-		cellgrid[2][0].e.type = 5;
-		cellgrid[3][1].e.type = 1;
-		cellgrid[3][1].n.type = 1;
-		cellgrid[3][3].w.type = 1;
-		cellgrid[3][3].n.type = 1;
-		cellgrid[4][2].n.type = 5;
-		cellgrid[0][6].s.type = 1;
-		cellgrid[1][5].e.type = 3;
-		cellgrid[2][6].n.type = 1;
+		cellgrid[2][0].e.type = 6;
+		cellgrid[3][1].e.type = 2;
+		cellgrid[3][1].n.type = 2;
+		cellgrid[3][3].w.type = 2;
+		cellgrid[3][3].n.type = 2;
+		cellgrid[4][2].n.type = 6;
+		cellgrid[0][6].s.type = 2;
+		cellgrid[1][5].e.type = 4;
+		cellgrid[2][6].n.type = 2;
 
 		cellgrid[6][1].s.type = 0;
 		cellgrid[6][4].s.type = 0;
-		cellgrid[7][1].e.type = 3;
-		cellgrid[7][1].w.type = 1;
-		cellgrid[8][1].w.type = 1;
-		cellgrid[8][1].s.type = 1;
-		cellgrid[8][2].n.type = 1;
-		cellgrid[8][2].s.type = 1;
-		cellgrid[8][3].n.type = 1;
-		cellgrid[8][3].s.type = 3;
-		cellgrid[8][4].s.type = 3;
-		cellgrid[8][4].e.type = 1;
-		cellgrid[7][4].e.type = 1;
-		cellgrid[7][4].w.type = 3;
+		cellgrid[7][1].e.type = 4;
+		cellgrid[7][1].w.type = 2;
+		cellgrid[8][1].w.type = 2;
+		cellgrid[8][1].s.type = 2;
+		cellgrid[8][2].n.type = 2;
+		cellgrid[8][2].s.type = 2;
+		cellgrid[8][3].n.type = 2;
+		cellgrid[8][3].s.type = 4;
+		cellgrid[8][4].s.type = 4;
+		cellgrid[8][4].e.type = 2;
+		cellgrid[7][4].e.type = 2;
+		cellgrid[7][4].w.type = 4;
 
-		cellgrid[4][2].w.type = 1;
-		cellgrid[4][2].w.target = 1;
-		cellgrid[6][1].w.door.door_flags = PLAYER_ACTIVATE;
-		cellgrid[5][2].w.type = 2;
-		cellgrid[6][2].w.type = 2;
-		cellgrid[4][1].e.type = 2;
-		cellgrid[5][1].e.type = 2;
-		cellgrid[6][1].e.type = 2;
-		cellgrid[4][2].w.flags = TRANSLUCENT;
-		cellgrid[5][2].w.flags = TRANSLUCENT;
-		cellgrid[6][2].w.flags = TRANSLUCENT;
-		cellgrid[4][1].e.flags = TRANSLUCENT;
-		cellgrid[5][1].e.flags = TRANSLUCENT;
-		cellgrid[6][1].e.flags = TRANSLUCENT;
+		cellgrid[4][2].w.type = 3;
+		cellgrid[3][3].w.target = 1;
+		cellgrid[3][3].w.door.door_flags = PLAYER_ACTIVATE;
 
-		cellgrid[6][1].s.type = 5;
+		{
+			Side side = { 0 };
+			side.type = 3;
+			side.flags = TRANSLUCENT;
+			for (u8 y = 4; y <= 6; y++)
+				_m_set_double_sided(1, y, M_EAST, &side);
+		}
+
+		cellgrid[6][1].s.type = 6;
 		cellgrid[6][1].s.flags = DOOR_V;
 		cellgrid[6][1].s.door.state = 0;
 		cellgrid[6][1].s.door.openspeed = 12;
@@ -155,7 +144,7 @@ void m_load()
 		cellgrid[6][1].s.tag = target++;
 		cellgrid[6][1].s.target = cellgrid[6][1].s.tag;
 
-		cellgrid[7][1].n.type = 5;
+		cellgrid[7][1].n.type = 6;
 		cellgrid[7][1].n.flags = DOOR_V;
 		cellgrid[7][1].n.door.state = 0;
 		cellgrid[7][1].n.door.openspeed = 1;
@@ -165,10 +154,56 @@ void m_load()
 		cellgrid[7][1].n.tag = cellgrid[6][1].s.tag;
 		cellgrid[7][1].n.target = cellgrid[6][1].s.tag;
 
+
+		for (u8 x = 7; x < 12; x++)
+			cellgrid[0][x].n.type = TX_SKY;
+		for (u8 x = 7; x < 12; x++)
+			cellgrid[8][x].s.type = TX_SKY;
+		for (u8 y = 0; y < 9; y++)
+			cellgrid[y][11].e.type = TX_SKY;
+		for (u8 y = 0; y < 9; y++)
+			cellgrid[y][7].w.type = 2;
+
+		{
+			Side side = { 0 };
+			side.type = 5;
+			side.flags = PASSABLE | TRANSLUCENT;
+			for (u8 y = 3; y <= 4; ++y)
+				_m_set_double_sided(6, y, M_EAST, &side);
+		}
+		
+		for (u8 i = 0; i < 4; ++i)
+		{
+			cellgrid[2 + i][9].e.type = 3;
+			cellgrid[2 + i][9].e.flags = TRANSLUCENT;
+		}
+		for (u8 i = 0; i < 3; ++i)
+		{
+			cellgrid[2][i + 7].n.type = 3;
+			cellgrid[2][i + 7].n.flags = TRANSLUCENT;
+			cellgrid[5][i + 7].s.type = 3;
+			cellgrid[5][i + 7].s.flags = TRANSLUCENT;
+		}
+
+
 		_m_flood_fill(0, 0, 7, false);
-		_m_flood_fill(9, 1, 6, false);
-		_m_flood_fill(0, 0, 6, true);
-		_m_flood_fill(9, 1, 7, true);
+		_m_flood_fill(0, 0, 8, true);
+
+		{
+			Side side = { 0 };
+			side.type = 5;
+			side.flags = PASSABLE | TRANSLUCENT;
+			_m_set_double_sided(4, 6, M_SOUTH, &side);
+				
+		}
+
+		cellgrid[0][6].flat.floor_type = 3;
+		cellgrid[0][6].flat.ceil_type = 3;
+
+		_m_flood_fill(8, 2, 0, false);
+		_m_flood_fill(8, 2, 7, true);
+
+		_m_flood_fill(4, 7, 0, false);
 	}
 
 	Actor pil;
@@ -324,6 +359,8 @@ static void _m_flood_fill(u16 x, u16 y, u16 type, bool floor)
 
 static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor)
 {
+	if (type == initial)
+		return;
 	if (x >= m_map.w || y >= m_map.h)
 		return;
 	Cell* cell = m_get_cell(x, y);
@@ -349,4 +386,33 @@ static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor)
 		_m_flood_fill_inner(x - 1, y, type, initial, floor);
 	if (!cell->s.type)
 		_m_flood_fill_inner(x, y + 1, type, initial, floor);
+}
+
+// Sets the given side and the one on the oppsoite side
+static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const Side* side)
+{
+	m_orientation opposite;
+	u16 opposite_x = x;
+	u16 opposite_y = y;
+	switch (orientation)
+	{
+	case M_EAST:
+		opposite = M_WEST;
+		opposite_x++;
+		break;
+	case M_NORTH:
+		opposite = M_SOUTH;
+		opposite_y--;
+		break;
+	case M_WEST:
+		opposite = M_EAST;
+		opposite_x--;
+		break;
+	case M_SOUTH:
+		opposite = M_NORTH;
+		opposite_y++;
+		break;
+	}
+	SDL_memcpy(m_get_side(x, y, orientation), side, sizeof(Side));
+	SDL_memcpy(m_get_side(opposite_x, opposite_y, opposite), side, sizeof(Side));
 }

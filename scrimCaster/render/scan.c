@@ -1,13 +1,14 @@
-#include <scan.h>
+#include <render/scan.h>
 
-#include <colormap.h>
 #include <map.h>
 #include <maputil.h>
 #include <camera.h>
 #include <geometry.h>
-#include <render.h>
-#include <renderconstants.h>
-#include <texture.h>
+#include <render/colormap.h>
+#include <render/render.h>
+#include <render/renderconstants.h>
+#include <render/skybox.h>
+#include <render/texture.h>
 #include <util/mathutil.h>
 
 #include <math.h>	//fmod is obsolete: maybe replace?
@@ -15,11 +16,9 @@
 
 #define HALFSIZE (TX_SIZE / 2)
 
-
 extern Map m_map;
 extern u8 viewport_x_fov;
 u8 viewport_x_fov_half;
-
 
 u16 viewport_w_half;
 
@@ -154,34 +153,39 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	i32 y_top = SDL_max(0, wall_y);
 	i32 y_end = viewport_h - y_top;
 
-	if (side->flags & DOOR_V)
+	if (side->type == TX_SKY)
+		r_sky_draw(target, col, y_top, y_end, intercept->angle);
+	else
 	{
-		const i32 door_h = (i32) (wall_h * ((M_CELLHEIGHT - side->door.scroll) / (float)(M_CELLHEIGHT)));
-		y_end = SDL_min(viewport_h, wall_y + door_h);
-	}
-
-	u32* render_px = (u32*) target->pixels;
-	float* z_buffer_px = z_buffer;
-
-	render_px += (y_top * viewport_w) + col;
-	z_buffer_px += (y_top * viewport_w) + col;
-
-	for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
-	{
-		const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, scan_get_slice_y_start(side));
-		u32 tex_col = *(slice + slice_px);
-		if (tex_col != COLOR_KEY)
+		if (side->flags & DOOR_V)
 		{
-			// Darken walls oriented E/W slightly
-			if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
-				tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.125f);
-
-			*render_px = tex_col;
-			*z_buffer_px = distance_corrected;
+			const i32 door_h = (i32) (wall_h * ((M_CELLHEIGHT - side->door.scroll) / (float) (M_CELLHEIGHT)));
+			y_end = SDL_min(viewport_h, wall_y + door_h);
 		}
 
-		render_px += viewport_w;
-		z_buffer_px += viewport_w;
+		u32* render_px = (u32*) target->pixels;
+		float* z_buffer_px = z_buffer;
+
+		render_px += (y_top * viewport_w) + col;
+		z_buffer_px += (y_top * viewport_w) + col;
+
+		for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
+		{
+			const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, scan_get_slice_y_start(side));
+			u32 tex_col = *(slice + slice_px);
+			if (tex_col != COLOR_KEY)
+			{
+				// Darken walls oriented E/W slightly
+				if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
+					tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.125f);
+
+				*render_px = tex_col;
+				*z_buffer_px = distance_corrected;
+			}
+
+			render_px += viewport_w;
+			z_buffer_px += viewport_w;
+		}
 	}
 
 	// Now draw the ceiling and floor
@@ -211,8 +215,17 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		const m_flat* flat = &m_get_cell(grid_xa, grid_ya)->flat;
 
-		*floor_render_px_bottom = tx_get_point(flat, cell_x, cell_y, true);
-		*floor_render_px_top = tx_get_point(flat, cell_x, cell_y, false);
+		const u32 bottom = tx_get_point(flat, cell_x, cell_y, true);
+		if (bottom == COLOR_KEY)
+			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
+		else
+			*floor_render_px_bottom = tx_get_point(flat, cell_x, cell_y, true);
+
+		const u32 top = tx_get_point(flat, cell_x, cell_y, false);
+		if (top == COLOR_KEY)
+			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
+		else
+			*floor_render_px_top = tx_get_point(flat, cell_x, cell_y, false);
 
 		floor_render_px_top -= viewport_w;
 		floor_render_px_bottom += viewport_w;

@@ -1,5 +1,6 @@
 #include <render/skybox.h>
 
+#include <render/colorramp.h>
 #include <render/render.h>
 #include <render/gfxloader.h>
 
@@ -82,5 +83,6 @@ u32 r_sky_get_pixel(u16 y, angle_rad_f angle)
 	const u16 x_sky = ((float) angle / PI_2_1) * sky->w;
 	const u16 y_sky = ((float) y / viewport_h) * sky->h;
 
-	return *(sky->data + x_sky * sky->h + y_sky);
+	const u32 px = *(sky->data + x_sky * sky->h + y_sky);
+	return cm_ramp_mix_infinite(px);
 }

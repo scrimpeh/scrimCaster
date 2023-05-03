@@ -59,7 +59,7 @@ i32 InitGame(i32 argc, char** argv)
 	mouselook_set_properties(true, 2.0);
 	SetViewportFov(90);
 
-	if (r_init(360, 240))
+	if (r_init(256, 192))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Fatal Error: Can't initialize renderer! %s", SDL_GetError());
 		return -1;

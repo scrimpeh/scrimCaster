@@ -1,6 +1,6 @@
-#include <gfxloader.h>
+#include <render/gfxloader.h>
 
-#include <renderconstants.h>
+#include <render/renderconstants.h>
 #include <render/skybox.h>
 
 #include <SDL/SDL_image.h>

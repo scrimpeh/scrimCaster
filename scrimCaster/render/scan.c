@@ -5,6 +5,7 @@
 #include <camera.h>
 #include <geometry.h>
 #include <render/colormap.h>
+#include <render/colorramp.h>
 #include <render/render.h>
 #include <render/renderconstants.h>
 #include <render/skybox.h>
@@ -178,6 +179,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 				// Darken walls oriented E/W slightly
 				if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
 					tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.125f);
+				tex_col = cm_ramp_mix(tex_col, distance_corrected);
 
 				*render_px = tex_col;
 				*z_buffer_px = distance_corrected;
@@ -201,11 +203,10 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
 		const u16 height = viewport_h - (2 * y_px);
-		float d = (projection_dist * M_CELLHEIGHT) / height;
-		d /= cosf(angle);
+		const float d = (projection_dist * M_CELLHEIGHT) / height;
 		float xa;
 		float ya;
-		math_vec_cast_f(x, y, intercept->angle, d, &xa, &ya);
+		math_vec_cast_f(x, y, intercept->angle, d / cosf(angle), &xa, &ya);
 
 		const i16 grid_xa = (i16) (floorf(xa / M_CELLSIZE));
 		const i16 grid_ya = (i16) (floorf(ya / M_CELLSIZE));
@@ -219,13 +220,13 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		if (bottom == COLOR_KEY)
 			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
 		else
-			*floor_render_px_bottom = tx_get_point(flat, cell_x, cell_y, true);
+			*floor_render_px_bottom = cm_ramp_mix(bottom, d);
 
 		const u32 top = tx_get_point(flat, cell_x, cell_y, false);
 		if (top == COLOR_KEY)
 			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
 		else
-			*floor_render_px_top = tx_get_point(flat, cell_x, cell_y, false);
+			*floor_render_px_top = cm_ramp_mix(top, d);
 
 		floor_render_px_top -= viewport_w;
 		floor_render_px_bottom += viewport_w;

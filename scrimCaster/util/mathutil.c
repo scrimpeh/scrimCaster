@@ -33,3 +33,12 @@ void math_vec_cast_f(float x, float y, angle_rad_f angle, float d, float* result
 	*result_x = x + dx;
 	*result_y = y + dy;
 }
+
+float math_lerp(float x0, float x1, float x, float y0, float y1)
+{
+	const float x_range = x1 - x0;
+	const float y_range = y1 - y0;
+	const float diff = x - x0;
+	const float ratio = diff / x_range;
+	return y0 + (ratio * y_range);
+}

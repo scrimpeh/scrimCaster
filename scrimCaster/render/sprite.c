@@ -1,6 +1,7 @@
 #include <render/sprite.h>
 
 #include <map.h>
+#include <render/colorramp.h>
 #include <render/renderconstants.h>
 #include <util/mathutil.h>
 
@@ -122,7 +123,7 @@ void DrawSprites(SDL_Surface* target)
 			{
 				const u32 spr_col = *(ws_px + (u16) sprcol_y * spritesheet_width);
 				if (spr_col != COLOR_KEY && z_buffer[y_i * viewport_w + x_i] > ds->distance)
-					*render_px = spr_col;
+					*render_px = cm_ramp_mix(spr_col, ds->distance);
 				sprcol_y += y_inc;
 				render_px += viewport_w;
 			}

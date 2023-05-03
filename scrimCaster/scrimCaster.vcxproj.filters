@@ -139,6 +139,9 @@
     <ClInclude Include="render\skybox.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="render\colorramp.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.c">
@@ -241,6 +244,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="render\skybox.c">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\colorramp.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
   </ItemGroup>

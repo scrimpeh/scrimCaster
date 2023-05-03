@@ -342,6 +342,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="init.h" />
     <ClInclude Include="mapupdate.h" />
     <ClInclude Include="maputil.h" />
+    <ClInclude Include="render\colorramp.h" />
     <ClInclude Include="render\skybox.h" />
     <ClInclude Include="render\texture.h" />
     <ClInclude Include="util\mathutil.h" />
@@ -375,6 +376,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="render\colormap.c" />
     <ClCompile Include="debugutil\watch.c" />
     <ClCompile Include="enemy.c" />
+    <ClCompile Include="render\colorramp.c" />
     <ClCompile Include="render\frame.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="render\gfxloader.c" />

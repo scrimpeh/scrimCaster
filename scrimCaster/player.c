@@ -1,12 +1,11 @@
 #include <player.h>
 
 #include <input/input.h>
-#include <map.h>
-#include <maputil.h>
-#include <mapupdate.h>
+#include <map/map.h>
+#include <map/maputil.h>
+#include <map/mapupdate.h>
 #include <util/mathutil.h>
 
-extern Input input, input_tf;
 Actor player;
 
 bool noclip = false;

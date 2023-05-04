@@ -38,6 +38,8 @@
 //     - [ ] Dynamic lighting
 // [ ] Add some proper textures
 // [ ] Material system, with animated textures and more
+// [ ] Geometric data structure for sprite rendering, or maybe even marking all cells that we saw
+// [ ] Simplify all the actor and level object handling in general
 
 char* app_dir = NULL;
 
@@ -69,7 +71,7 @@ i32 main(i32 argc, char** argv)
 			case SDL_MOUSEWHEEL:
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-				GetInput(&evt);
+				input_process_event(&evt);
 				break;
 			case SDL_WINDOWEVENT:
 				win_process_event(&evt);
@@ -82,8 +84,8 @@ i32 main(i32 argc, char** argv)
 		}
 
 		// Do game logic here
-		u32 delta = SDL_GetTicks() - delta_ticks;
-		FilterInput();
+		const u32 delta = SDL_GetTicks() - delta_ticks;
+		input_filter();
 		UpdateGame(delta);
 		delta_ticks = SDL_GetTicks();
 

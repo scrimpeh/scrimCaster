@@ -4,5 +4,5 @@
 
 #include <SDL/SDL_keycode.h>
 
-void LoadInitialBindings();
-extern inline u8 GetMapping(SDL_Keycode kc);
+void input_map_load_bindings();
+u8 input_map_get(SDL_Keycode kc);

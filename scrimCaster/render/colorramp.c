@@ -30,16 +30,25 @@ static const cm_ramp_setpoint CM_RAMP_DARK_PTS[] =
 };
 static const cm_ramp CM_RAMP_DARK = { CM_RAMP_DARK_PTS, SDL_arraysize(CM_RAMP_DARK_PTS) };
 
+static const cm_ramp_setpoint CM_RAMP_HALF_DARK_PTS[] =
+{
+	{ CM_GET(   0,    0,    0),    0.f,     0.f},
+	{ CM_GET(   0,    0,    0),    0.f,     0.f},
+	{ CM_GET(   0,    0,    0),   0.6f,   256.f},
+	{ CM_GET(   0,    0,    0),   0.6f, FLT_MAX},
+};
+static const cm_ramp CM_RAMP_HALF_DARK = { CM_RAMP_HALF_DARK_PTS, SDL_arraysize(CM_RAMP_HALF_DARK_PTS) };
+
 static const cm_ramp_setpoint CM_RAMP_FOG_PTS[] =
 {
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
-	{ CM_GET(0xFF, 0x80,    0),   0.4f,   256.f},
-	{ CM_GET(0xFF, 0x80,    0),   0.4f, FLT_MAX},
+	{ CM_GET(0x70, 0x60, 0x30),   0.3f,   192.f},
+	{ CM_GET(0x70, 0x60, 0x30),   0.3f, FLT_MAX},
 };
 static const cm_ramp CM_RAMP_FOG = { CM_RAMP_FOG_PTS, SDL_arraysize(CM_RAMP_FOG_PTS) };
 
-cm_ramp* cm_ramp_current = &CM_RAMP_DARK;
+cm_ramp* cm_ramp_current = &CM_RAMP_FOG;
 
 cm_ramp* cm_ramp_create(u32 size)
 {

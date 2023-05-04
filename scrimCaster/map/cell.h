@@ -13,12 +13,17 @@
 
 // Note: All directionality in this game is East - North - West - South
 // 0° degrees in a circle is pointing east as well.
-typedef u8 m_orientation;
+typedef enum
+{
+	M_EAST = 0,
+	M_NORTH = 1,
+	M_WEST = 2,
+	M_SOUTH = 3,
 
-#define M_EAST  0
-#define M_NORTH 1
-#define M_WEST  2
-#define M_SOUTH 3
+	M_FLOOR = 4,
+	M_CEIL = 5
+} m_orientation;
+
 
 // Define The size of one individual cell in game units.
 #define M_CELLSIZE 64
@@ -92,6 +97,7 @@ typedef struct Side
 typedef struct Cell
 {
 	m_flat flat;
+	u8 brightness;
 	Side e;
 	Side n;
 	Side w;

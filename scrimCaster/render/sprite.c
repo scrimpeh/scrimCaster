@@ -1,6 +1,6 @@
 #include <render/sprite.h>
 
-#include <map.h>
+#include <map/map.h>
 #include <render/colorramp.h>
 #include <render/renderconstants.h>
 #include <util/mathutil.h>
@@ -12,12 +12,12 @@
 
 // Sprite data should probably be externalized to a separate file so data can be edited without
 // rebuilding the solution.
-#define CORNERS(x1, y1, x2,y2) { (x1), (y1), ((x2) - (x1)), ((y2) - (y1)) }
+#define CORNERS(x1, y1, x2, y2) { (x1), (y1), ((x2) - (x1)), ((y2) - (y1)) }
 
 const WorldSprite worldSprites[] =
 {
 	{ 0, CORNERS(0, 0, 0, 0), CENTER, 0 },	//Dummy sprite
-	{ 0, CORNERS(0, 0, 28, 64), FLOORCEIL, 0 }	//Pillar
+	{ 0, CORNERS(0, 0, 28, 64), FLOOR, 0 }	//Pillar
 };
 
 const ActorFrameSheet frameSheets[] =
@@ -33,8 +33,6 @@ const ActorSpriteSheet spriteSheets[] =
 };
 
 #define MAX_SPRITES 256
-
-static const float SPRITE_RATIO_END = 8e-4f;
 
 ActorSprite sprite_slot_buffer[MAX_SPRITES];
 
@@ -52,7 +50,7 @@ extern float* z_buffer;
 
 extern SDL_Surface* gfx_ws_buffer[];
 
-void DrawSprites(SDL_Surface* target)
+void spr_draw(SDL_Surface* target)
 {
 	SDL_Rect spr_rect;
 	const static ActorList* const actorLists[] =
@@ -74,58 +72,63 @@ void DrawSprites(SDL_Surface* target)
 		PopulateSpriteBufferList(actorLists[i], &ds_index);
 	for (u32 i = 0; i < SDL_arraysize(actorArrays); ++i)
 		PopulateSpriteBufferArray(actorArrays[i], &ds_index);
-	SDL_qsort(sprite_slot_buffer, ds_index, sizeof(ActorSprite), SpriteDistSort);
 
 	//Now draw them, back to front
 	while (ds_index--)
 	{
 		const ActorSprite* ds = &sprite_slot_buffer[ds_index];
 
-		//Todo: work out what animation frame and angle to use
-		WorldSprite ws = GetWorldSprite(ds);
-		const i32 height = ws.anchor == FLOORCEIL ? M_CELLHEIGHT : ws.coords.h;
+		// Todo: work out what animation frame and angle to use
+		const WorldSprite ws = GetWorldSprite(ds);
 		//const u16 max_width = viewport_w + (viewport_w / 4);	//cap the size of the sprite
 
-		const i16 h_offset = ws.anchor == FLOORCEIL ? 0 :
-			(i16)((projection_dist * ws.offset +
-			((M_CELLHEIGHT / 2) + (ws.coords.h / 2) * ws.anchor == FLOOR ? 1 : -1) / ds->distance));
-
-		const double angle = angle_normalize_deg_d(ds->angle - viewport_x_fov_half);
+		const i16 spr_offset = spr_get_y_offset(&ws);
+		const i16 y_offset = (i16) ((projection_dist * spr_offset) / ds->distance);
+		const angle_d angle = angle_normalize_deg_d(ds->angle - viewport_x_fov_half);
 
 		spr_rect.w = (i32) ((projection_dist * ws.coords.w) / ds->distance);
 		//if (spr_rect.w > max_width) spr_rect.w = max_width;
-		spr_rect.h = (i32) ((projection_dist * height) / ds->distance);
+		spr_rect.h = (i32) ((projection_dist * ws.coords.h) / ds->distance);
 		spr_rect.x = (i32) (tan(TO_RAD(angle)) * projection_dist) + viewport_w_half - (spr_rect.w / 2);
-		spr_rect.y = h_offset + ((viewport_h - spr_rect.h) / 2);
+		spr_rect.y = (i32) (viewport_h / 2) - ((projection_dist * R_HALF_H) / ds->distance) + y_offset;
 
 		// The idea: Make a loop running through all the pixel columns, clipping accordingly at the edges:
 		// If and only if the sprite needs to be masked, blit into a specialty area first
 		const i32 x_start = SDL_max(spr_rect.x, 0);
 		const i32 x_end = SDL_min(spr_rect.x + spr_rect.w, viewport_w);
-		const float x_inc = ws.coords.w / (float) spr_rect.w - SPRITE_RATIO_END;
+		const float x_inc = ws.coords.w / (float) spr_rect.w;
 
 		const i32 y_start = SDL_max(spr_rect.y, 0);
 		const i32 y_end = SDL_min(spr_rect.y + spr_rect.h, viewport_h);
-		const i32 y_diff = y_end - y_start;
-		const float y_inc = ws.coords.h / (float) spr_rect.h - SPRITE_RATIO_END;
+		const float y_inc = ws.coords.h / (float) spr_rect.h;
 
 		const u16 spritesheet_width = gfx_ws_buffer[ws.spritesheet]->w;
-		const u32* spr_ptr_begin = (u32*) gfx_ws_buffer[ws.spritesheet]->pixels +
-			(ws.coords.y * spritesheet_width) + ws.coords.x;
+		const u32* spr_ptr_begin = (u32*) gfx_ws_buffer[ws.spritesheet]->pixels + (ws.coords.y * spritesheet_width) + ws.coords.x;
 
 		float sprcol_x = spr_rect.x >= 0 ? 0 : -spr_rect.x * x_inc;
 		for (i32 x_i = x_start; x_i < x_end; ++x_i)
 		{
 			float sprcol_y = spr_rect.y >= 0 ? 0 : -spr_rect.y * y_inc;
 			u32* render_px = (u32*) target->pixels + (y_start * viewport_w) + x_i;
-			const u32* const ws_px = (u32*) spr_ptr_begin + (u16)sprcol_x;
+			float* z_buffer_px = z_buffer + (y_start * viewport_w) + x_i;
+			const u32* const ws_px = (u32*) spr_ptr_begin + (u16) sprcol_x;
 			for (i32 y_i = y_start; y_i < y_end; ++y_i)
 			{
-				const u32 spr_col = *(ws_px + (u16) sprcol_y * spritesheet_width);
-				if (spr_col != COLOR_KEY && z_buffer[y_i * viewport_w + x_i] > ds->distance)
-					*render_px = cm_ramp_mix(spr_col, ds->distance);
+				u32 spr_px = *(ws_px + (u16) sprcol_y * spritesheet_width);
+				if (spr_px != COLOR_KEY && *z_buffer_px > ds->distance)
+				{
+					const i16 map_x = (i16) floor(ds->actor->x / M_CELLSIZE);
+					const i16 map_y = (i16) floor(ds->actor->y / M_CELLSIZE);
+					const i16 cell_x = (i16) fmod(ds->actor->x, M_CELLSIZE);
+					const i16 cell_y = (i16) fmod(ds->actor->y, M_CELLSIZE);
+					spr_px = r_light_px(map_x, map_y, ws.anchor == CEIL ? M_CEIL : M_FLOOR, spr_px, cell_x, cell_y);
+					spr_px = cm_ramp_mix(spr_px, ds->distance);
+					*render_px = spr_px;
+					*z_buffer_px = ds->distance;
+				}
 				sprcol_y += y_inc;
 				render_px += viewport_w;
+				z_buffer_px += viewport_w;
 			}
 	
 			sprcol_x += x_inc;
@@ -252,15 +255,15 @@ static void PopulateSpriteBufferArray(const ActorArray* actors, u32 *ds_index)
 	}
 }
 
-
-static i32 SpriteDistSort(const void* p1, const void* p2)
+static u8 spr_get_y_offset(const WorldSprite* ws)
 {
-	const ActorSprite* const d1 = (ActorSprite*)p1;
-	const ActorSprite* const d2 = (ActorSprite*)p2;
-
-	if (d1->distance > d2->distance) 
-		return  1;
-	if (d1->distance < d2->distance) 
-		return -1;
-	return 0;
+	switch (ws->anchor)
+	{
+	case CEIL:
+		return ws->offset;
+	case CENTER:
+		return R_HALF_H - ws->coords.h / 2;
+	case FLOOR:
+		return R_CELL_H - ws->coords.h - ws->offset;
+	}
 }

@@ -17,9 +17,6 @@
     <Filter Include="Source Files\input">
       <UniqueIdentifier>{369f4a3a-3780-48ea-ac09-f7b2f561c138}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\game\map">
-      <UniqueIdentifier>{6deaf4eb-ad00-4e01-a1d2-d954341dafde}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\game\actor">
       <UniqueIdentifier>{daae062d-a80f-44ab-83ca-bde3d3413a5c}</UniqueIdentifier>
     </Filter>
@@ -31,6 +28,9 @@
     </Filter>
     <Filter Include="Source Files\debugutil">
       <UniqueIdentifier>{5aebc0eb-8385-4c17-ab54-f0eada4872d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\map">
+      <UniqueIdentifier>{6deaf4eb-ad00-4e01-a1d2-d954341dafde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,11 +61,11 @@
     <ClInclude Include="input\inputmap.h">
       <Filter>Source Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="cell.h">
-      <Filter>Source Files\game\map</Filter>
+    <ClInclude Include="map\cell.h">
+      <Filter>Source Files\map</Filter>
     </ClInclude>
-    <ClInclude Include="map.h">
-      <Filter>Source Files\game\map</Filter>
+    <ClInclude Include="map\map.h">
+      <Filter>Source Files\map</Filter>
     </ClInclude>
     <ClInclude Include="render\gfxloader.h">
       <Filter>Source Files\render</Filter>
@@ -85,11 +85,11 @@
     <ClInclude Include="render\renderconstants.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="mapupdate.h">
-      <Filter>Source Files\game\map</Filter>
+    <ClInclude Include="map\mapupdate.h">
+      <Filter>Source Files\map</Filter>
     </ClInclude>
-    <ClInclude Include="maputil.h">
-      <Filter>Source Files\game\map</Filter>
+    <ClInclude Include="map\maputil.h">
+      <Filter>Source Files\map</Filter>
     </ClInclude>
     <ClInclude Include="init.h">
       <Filter>Source Files</Filter>
@@ -142,6 +142,9 @@
     <ClInclude Include="render\colorramp.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="render\lighting.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.c">
@@ -174,11 +177,11 @@
     <ClCompile Include="input\inputmap.c">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="cell.c">
-      <Filter>Source Files\game\map</Filter>
+    <ClCompile Include="map\cell.c">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
-    <ClCompile Include="map.c">
-      <Filter>Source Files\game\map</Filter>
+    <ClCompile Include="map\map.c">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="render\gfxloader.c">
       <Filter>Source Files\render</Filter>
@@ -198,11 +201,11 @@
     <ClCompile Include="render\renderconstants.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="mapupdate.c">
-      <Filter>Source Files\game\map</Filter>
+    <ClCompile Include="map\mapupdate.c">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
-    <ClCompile Include="maputil.c">
-      <Filter>Source Files\game\map</Filter>
+    <ClCompile Include="map\maputil.c">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
@@ -247,6 +250,9 @@
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="render\colorramp.c">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\lighting.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
   </ItemGroup>

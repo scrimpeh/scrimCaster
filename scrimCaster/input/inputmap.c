@@ -1,41 +1,37 @@
-#include "inputmap.h"
-#include "input.h"
+#include <input/inputmap.h>
 
-//Inputmap's purpose is to map the actual processed window events to 
-//input events - i.e. set keybindings
+#include <input/input.h>
 
-extern Input input;
+#define KEYCODE_COUNT 0x11A
 
-#define  KEYCODE_COUNT 0x11A
+// Maps SDL scan codes to offset in the input structure
+static u8 input_map_scancodes[KEYCODE_COUNT];
 
-//Maps SDL scan codes to teh offset in the input structure
-u8 scancode_map[KEYCODE_COUNT];
-
-void LoadInitialBindings()
+void input_map_load_bindings()
 {
-	scancode_map[SDL_SCANCODE_LSHIFT] = offsetof(Input, debug);
+	input_map_scancodes[SDL_SCANCODE_LSHIFT] = offsetof(input_keys, debug);
 
-	scancode_map[SDL_SCANCODE_W] = offsetof(Input, forward);
-	scancode_map[SDL_SCANCODE_S] = offsetof(Input, backward);
-	scancode_map[SDL_SCANCODE_A] = offsetof(Input, strafe_left);
-	scancode_map[SDL_SCANCODE_D] = offsetof(Input, strafe_right);
+	input_map_scancodes[SDL_SCANCODE_W] = offsetof(input_keys, forward);
+	input_map_scancodes[SDL_SCANCODE_S] = offsetof(input_keys, backward);
+	input_map_scancodes[SDL_SCANCODE_A] = offsetof(input_keys, strafe_left);
+	input_map_scancodes[SDL_SCANCODE_D] = offsetof(input_keys, strafe_right);
 
-	scancode_map[SDL_SCANCODE_Q] = offsetof(Input, turn_left);
-	scancode_map[SDL_SCANCODE_LEFT] = offsetof(Input, turn_left);
-	scancode_map[SDL_SCANCODE_E] = offsetof(Input, turn_right);
-	scancode_map[SDL_SCANCODE_RIGHT] = offsetof(Input, turn_right);
+	input_map_scancodes[SDL_SCANCODE_Q] = offsetof(input_keys, turn_left);
+	input_map_scancodes[SDL_SCANCODE_LEFT] = offsetof(input_keys, turn_left);
+	input_map_scancodes[SDL_SCANCODE_E] = offsetof(input_keys, turn_right);
+	input_map_scancodes[SDL_SCANCODE_RIGHT] = offsetof(input_keys, turn_right);
 
-	scancode_map[SDL_SCANCODE_ESCAPE] = offsetof(Input, pause);
+	input_map_scancodes[SDL_SCANCODE_ESCAPE] = offsetof(input_keys, pause);
 
-	scancode_map[SDL_SCANCODE_SPACE] = offsetof(Input, use);
-	scancode_map[SDL_SCANCODE_LCTRL] = offsetof(Input, fire);
+	input_map_scancodes[SDL_SCANCODE_SPACE] = offsetof(input_keys, use);
+	input_map_scancodes[SDL_SCANCODE_LCTRL] = offsetof(input_keys, fire);
 
-	scancode_map[SDL_SCANCODE_TAB] = offsetof(Input, m_map);
+	input_map_scancodes[SDL_SCANCODE_TAB] = offsetof(input_keys, map);
 
-	scancode_map[SDL_SCANCODE_PAUSE] = offsetof(Input, pause);
+	input_map_scancodes[SDL_SCANCODE_PAUSE] = offsetof(input_keys, pause);
 } 
 
-u8 GetMapping(SDL_Keycode kc)
+u8 input_map_get(SDL_Keycode kc)
 {
-	return scancode_map[SDL_GetScancodeFromKey(kc)];
+	return input_map_scancodes[SDL_GetScancodeFromKey(kc)];
 }

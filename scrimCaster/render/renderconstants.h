@@ -12,4 +12,7 @@
 #define TEX_SIZE 64
 #define TEX_MAP_SIZE 1024
 
+#define R_CELL_H M_CELLHEIGHT
+#define R_HALF_H (R_CELL_H / 2)
+
 extern const cm_color COLOR_KEY;

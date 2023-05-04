@@ -3,7 +3,7 @@
 #include <camera.h>
 #include <enemy.h>
 #include <input/input.h>
-#include <map.h>
+#include <map/map.h>
 #include <player.h>
 #include <render/render.h>
 #include <render/renderutil.h>
@@ -68,10 +68,10 @@ void am_draw(SDL_Surface* target)
 static void am_draw_cell(SDL_Surface* target, i16 grid_x, i16 grid_y)
 {
 	const Cell* cell = m_map.cells + grid_y * m_map.h + grid_x;
-	am_draw_side(target, grid_x, grid_y, &cell->e, SIDE_ORIENTATION_EAST);
-	am_draw_side(target, grid_x, grid_y, &cell->n, SIDE_ORIENTATION_NORTH);
-	am_draw_side(target, grid_x, grid_y, &cell->w, SIDE_ORIENTATION_WEST);
-	am_draw_side(target, grid_x, grid_y, &cell->s, SIDE_ORIENTATION_SOUTH);
+	am_draw_side(target, grid_x, grid_y, &cell->e, M_EAST);
+	am_draw_side(target, grid_x, grid_y, &cell->n, M_NORTH);
+	am_draw_side(target, grid_x, grid_y, &cell->w, M_WEST);
+	am_draw_side(target, grid_x, grid_y, &cell->s, M_SOUTH);
 }
 
 static i32 am_map_h(float x)
@@ -92,7 +92,7 @@ static i32 am_map_distance(float d)
 	return r_hud_px_h(d * rel_size);
 }
 
-static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side* side, g_side_orientation orientation)
+static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side* side, m_orientation orientation)
 {
 	if (!side->type)
 		return;
@@ -107,25 +107,25 @@ static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side
 	i32 y_b;
 	switch (orientation)
 	{
-	case SIDE_ORIENTATION_EAST:
+	case M_EAST:
 		x_a = px_x + length;
 		y_a = px_y;
 		x_b = px_x + length;
 		y_b = px_y + length;
 		break;
-	case SIDE_ORIENTATION_NORTH:
+	case M_NORTH:
 		x_a = px_x;
 		y_a = px_y;
 		x_b = px_x + length;
 		y_b = px_y;
 		break;
-	case SIDE_ORIENTATION_WEST:
+	case M_WEST:
 		x_a = px_x;
 		y_a = px_y;
 		x_b = px_x;
 		y_b = px_y + length;
 		break;
-	case SIDE_ORIENTATION_SOUTH:
+	case M_SOUTH:
 		x_a = px_x;
 		y_a = px_y + length;
 		x_b = px_x + length;

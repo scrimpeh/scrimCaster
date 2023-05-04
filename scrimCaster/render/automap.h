@@ -15,7 +15,7 @@ void am_draw(SDL_Surface* target);
 
 static void am_draw_map(SDL_Surface* target);
 static void am_draw_cell(SDL_Surface* target, i16 x, i16 y);
-static void am_draw_side(SDL_Surface* target, i16 x, i16 y, const Side* side, g_side_orientation orientation);
+static void am_draw_side(SDL_Surface* target, i16 x, i16 y, const Side* side, m_orientation orientation);
 static void am_draw_actors(SDL_Surface* target);
 static void am_draw_actor(SDL_Surface* target, Actor* actor);
 

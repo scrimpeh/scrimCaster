@@ -16,14 +16,12 @@
  */
 
 Map m_map;
-Cell* cellptr = NULL;
 
 const char* tx_sets[] = { "test.png" };
-const char* none = "";
 
 extern ActorVector levelEnemies;
 
-Cell cellgrid[16][16];
+Cell cells[16][16];
 
 u32 m_max_tag;
 m_taglist* m_tags;
@@ -46,85 +44,86 @@ void m_load()
 	u32 target = 1;
 	m_map.w = 16;
 	m_map.h = 16;
-	m_map.cells = cellgrid[0];
+	m_map.cells = cells[0];
 	m_map.info.texture_set_count = 1;
 	m_map.info.texture_sets = tx_sets;
 	m_map.info.sky = 0;
 
 	tx_map_load(m_map.info.texture_set_count, m_map.info.texture_sets);
 	r_sky_set_current(m_map.info.sky);
+	_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 255);
 
 	for (i = 0; i < 8; ++i)
 		for (j = 0; j < 8; ++j)
 			for (n = 0; n < 4; ++n)
-				m_cell_get_side(&cellgrid[i][j], n)->type = 0;
+				m_cell_get_side(&cells[i][j], n)->type = 0;
 
 	// Make rudimentary walls
 	{
 		for (u8 i = 0; i < 7; ++i)
 		{
-			cellgrid[0][i].n.type = 2;
-			cellgrid[6][i].s.type = 2;
-			cellgrid[i][0].w.type = 2;
+			cells[0][i].n.type = 2;
+			cells[6][i].s.type = 2;
+			cells[i][0].w.type = 2;
 		}
-		cellgrid[4][0].w.type = 0;
+		cells[4][0].w.type = 0;
 
-		cellgrid[0][0].w.type = 3;
+		cells[0][0].w.type = 3;
 
-		cellgrid[0][6].e.type = 4;
-		cellgrid[2][6].e.type = 2;
-		cellgrid[6][6].e.type = 4;
-		cellgrid[5][6].e.type = 2;
-		cellgrid[2][7].w.type = 2;
-		cellgrid[5][7].w.type = 2;
+		cells[0][6].e.type = 4;
+		cells[2][6].e.type = 2;
+		cells[6][6].e.type = 4;
+		cells[5][6].e.type = 2;
+		cells[2][7].w.type = 2;
+		cells[5][7].w.type = 2;
 		for (u8 i = 0; i < 4; ++i)
-			cellgrid[2 + i][9].e.type = 2;
+			cells[2 + i][9].e.type = 2;
 		for (u8 i = 0; i < 3; ++i)
 		{
-			cellgrid[2][7 + i].n.type = 2;
-			cellgrid[5][7 + i].s.type = 2;
+			cells[2][7 + i].n.type = 2;
+			cells[5][7 + i].s.type = 2;
 		}
-		cellgrid[3][9].e.type = 6;
-		cellgrid[4][9].e.type = 6;
+		cells[3][9].e.type = 6;
+		cells[4][9].e.type = 6;
 
-		cellgrid[1][1].e.type = 4;
-		cellgrid[1][1].s.type = 2;
-		cellgrid[1][1].s.flags = SCROLL_H;
+		cells[1][1].e.type = 4;
+		cells[1][1].s.type = 2;
+		cells[1][1].s.flags = SCROLL_H;
 		// cellgrid[1][1].s.param1 = 8;
-		cellgrid[0][2].s.type = 6;
-		cellgrid[1][3].s.type = 2;
-		cellgrid[1][3].w.type = 2;
-		cellgrid[2][4].w.type = 6;
-		cellgrid[2][4].w.flags = (m_side_flags)(MIRR_H | SCROLL_H);
+		cells[0][2].s.type = 6;
+		cells[1][3].s.type = 2;
+		cells[1][3].w.type = 2;
+		cells[2][4].w.type = 6;
+		cells[2][4].w.flags = (m_side_flags)(MIRR_H | SCROLL_H);
 		// cellgrid[2][4].w.param1 = -8;
-		cellgrid[2][0].e.type = 6;
-		cellgrid[3][1].e.type = 2;
-		cellgrid[3][1].n.type = 2;
-		cellgrid[3][3].w.type = 2;
-		cellgrid[3][3].n.type = 2;
-		cellgrid[4][2].n.type = 6;
-		cellgrid[0][6].s.type = 2;
-		cellgrid[1][5].e.type = 4;
-		cellgrid[2][6].n.type = 2;
+		cells[2][0].e.type = 6;
+		cells[3][1].e.type = 2;
+		cells[3][1].n.type = 2;
+		cells[3][3].w.type = 2;
+		cells[3][3].n.type = 2;
+		cells[4][2].n.type = 6;
+		cells[0][6].s.type = 2;
+		cells[1][5].e.type = 4;
+		cells[2][6].n.type = 2;
 
-		cellgrid[6][1].s.type = 0;
-		cellgrid[6][4].s.type = 0;
-		cellgrid[7][1].e.type = 4;
-		cellgrid[7][1].w.type = 2;
-		cellgrid[8][1].w.type = 2;
-		cellgrid[8][1].s.type = 2;
-		cellgrid[8][2].n.type = 2;
-		cellgrid[8][2].s.type = 2;
-		cellgrid[8][3].n.type = 2;
-		cellgrid[8][3].s.type = 4;
-		cellgrid[8][4].s.type = 4;
-		cellgrid[8][4].e.type = 2;
-		cellgrid[7][4].e.type = 2;
-		cellgrid[7][4].w.type = 4;
+		cells[6][1].s.type = 0;
+		cells[6][4].s.type = 0;
+		cells[7][1].e.type = 4;
+		cells[7][1].w.type = 2;
+		cells[8][1].w.type = 2;
+		cells[8][1].s.type = 2;
+		cells[8][2].n.type = 2;
+		cells[8][2].s.type = 2;
+		cells[8][3].n.type = 2;
+		cells[8][3].s.type = 4;
+		cells[8][4].s.type = 4;
+		cells[8][4].e.type = 2;
+		cells[7][4].e.type = 2;
+		cells[7][4].w.type = 4;
 
-		cellgrid[4][2].w.type = 3;
-		cellgrid[3][3].w.target = 1;
-		cellgrid[3][3].w.door.door_flags = PLAYER_ACTIVATE;
+		cells[4][2].w.type = 3;
+		cells[3][3].w.target = 1;
+		cells[3][3].w.door.door_flags = PLAYER_ACTIVATE;
 
 		{
 			Side side = { 0 };
@@ -134,35 +133,35 @@ void m_load()
 				_m_set_double_sided(1, y, M_EAST, &side);
 		}
 
-		cellgrid[6][1].s.type = 6;
-		cellgrid[6][1].s.flags = DOOR_V;
-		cellgrid[6][1].s.door.state = 0;
-		cellgrid[6][1].s.door.openspeed = 12;
-		cellgrid[6][1].s.door.staytime = 12;
-		cellgrid[6][1].s.door.closespeed = 12;
-		cellgrid[6][1].s.door.door_flags = PLAYER_ACTIVATE;
-		cellgrid[6][1].s.tag = target++;
-		cellgrid[6][1].s.target = cellgrid[6][1].s.tag;
+		cells[6][1].s.type = 6;
+		cells[6][1].s.flags = DOOR_V;
+		cells[6][1].s.door.state = 0;
+		cells[6][1].s.door.openspeed = 12;
+		cells[6][1].s.door.staytime = 12;
+		cells[6][1].s.door.closespeed = 12;
+		cells[6][1].s.door.door_flags = PLAYER_ACTIVATE;
+		cells[6][1].s.tag = target++;
+		cells[6][1].s.target = cells[6][1].s.tag;
 
-		cellgrid[7][1].n.type = 6;
-		cellgrid[7][1].n.flags = DOOR_V;
-		cellgrid[7][1].n.door.state = 0;
-		cellgrid[7][1].n.door.openspeed = 1;
-		cellgrid[7][1].n.door.staytime = 12;
-		cellgrid[7][1].n.door.closespeed = 1;
-		cellgrid[7][1].n.door.door_flags = PLAYER_ACTIVATE;
-		cellgrid[7][1].n.tag = cellgrid[6][1].s.tag;
-		cellgrid[7][1].n.target = cellgrid[6][1].s.tag;
+		cells[7][1].n.type = 6;
+		cells[7][1].n.flags = DOOR_V;
+		cells[7][1].n.door.state = 0;
+		cells[7][1].n.door.openspeed = 1;
+		cells[7][1].n.door.staytime = 12;
+		cells[7][1].n.door.closespeed = 1;
+		cells[7][1].n.door.door_flags = PLAYER_ACTIVATE;
+		cells[7][1].n.tag = cells[6][1].s.tag;
+		cells[7][1].n.target = cells[6][1].s.tag;
 
 
 		for (u8 x = 7; x < 12; x++)
-			cellgrid[0][x].n.type = TX_SKY;
+			cells[0][x].n.type = TX_SKY;
 		for (u8 x = 7; x < 12; x++)
-			cellgrid[8][x].s.type = TX_SKY;
+			cells[8][x].s.type = TX_SKY;
 		for (u8 y = 0; y < 9; y++)
-			cellgrid[y][11].e.type = TX_SKY;
+			cells[y][11].e.type = TX_SKY;
 		for (u8 y = 0; y < 9; y++)
-			cellgrid[y][7].w.type = 2;
+			cells[y][7].w.type = 2;
 
 		{
 			Side side = { 0 };
@@ -174,20 +173,21 @@ void m_load()
 		
 		for (u8 i = 0; i < 4; ++i)
 		{
-			cellgrid[2 + i][9].e.type = 3;
-			cellgrid[2 + i][9].e.flags = TRANSLUCENT;
+			cells[2 + i][9].e.type = 3;
+			cells[2 + i][9].e.flags = TRANSLUCENT;
 		}
 		for (u8 i = 0; i < 3; ++i)
 		{
-			cellgrid[2][i + 7].n.type = 3;
-			cellgrid[2][i + 7].n.flags = TRANSLUCENT;
-			cellgrid[5][i + 7].s.type = 3;
-			cellgrid[5][i + 7].s.flags = TRANSLUCENT;
+			cells[2][i + 7].n.type = 3;
+			cells[2][i + 7].n.flags = TRANSLUCENT;
+			cells[5][i + 7].s.type = 3;
+			cells[5][i + 7].s.flags = TRANSLUCENT;
 		}
 
 
-		_m_flood_fill(0, 0, 7, false);
-		_m_flood_fill(0, 0, 8, true);
+		_m_flood_fill(0, 0, _m_flood_fill_cb_ceil, 7);
+		_m_flood_fill(0, 0, _m_flood_fill_cb_floor, 8);
+		_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 224);
 
 		{
 			Side side = { 0 };
@@ -197,13 +197,17 @@ void m_load()
 				
 		}
 
-		cellgrid[0][6].flat.floor_type = 3;
-		cellgrid[0][6].flat.ceil_type = 3;
+		cells[0][6].flat.floor_type = 3;
+		cells[0][6].flat.ceil_type = 3;
 
-		_m_flood_fill(8, 2, 0, false);
-		_m_flood_fill(8, 2, 7, true);
+		_m_flood_fill(8, 2, _m_flood_fill_cb_ceil, 0);
+		_m_flood_fill(8, 2, _m_flood_fill_cb_floor, 7);
 
-		_m_flood_fill(4, 7, 0, false);
+		_m_flood_fill(4, 7, _m_flood_fill_cb_ceil, 0);
+		_m_flood_fill(4, 7, _m_flood_fill_cb_brightness, 255);
+		cells[5][6].brightness = 192;
+		cells[6][6].brightness = 160;
+		cells[6][5].brightness = 192;
 	}
 
 	Actor pil;
@@ -260,8 +264,8 @@ void m_load()
 	z->type = DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
-	//cellptr = SDL_malloc(sizeof(Cell) * 32 * 32);
-	//SDL_assert(cellptr);
+	//cells = SDL_malloc(sizeof(Cell) * 32 * 32);
+	//SDL_assert(cells);
 	m_create_tags();
 };
 
@@ -272,7 +276,7 @@ void m_unload()
 	mu_clear();
 	m_destroy_tags();
 	tx_unload();
-	//SDL_free(cellptr);
+	//SDL_free(cells);
 };
 
 static i32 m_create_tags()
@@ -351,41 +355,49 @@ m_taglist* m_get_tags(u32 target)
 	return &m_tags[target];
 }
 
-static void _m_flood_fill(u16 x, u16 y, u16 type, bool floor)
+static bool _m_flood_fill_cb_floor(Cell* cell, void* data)
 {
-	const m_flat* cell = &m_get_cell(x, y)->flat;
-	_m_flood_fill_inner(x, y, type, floor ? cell->floor_type : cell->ceil_type, floor);
+	u16 type = data;
+	if (cell->flat.floor_type == type)
+		return false;
+	cell->flat.floor_type = type;
+	return true;
 }
 
-static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor)
+static bool _m_flood_fill_cb_ceil(Cell* cell, void* data)
 {
-	if (type == initial)
-		return;
+	u16 type = data;
+	if (cell->flat.ceil_type == type)
+		return false;
+	cell->flat.ceil_type = type;
+	return true;
+}
+
+static bool _m_flood_fill_cb_brightness(Cell* cell, void* data)
+{
+	u8 brightness = data;
+	if (cell->brightness == brightness)
+		return false;
+	cell->brightness = brightness;
+	return true;
+}
+
+static void _m_flood_fill(u16 x, u16 y, _m_flood_fill_action func, void* data)
+{
 	if (x >= m_map.w || y >= m_map.h)
 		return;
 	Cell* cell = m_get_cell(x, y);
-	m_flat* flat = &cell->flat;
-	if (floor)
-	{
-		if (flat->floor_type != initial)
-			return;
-		flat->floor_type = type;
-	}
-	else
-	{
-		if (flat->ceil_type != initial)
-			return;
-		flat->ceil_type = type;
-	}
+	if (!func(cell, data))
+		return;
 
 	if (!cell->e.type)
-		_m_flood_fill_inner(x + 1, y, type, initial, floor);
+		_m_flood_fill(x + 1, y, func, data);
 	if (!cell->n.type)
-		_m_flood_fill_inner(x, y - 1, type, initial, floor);
+		_m_flood_fill(x, y - 1, func, data);
 	if (!cell->w.type)
-		_m_flood_fill_inner(x - 1, y, type, initial, floor);
+		_m_flood_fill(x - 1, y, func, data);
 	if (!cell->s.type)
-		_m_flood_fill_inner(x, y + 1, type, initial, floor);
+		_m_flood_fill(x, y + 1, func, data);
 }
 
 // Sets the given side and the one on the oppsoite side

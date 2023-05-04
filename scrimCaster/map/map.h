@@ -2,8 +2,8 @@
 
 #include <common.h>
 
-#include <cell.h>
 #include <actorcontainers.h>
+#include <map/cell.h>
 
 typedef struct MapInfo
 {
@@ -44,6 +44,12 @@ static i32 m_create_tags();
 static void m_destroy_tags();
 
 // Development function, flood-fills a floor with a certain type
-static void _m_flood_fill(u16 x, u16 y, u16 type, bool floor);
-static void _m_flood_fill_inner(u16 x, u16 y, u16 type, u16 initial, bool floor);
+typedef bool (*_m_flood_fill_action)(Cell* cell, void* data);
+
+static void _m_flood_fill(u16 x, u16 y, _m_flood_fill_action func, void* data);
+
 static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const Side* side);
+
+static bool _m_flood_fill_cb_floor(Cell* cell, void* data);
+static bool _m_flood_fill_cb_ceil(Cell* cell, void* data);
+static bool _m_flood_fill_cb_brightness(Cell* cell, void* data);

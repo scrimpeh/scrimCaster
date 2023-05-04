@@ -55,7 +55,7 @@ i32 InitGame(i32 argc, char** argv)
 		return -1;
 	}
 
-	InitializeInput();
+	input_init();
 	mouselook_set_properties(true, 2.0);
 	SetViewportFov(90);
 

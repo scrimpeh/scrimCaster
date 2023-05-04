@@ -79,7 +79,7 @@ void r_draw()
 		SDL_FillRect(r_surface_viewport, NULL, COLOR_KEY);
 
 	scan_draw(r_surface_viewport);
-	DrawSprites(r_surface_viewport);
+	spr_draw(r_surface_viewport);
 	if (r_show_map)
 		am_draw(r_surface_viewport);
 	else if (r_show_crosshair) 

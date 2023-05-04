@@ -1,11 +1,12 @@
 #include <render/scan.h>
 
-#include <map.h>
-#include <maputil.h>
 #include <camera.h>
 #include <geometry.h>
+#include <map/map.h>
+#include <map/maputil.h>
 #include <render/colormap.h>
 #include <render/colorramp.h>
+#include <render/lighting.h>
 #include <render/render.h>
 #include <render/renderconstants.h>
 #include <render/skybox.h>
@@ -14,8 +15,6 @@
 
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
-
-#define HALFSIZE (TX_SIZE / 2)
 
 extern Map m_map;
 extern u8 viewport_x_fov;
@@ -141,7 +140,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
 	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
-	i32 wall_h = (i32) (projection_dist * M_CELLHEIGHT / distance_corrected);
+	i32 wall_h = (i32) (projection_dist * R_CELL_H / distance_corrected);
 	if (wall_h & 1)
 		wall_h++;
 	i32 wall_y = (viewport_h - wall_h) / 2;
@@ -160,7 +159,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	{
 		if (side->flags & DOOR_V)
 		{
-			const i32 door_h = (i32) (wall_h * ((M_CELLHEIGHT - side->door.scroll) / (float) (M_CELLHEIGHT)));
+			const i32 door_h = (i32) (wall_h * ((R_CELL_H - side->door.scroll) / (float) (R_CELL_H)));
 			y_end = SDL_min(viewport_h, wall_y + door_h);
 		}
 
@@ -176,9 +175,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			u32 tex_col = *(slice + slice_px);
 			if (tex_col != COLOR_KEY)
 			{
-				// Darken walls oriented E/W slightly
-				if (intercept->orientation == SIDE_ORIENTATION_WEST || intercept->orientation == SIDE_ORIENTATION_EAST)
-					tex_col = cm_map(tex_col, CM_GET(0, 0, 0), 0.125f);
+				tex_col = r_light_px(intercept->map_x, intercept->map_y, intercept->orientation, tex_col, intercept->column, slice_px);
 				tex_col = cm_ramp_mix(tex_col, distance_corrected);
 
 				*render_px = tex_col;
@@ -203,7 +200,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
 		const u16 height = viewport_h - (2 * y_px);
-		const float d = (projection_dist * M_CELLHEIGHT) / height;
+		const float d = (projection_dist * R_CELL_H) / height;
 		float xa;
 		float ya;
 		math_vec_cast_f(x, y, intercept->angle, d / cosf(angle), &xa, &ya);
@@ -216,17 +213,25 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		const m_flat* flat = &m_get_cell(grid_xa, grid_ya)->flat;
 
-		const u32 bottom = tx_get_point(flat, cell_x, cell_y, true);
-		if (bottom == COLOR_KEY)
+		u32 floor_px = tx_get_point(flat, cell_x, cell_y, true);
+		if (floor_px == COLOR_KEY)
 			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
 		else
-			*floor_render_px_bottom = cm_ramp_mix(bottom, d);
+		{
+			floor_px = r_light_px(grid_xa, grid_ya, M_FLOOR, floor_px, cell_x, cell_y);
+			floor_px = cm_ramp_mix(floor_px, d);
+			*floor_render_px_bottom = floor_px;
+		}
 
-		const u32 top = tx_get_point(flat, cell_x, cell_y, false);
-		if (top == COLOR_KEY)
+		u32 ceil_px = tx_get_point(flat, cell_x, cell_y, false);
+		if (ceil_px == COLOR_KEY)
 			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
 		else
-			*floor_render_px_top = cm_ramp_mix(top, d);
+		{
+			ceil_px = r_light_px(grid_xa, grid_ya, M_CEIL, ceil_px, cell_x, cell_y);
+			ceil_px = cm_ramp_mix(ceil_px, d);
+			*floor_render_px_top = ceil_px;
+		}
 
 		floor_render_px_top -= viewport_w;
 		floor_render_px_bottom += viewport_w;

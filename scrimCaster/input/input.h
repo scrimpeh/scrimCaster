@@ -22,14 +22,14 @@ typedef struct Input
 
 	u8 pause;
 	u8 use;
-	u8 m_map;
-} Input;
+	u8 map;
+} input_keys;
 
-extern Input input;
-extern Input input_tf;
+extern input_keys input;
+extern input_keys input_tf;
 
 extern i64 input_mwheel;
 
-void InitializeInput();
-void GetInput(SDL_Event* evt);
-void FilterInput();
+void input_init();
+void input_process_event(const SDL_Event* evt);
+void input_filter();

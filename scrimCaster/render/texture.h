@@ -2,7 +2,7 @@
 
 #include <common.h>
 
-#include <map.h>
+#include <map/map.h>
 
 #include <SDL/SDL_video.h>
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-#include "geometry.h"
-#include "cell.h"
-#include "actor.h"
+#include <actor.h>
+#include <geometry.h>
+#include <map/cell.h>
 
-#include "SDL/SDL_surface.h"
+#include <SDL/SDL_surface.h>
 
 typedef struct g_intercept_stack
 {

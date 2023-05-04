@@ -4,9 +4,9 @@
 // Everything that needs to interact with the map, i.e., rendering, interacting with walls or shooting
 // should go through this module
 
-#include "common.h"
+#include <common.h>
 
-#include "map.h"
+#include <map/cell.h>
 
 typedef u8 g_orientation;
 
@@ -15,12 +15,6 @@ typedef u8 g_orientation;
 #define ORIENTATION_SOUTH 0x0
 #define ORIENTATION_WEST 0x0
 
-typedef u8 g_side_orientation;
-
-#define SIDE_ORIENTATION_NORTH 0
-#define SIDE_ORIENTATION_EAST 1
-#define SIDE_ORIENTATION_SOUTH 2
-#define SIDE_ORIENTATION_WEST 3
 
 typedef enum g_intercept_type
 {
@@ -37,7 +31,7 @@ typedef enum g_intercept_type
 
 // A basic struct describing an intersection with a ray and a wall
 typedef struct g_intercept {
-	g_side_orientation orientation;
+	m_orientation orientation;
 	g_intercept_type type;
 	angle_rad_f angle;
 	float x;

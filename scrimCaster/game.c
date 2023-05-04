@@ -5,8 +5,8 @@
 #include <enemy.h>
 #include <input/input.h>
 #include <input/mouselook.h>
-#include <map.h>
-#include <mapupdate.h>
+#include <map/map.h>
+#include <map/mapupdate.h>
 #include <player.h>
 
 // On game Objects:
@@ -62,7 +62,7 @@ bool loadMap = true;
 bool inGame = false;
 bool inMenu = true;
 
-extern Input input, input_tf;
+extern input_keys input, input_tf;
 
 void SetMenu(bool open)
 {

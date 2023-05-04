@@ -1,6 +1,6 @@
 #include <geometry.h>
 
-#include <map.h>
+#include <map/map.h>
 #include <render/renderconstants.h>
 
 #include <math.h>
@@ -48,7 +48,7 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 				y_inv = (float)(y_cell_side * M_CELLSIZE);
 
 				g_intercept intercept;
-				intercept.orientation = g_is_north(orientation) ? SIDE_ORIENTATION_NORTH : SIDE_ORIENTATION_SOUTH;
+				intercept.orientation = g_is_north(orientation) ? M_NORTH : M_SOUTH;
 				intercept.type = g_get_intercept_type(side, edge);
 				intercept.angle = angle;
 				intercept.x = x_inv;
@@ -79,7 +79,7 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 		if (edge || side->type)
 		{
 			g_intercept intercept;
-			intercept.orientation = g_is_west(orientation) ? SIDE_ORIENTATION_WEST : SIDE_ORIENTATION_EAST;
+			intercept.orientation = g_is_west(orientation) ? M_WEST : M_EAST;
 			intercept.type = g_get_intercept_type(side, edge);
 			intercept.angle = angle;
 			intercept.x = x;

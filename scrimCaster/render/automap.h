@@ -15,7 +15,7 @@ void am_draw(SDL_Surface* target);
 
 static void am_draw_map(SDL_Surface* target);
 static void am_draw_cell(SDL_Surface* target, i16 x, i16 y);
-static void am_draw_side(SDL_Surface* target, i16 x, i16 y, const Side* side, m_orientation orientation);
+static void am_draw_side(SDL_Surface* target, i16 x, i16 y, const m_side* side, m_orientation orientation);
 static void am_draw_actors(SDL_Surface* target);
 static void am_draw_actor(SDL_Surface* target, Actor* actor);
 
@@ -25,4 +25,4 @@ static bool am_collect_intercept(const g_intercept* intercept);
 static i32 am_map_h(float x);
 static i32 am_map_v(float y);
 
-static cm_color am_get_color(const Side* side);
+static cm_color am_get_color(const m_side* side);

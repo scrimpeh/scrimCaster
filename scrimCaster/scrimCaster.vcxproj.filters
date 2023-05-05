@@ -32,6 +32,9 @@
     <Filter Include="Source Files\map">
       <UniqueIdentifier>{6deaf4eb-ad00-4e01-a1d2-d954341dafde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\render\lighting">
+      <UniqueIdentifier>{1317292a-cf29-4a7c-879a-e5d6b412b5a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="render\window.h">
@@ -88,9 +91,6 @@
     <ClInclude Include="map\mapupdate.h">
       <Filter>Source Files\map</Filter>
     </ClInclude>
-    <ClInclude Include="map\maputil.h">
-      <Filter>Source Files\map</Filter>
-    </ClInclude>
     <ClInclude Include="init.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -142,8 +142,11 @@
     <ClInclude Include="render\colorramp.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="render\lighting.h">
-      <Filter>Source Files\render</Filter>
+    <ClInclude Include="render\lighting\lighting.h">
+      <Filter>Source Files\render\lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="render\lighting\smoothlight.h">
+      <Filter>Source Files\render\lighting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +207,6 @@
     <ClCompile Include="map\mapupdate.c">
       <Filter>Source Files\map</Filter>
     </ClCompile>
-    <ClCompile Include="map\maputil.c">
-      <Filter>Source Files\map</Filter>
-    </ClCompile>
     <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -252,8 +252,11 @@
     <ClCompile Include="render\colorramp.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="render\lighting.c">
-      <Filter>Source Files\render</Filter>
+    <ClCompile Include="render\lighting\lighting.c">
+      <Filter>Source Files\render\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="render\lighting\smoothlight.c">
+      <Filter>Source Files\render\lighting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 #include <camera.h>
 #include <input/input.h>
 #include <render/automap.h>
+#include <render/lighting/lighting.h>
 #include <render/renderconstants.h>
 #include <render/renderdebug.h>
 #include <render/renderutil.h>
@@ -47,8 +48,13 @@ i32 r_init(u16 w, u16 h)
 		return -1;
 	}
 
-	am_init();
+	if (r_light_init(R_LIGHT_SMOOTH))
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize lighting! %s", SDL_GetError());
+		return -1;
+	}
 
+	am_init();
 	return 0;
 }
 

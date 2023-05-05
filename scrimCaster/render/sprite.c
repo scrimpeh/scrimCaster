@@ -2,6 +2,7 @@
 
 #include <map/map.h>
 #include <render/colorramp.h>
+#include <render/lighting/lighting.h>
 #include <render/renderconstants.h>
 #include <util/mathutil.h>
 
@@ -36,7 +37,6 @@ const ActorSpriteSheet spriteSheets[] =
 
 ActorSprite sprite_slot_buffer[MAX_SPRITES];
 
-extern Map m_map;
 extern ActorList particles, projectiles, tempEnemies;
 
 extern u16 viewport_w, viewport_h, viewport_w_half;

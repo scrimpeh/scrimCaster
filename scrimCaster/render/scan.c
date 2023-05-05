@@ -3,10 +3,9 @@
 #include <camera.h>
 #include <geometry.h>
 #include <map/map.h>
-#include <map/maputil.h>
 #include <render/colormap.h>
 #include <render/colorramp.h>
-#include <render/lighting.h>
+#include <render/lighting/lighting.h>
 #include <render/render.h>
 #include <render/renderconstants.h>
 #include <render/skybox.h>
@@ -16,7 +15,7 @@
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
 
-extern Map m_map;
+extern m_map_data m_map;
 extern u8 viewport_x_fov;
 u8 viewport_x_fov_half;
 
@@ -103,7 +102,7 @@ void scan_draw(SDL_Surface* target)
 	}
 }
 
-static u8 scan_get_slice_y_start(const Side* side)
+static u8 scan_get_slice_y_start(const m_side* side)
 {
 	if (!side->flags & DOOR_V)
 		return 0;
@@ -146,7 +145,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
-	const Side* side = map_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
+	const m_side* side = m_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
 	const tx_slice slice = tx_get_slice(side, intercept->column);
 
 	// Now draw the texture slice
@@ -211,9 +210,9 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		const i16 cell_x = (i16) (fmodf(floorf(xa), (float)(M_CELLSIZE)));
 		const i16 cell_y = (i16) (fmodf(floorf(ya), (float)(M_CELLSIZE)));
 
-		const m_flat* flat = &m_get_cell(grid_xa, grid_ya)->flat;
+		const m_cell* cell = m_get_cell(grid_xa, grid_ya);
 
-		u32 floor_px = tx_get_point(flat, cell_x, cell_y, true);
+		u32 floor_px = tx_get_point(&cell->floor, cell_x, cell_y);
 		if (floor_px == COLOR_KEY)
 			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
 		else
@@ -223,7 +222,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			*floor_render_px_bottom = floor_px;
 		}
 
-		u32 ceil_px = tx_get_point(flat, cell_x, cell_y, false);
+		u32 ceil_px = tx_get_point(&cell->ceil, cell_x, cell_y);
 		if (ceil_px == COLOR_KEY)
 			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
 		else

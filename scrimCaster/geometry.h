@@ -54,4 +54,4 @@ static inline bool g_is_east(g_orientation orientation);
 static inline bool g_is_west(g_orientation orientation);
 static inline bool g_is_south(g_orientation orientation);
 
-static inline g_intercept_type g_get_intercept_type(const Side* side, bool is_edge);
+static inline g_intercept_type g_get_intercept_type(const m_side* side, bool is_edge);

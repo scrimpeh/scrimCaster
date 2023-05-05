@@ -2,7 +2,6 @@
 
 #include <input/input.h>
 #include <map/map.h>
-#include <map/maputil.h>
 #include <map/mapupdate.h>
 #include <util/mathutil.h>
 
@@ -44,7 +43,7 @@ static void player_use()
 		const float distance = math_dist_f(player.x, player.y, player_use_intercept.x, player_use_intercept.y);
 		if (distance < USELENGTH)
 		{
-			Side* side = map_get_side(player_use_intercept.map_x, player_use_intercept.map_y, player_use_intercept.orientation);
+			m_side* side = m_get_side(player_use_intercept.map_x, player_use_intercept.map_y, player_use_intercept.orientation);
 			if (side->target)
 				mu_activate_tag(side->target);
 		}

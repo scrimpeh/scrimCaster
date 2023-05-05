@@ -67,7 +67,7 @@ void am_draw(SDL_Surface* target)
 
 static void am_draw_cell(SDL_Surface* target, i16 grid_x, i16 grid_y)
 {
-	const Cell* cell = m_map.cells + grid_y * m_map.h + grid_x;
+	const m_cell* cell = m_map.cells + grid_y * m_map.h + grid_x;
 	am_draw_side(target, grid_x, grid_y, &cell->e, M_EAST);
 	am_draw_side(target, grid_x, grid_y, &cell->n, M_NORTH);
 	am_draw_side(target, grid_x, grid_y, &cell->w, M_WEST);
@@ -92,7 +92,7 @@ static i32 am_map_distance(float d)
 	return r_hud_px_h(d * rel_size);
 }
 
-static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const Side* side, m_orientation orientation)
+static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const m_side* side, m_orientation orientation)
 {
 	if (!side->type)
 		return;
@@ -195,7 +195,7 @@ static bool am_collect_intercept(const g_intercept* intercept)
 	return intercept->type == G_INTERCEPT_NON_SOLID;
 }
 
-static cm_color am_get_color(const Side* side)
+static cm_color am_get_color(const m_side* side)
 {
 	if (side->type == TX_SKY)
 		return CM_GET(192, 255, 255);

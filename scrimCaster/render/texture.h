@@ -30,8 +30,8 @@ void tx_unload();
 // Automatically handles getting the correct vertical slice, but vertical mirroring needs to be done at the drawing side
 // The purpose of this function is to shunt off all special jank cases into a separate function
 // though somehow this needs to handle both slices and floors
-const tx_slice tx_get_slice(const Side* side, u8 column);
-const u32 tx_get_point(const m_flat* flat, u8 x, u8 y, bool floor);
+const tx_slice tx_get_slice(const m_side* side, u8 column);
+const u32 tx_get_point(const m_flat* flat, u8 x, u8 y);
 
 
 typedef enum
@@ -39,9 +39,5 @@ typedef enum
 	TX_BLIT_SLICE_Z_BUFFER_READ = 0x1,
 	TX_BLIT_SLICE_Z_BUFFER_WRITE = 0x2
 } tx_blit_slice_z_buffer_access;
-
-
-// Tentative, might as well add a blit function here later
-const void tx_blit_slice(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end, float* z_buffer, tx_blit_slice_z_buffer_access z_bufferr_access);
 
 void tx_copy(const SDL_Surface* source, const SDL_Rect* r, tx_block target);

@@ -1,7 +1,7 @@
-#include <map.h>
+#include <map/map.h>
 
 #include <actor.h>
-#include <mapupdate.h>
+#include <map/mapupdate.h>
 #include <render/gfxloader.h>
 #include <render/texture.h>
 #include <render/skybox.h>
@@ -15,25 +15,25 @@
  * scroll shall define "how open" the door is, i.e. it determines the ratio between open and not open
  */
 
-Map m_map;
+m_map_data m_map;
 
 const char* tx_sets[] = { "test.png" };
 
 extern ActorVector levelEnemies;
 
-Cell cells[16][16];
+m_cell cells[16][16];
 
 u32 m_max_tag;
 m_taglist* m_tags;
 bool* m_tag_active;
 
-Cell* m_get_cell(u16 x, u16 y)
+m_cell* m_get_cell(u16 x, u16 y)
 {
 	SDL_assert(x < m_map.w && y < m_map.h);
 	return &m_map.cells[m_map.w * y + x];
 }
 
-Side* m_get_side(u16 x, u16 y, m_orientation o)
+m_side* m_get_side(u16 x, u16 y, m_orientation o)
 {
 	return m_cell_get_side(m_get_cell(x, y), o);
 }
@@ -94,7 +94,7 @@ void m_load()
 		cells[1][3].s.type = 2;
 		cells[1][3].w.type = 2;
 		cells[2][4].w.type = 6;
-		cells[2][4].w.flags = (m_side_flags)(MIRR_H | SCROLL_H);
+		cells[2][4].w.flags = (m_side_flags) (MIRR_H | SCROLL_H);
 		// cellgrid[2][4].w.param1 = -8;
 		cells[2][0].e.type = 6;
 		cells[3][1].e.type = 2;
@@ -126,7 +126,7 @@ void m_load()
 		cells[3][3].w.door.door_flags = PLAYER_ACTIVATE;
 
 		{
-			Side side = { 0 };
+			m_side side = { 0 };
 			side.type = 3;
 			side.flags = TRANSLUCENT;
 			for (u8 y = 4; y <= 6; y++)
@@ -164,13 +164,13 @@ void m_load()
 			cells[y][7].w.type = 2;
 
 		{
-			Side side = { 0 };
+			m_side side = { 0 };
 			side.type = 5;
 			side.flags = PASSABLE | TRANSLUCENT;
 			for (u8 y = 3; y <= 4; ++y)
 				_m_set_double_sided(6, y, M_EAST, &side);
 		}
-		
+
 		for (u8 i = 0; i < 4; ++i)
 		{
 			cells[2 + i][9].e.type = 3;
@@ -187,27 +187,34 @@ void m_load()
 
 		_m_flood_fill(0, 0, _m_flood_fill_cb_ceil, 7);
 		_m_flood_fill(0, 0, _m_flood_fill_cb_floor, 8);
-		_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 224);
+		_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 50);
 
 		{
-			Side side = { 0 };
+			m_side side = { 0 };
 			side.type = 5;
 			side.flags = PASSABLE | TRANSLUCENT;
 			_m_set_double_sided(4, 6, M_SOUTH, &side);
-				
+
 		}
 
-		cells[0][6].flat.floor_type = 3;
-		cells[0][6].flat.ceil_type = 3;
+		cells[0][6].floor.type = 3;
+		cells[0][6].ceil.type = 3;
+		cells[0][6].w.flags = BLOCK_SMOOTH_LIGHT;
+		cells[0][6].brightness = 128;
 
 		_m_flood_fill(8, 2, _m_flood_fill_cb_ceil, 0);
 		_m_flood_fill(8, 2, _m_flood_fill_cb_floor, 7);
 
 		_m_flood_fill(4, 7, _m_flood_fill_cb_ceil, 0);
 		_m_flood_fill(4, 7, _m_flood_fill_cb_brightness, 255);
-		cells[5][6].brightness = 192;
-		cells[6][6].brightness = 160;
-		cells[6][5].brightness = 192;
+		cells[5][6].brightness = 128;
+		cells[6][6].brightness = 64;
+		cells[6][5].brightness = 128;
+
+		cells[4 - 1][4 + 1].brightness = 0;
+		cells[3 - 1][4 + 1].brightness = 0;
+		cells[4 - 1][3 + 1].brightness = 0;
+		cells[3 - 1][3 + 1].brightness = 0;
 	}
 
 	Actor pil;
@@ -264,8 +271,13 @@ void m_load()
 	z->type = DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
-	//cells = SDL_malloc(sizeof(Cell) * 32 * 32);
+	//cells = SDL_malloc(sizeof(m_cell) * 32 * 32);
 	//SDL_assert(cells);
+	cells[0][0].brightness = 64;
+	cells[1][1].brightness = 64;
+	cells[1][3].brightness = 64;
+	cells[3][3].brightness = 64;
+	cells[3][1].brightness = 64;
 	m_create_tags();
 };
 
@@ -304,7 +316,7 @@ static i32 m_create_tags()
 
 	// Allocate space for the tag lists
 	for (u32 i = 1; i <= m_max_tag; i++)
-		if (!(m_tags[i].sides = SDL_malloc(sizeof(Side*) * m_tags[i].count)))
+		if (!(m_tags[i].sides = SDL_malloc(sizeof(m_side*) * m_tags[i].count)))
 			return -2;
 
 	// Now iterate through the map and build the side list for each tag
@@ -318,7 +330,7 @@ static i32 m_create_tags()
 		{
 			for (u8 orientation = 0; orientation < 4; orientation++)
 			{
-				Side* side = m_get_side(x, y, orientation);
+				m_side* side = m_get_side(x, y, orientation);
 				if (side->tag)
 				{
 					u32 next_tag = side_indices[side->tag]++;
@@ -355,25 +367,25 @@ m_taglist* m_get_tags(u32 target)
 	return &m_tags[target];
 }
 
-static bool _m_flood_fill_cb_floor(Cell* cell, void* data)
+static bool _m_flood_fill_cb_floor(m_cell* cell, void* data)
 {
 	u16 type = data;
-	if (cell->flat.floor_type == type)
+	if (cell->floor.type == type)
 		return false;
-	cell->flat.floor_type = type;
+	cell->floor.type = type;
 	return true;
 }
 
-static bool _m_flood_fill_cb_ceil(Cell* cell, void* data)
+static bool _m_flood_fill_cb_ceil(m_cell* cell, void* data)
 {
 	u16 type = data;
-	if (cell->flat.ceil_type == type)
+	if (cell->ceil.type == type)
 		return false;
-	cell->flat.ceil_type = type;
+	cell->ceil.type = type;
 	return true;
 }
 
-static bool _m_flood_fill_cb_brightness(Cell* cell, void* data)
+static bool _m_flood_fill_cb_brightness(m_cell* cell, void* data)
 {
 	u8 brightness = data;
 	if (cell->brightness == brightness)
@@ -386,7 +398,7 @@ static void _m_flood_fill(u16 x, u16 y, _m_flood_fill_action func, void* data)
 {
 	if (x >= m_map.w || y >= m_map.h)
 		return;
-	Cell* cell = m_get_cell(x, y);
+	m_cell* cell = m_get_cell(x, y);
 	if (!func(cell, data))
 		return;
 
@@ -401,7 +413,7 @@ static void _m_flood_fill(u16 x, u16 y, _m_flood_fill_action func, void* data)
 }
 
 // Sets the given side and the one on the oppsoite side
-static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const Side* side)
+static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const m_side* side)
 {
 	m_orientation opposite;
 	u16 opposite_x = x;
@@ -425,6 +437,6 @@ static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const S
 		opposite_y++;
 		break;
 	}
-	SDL_memcpy(m_get_side(x, y, orientation), side, sizeof(Side));
-	SDL_memcpy(m_get_side(opposite_x, opposite_y, opposite), side, sizeof(Side));
+	SDL_memcpy(m_get_side(x, y, orientation), side, sizeof(m_side));
+	SDL_memcpy(m_get_side(opposite_x, opposite_y, opposite), side, sizeof(m_side));
 }

@@ -32,8 +32,8 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 			if (y_cell < 0 || y_cell >= m_map.h || grid_x < 0 || grid_x >= m_map.w)
 				return;
 
-			const Cell* cell = &m_map.cells[m_map.w * y_cell + grid_x];
-			const Side* side = g_is_north(orientation) ? &cell->n : &cell->s;
+			const m_cell* cell = &m_map.cells[m_map.w * y_cell + grid_x];
+			const m_side* side = g_is_north(orientation) ? &cell->n : &cell->s;
 			const bool edge =
 				(g_is_north(orientation) && y_cell == 0) ||
 				(g_is_south(orientation) && y_cell == m_map.h - 1);
@@ -70,8 +70,8 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 		if (grid_y < 0 || grid_y >= m_map.h || grid_x < 0 || grid_x >= m_map.w)
 			return;
 
-		const Cell* cell = &m_map.cells[m_map.w * grid_y + grid_x];
-		const Side* side = g_is_west(orientation) ? &cell->w : &cell->e;
+		const m_cell* cell = &m_map.cells[m_map.w * grid_y + grid_x];
+		const m_side* side = g_is_west(orientation) ? &cell->w : &cell->e;
 		const bool edge =
 			(g_is_west(orientation) && grid_x == 0) ||
 			(g_is_east(orientation) && grid_x == m_map.w - 1);
@@ -130,7 +130,7 @@ static inline bool g_is_south(g_orientation orientation)
 }
 
 
-static inline g_intercept_type g_get_intercept_type(const Side* side, bool is_edge)
+static inline g_intercept_type g_get_intercept_type(const m_side* side, bool is_edge)
 {
 	g_intercept_type intercept_type = G_INTERCEPT_VOID;
 	if (!is_edge)

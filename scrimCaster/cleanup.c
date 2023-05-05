@@ -1,6 +1,6 @@
 #include <cleanup.h>
 
-#include <map.h>
+#include <map/map.h>
 #include <render/gfxloader.h>
 #include <render/render.h>
 #include <render/window.h>

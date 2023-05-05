@@ -102,23 +102,17 @@ void tx_unload()
 	tx_map_textures = NULL;
 }
 
-const tx_slice tx_get_slice(const Side* side, u8 column)
+const tx_slice tx_get_slice(const m_side* side, u8 column)
 {
 	const u16 type = side->type;
 	const tx_block block = tx_map_textures + type * TX_PX_SIZE;
 	return block + column * TX_SIZE;
 }
 
-const u32 tx_get_point(const m_flat* flat, u8 x, u8 y, bool floor)
+const u32 tx_get_point(const m_flat* flat, u8 x, u8 y)
 {
-	const u16 type = floor ? flat->floor_type : flat->ceil_type;
-	const tx_block block = tx_map_textures + type * TX_PX_SIZE;
+	const tx_block block = tx_map_textures + flat->type * TX_PX_SIZE;
 	const tx_slice slice = block + x * TX_SIZE;
 	return *(slice + y);
-}
-
-const void tx_blit_slice(tx_slice strip, u16 tx_start, u16 tx_end, SDL_Surface* target, i16 target_start, i16 target_end, float* z_buffer, tx_blit_slice_z_buffer_access z_bufferr_access)
-{
-	// TODO
 }
 

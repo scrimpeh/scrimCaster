@@ -78,7 +78,6 @@ void UpdateGame(u32 timeStep)
 
 	if (loadMap)
 	{
-		m_load();
 		player_spawn();
 		loadMap = false;
 		SetMenu(false);

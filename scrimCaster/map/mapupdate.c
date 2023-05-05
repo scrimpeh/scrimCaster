@@ -1,4 +1,4 @@
-#include <mapupdate.h>
+#include <map/mapupdate.h>
 
 #define DOOR_SCROLL_MAX (M_CELLHEIGHT - 4)
 #define DOOR_TICKS_PER_SEC 60
@@ -14,7 +14,7 @@ extern u32 m_max_tag;
 
 m_active_tag_list* m_active_tags = NULL;
 
-extern Map m_map;
+extern m_map_data m_map;
 
 void mu_update(u32 t_delta)
 {
@@ -80,7 +80,7 @@ void mu_clear()
 	}
 }
 
-static bool mu_update_side(Side* side, u32 delta)
+static bool mu_update_side(m_side* side, u32 delta)
 {
 	DoorParams* params = &side->door;
 	const u8 ticks = params->timer_ticks + delta;

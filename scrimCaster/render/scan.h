@@ -24,4 +24,4 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 static inline bool collect_intercept(const g_intercept* intercept);
 
 static u8 scan_get_tx_slice_y(i64 wall_h, i64 y, u8 start_y);
-static u8 scan_get_slice_y_start(const Side* side);
+static u8 scan_get_slice_y_start(const m_side* side);

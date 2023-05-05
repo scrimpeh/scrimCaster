@@ -34,44 +34,51 @@ typedef enum
 //Just balling around ideas so far
 typedef enum
 {
-	PASSABLE =         0x0001,
-	TRANSLUCENT =      0x0002,
-	BULLETS_PASS =     0x0004,
-	PROJECTILES_PASS = 0x0008,
-	SWITCH_ONCE =      0x0010,
-	SWITCH_MULTIPLE =  0x0020,
-	DOOR_V =           0x0040,
-	DOOR_H =           0x0080,
-	DOOR_ANIM =        0x0100,
-	SCROLL_V =		   0x0200,
-	SCROLL_H =         0x0400,
-	MIRR_H =           0x0800,
-	MIRR_V =           0x1000
+	PASSABLE =           0x0001,
+	TRANSLUCENT =        0x0002,
+	BULLETS_PASS =       0x0004,
+	PROJECTILES_PASS =   0x0008,
+	SWITCH_ONCE =        0x0010,
+	SWITCH_MULTIPLE =    0x0020,
+	DOOR_V =             0x0040,
+	DOOR_H =             0x0080,
+	DOOR_ANIM =          0x0100,
+	SCROLL_V =		     0x0200,
+	SCROLL_H =           0x0400,
+	MIRR_H =             0x0800,
+	MIRR_V =             0x1000,
+	BLOCK_SMOOTH_LIGHT = 0x2000,
 } m_side_flags;
 
-// The floor flags. Some flags may be contradictory, e.g. a "Multiple" Trigger
+// The floor flags. Some flags may be incompatible, e.g. a "Multiple" Trigger
 // overrides a "Once" trigger. In this case, a certain flag wins.
 typedef enum
 {
-	M_FLOOR_TRIGGER_ONCE     = 0x0001,
-	M_FLOOR_TRIGGER_MULTIPLE = 0x0002
-} m_floor_flags;
+	M_CELL_TRIGGER_ONCE     = 0x0001,
+	M_CELL_TRIGGER_MULTIPLE = 0x0002
+} m_cell_flags;
+
+typedef enum
+{
+	M_FLAT_FLIP_V =     0x0001,
+	M_FLAT_FLIP_H =     0x0002,
+	M_FLAT_ROTATE_90 =  0x0004,
+	M_FLAT_ROTATE_180 = 0x0008
+} m_flat_flags;
 
 typedef struct
 {
-	u16 floor_type;
-	u16 ceil_type;
-	u32 target;
-	m_floor_flags flags;
+	u16 type;
+	m_flat_flags flags;
 } m_flat;
 
-typedef enum DoorFlags
+typedef enum
 {
 	PLAYER_ACTIVATE = 1,
 	MONSTER_ACTIVATE = 2
 } DoorFlags;
 
-typedef struct DoorParams
+typedef struct
 {
 	u8 openspeed, closespeed; //the ticks needed to reach one increment in game units
 	u8 staytime;			  //the amount of (half-)seconds that a door stays open
@@ -83,7 +90,7 @@ typedef struct DoorParams
 	u8 timer_ticks;
 } DoorParams;
 
-typedef struct Side
+typedef struct
 {
 	u16 type;
 	u32 tag;
@@ -92,18 +99,28 @@ typedef struct Side
 	bool solid;
 	m_side_flags flags;
 	DoorParams door;
-} Side;
+} m_side;
 
-typedef struct Cell
+typedef struct
 {
-	m_flat flat;
+	// Flats
+	m_flat floor;
+	m_flat ceil;
+
+	// Sides
+	m_side e;
+	m_side n;
+	m_side w;
+	m_side s;
+
+	// Cell info
+	m_cell_flags flags;
 	u8 brightness;
-	Side e;
-	Side n;
-	Side w;
-	Side s;
-} Cell;
+	u32 target;
+} m_cell;
 
-Side* m_cell_get_side(Cell* cell, m_orientation orientation);
+m_cell* m_get_cell(u16 grid_x, u16 grid_y);
+m_side* m_get_side(u16 grid_x, u16 grid_y, m_orientation orientation);
+m_side* m_cell_get_side(m_cell* cell, m_orientation orientation);
 
-typedef Side** m_tag_array;
+typedef m_side** m_tag_array;

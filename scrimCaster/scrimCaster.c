@@ -33,8 +33,8 @@
 //     - [ ] Rotate surfaces by 90° so data is read and written sequentially
 //     - [ ] Use SDL_render for scaling
 //     - [ ] General optimizations
-// [ ] Cell lighting
-//     - [ ] Smooth light blending between adjacent cells
+// [X] Cell lighting
+//     - [X] Smooth light blending between adjacent cells
 //     - [ ] Dynamic lighting
 // [ ] Add some proper textures
 // [ ] Material system, with animated textures and more

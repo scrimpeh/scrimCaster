@@ -14,4 +14,4 @@ void mu_update(u32 t_delta);
 void mu_activate_tag(u32 tag);
 void mu_clear();
 
-static bool mu_update_side(Side* const side, u32 timeStep);
+static bool mu_update_side(m_side* const side, u32 timeStep);

@@ -11,7 +11,7 @@ const double MIN_WALL_DIST = 1e-12;
 
 Bounds curBounds;
 
-extern Map m_map;
+extern m_map_data m_map;
 extern ActorList tempEnemies, projectiles, particles;
 extern ActorVector levelEnemies;
 
@@ -161,17 +161,17 @@ static bool CollideHorizontalWall(const Actor* actor, double* p_dx)
 	const i16 y_top = (i16)SDL_floor((actor->y - curBounds.y) / M_CELLSIZE);
 	const i16 y_bottom = (i16)SDL_floor((actor->y + curBounds.y) / M_CELLSIZE);
 
-	const Cell* cells = m_map.cells;
+	const m_cell* cells = m_map.cells;
 
 	const i8 inc = x_start > x_end ? -1 : 1;
 	for (i16 x = x_start; x != x_end; x += inc)
 	{
 		// Todo: This might be optimized by just adding to pointers directly.
-		const Cell cell_top = cells[y_top * m_map.w + x];
-		const Cell cell_bottom = cells[y_bottom * m_map.w + x];
+		const m_cell cell_top = cells[y_top * m_map.w + x];
+		const m_cell cell_bottom = cells[y_bottom * m_map.w + x];
 
-		const Side side_top = d_x > 0 ? cell_top.e : cell_top.w;
-		const Side side_bottom = d_x > 0 ? cell_bottom.e : cell_bottom.w;
+		const m_side side_top = d_x > 0 ? cell_top.e : cell_top.w;
+		const m_side side_bottom = d_x > 0 ? cell_bottom.e : cell_bottom.w;
 
 		if ((side_top.type && !(side_top.flags  & PASSABLE)) ||
 			(side_bottom.type && !(side_bottom.flags & PASSABLE)))
@@ -200,16 +200,16 @@ static bool CollideVerticalWall(const Actor* actor, double* p_dy)
 	const i16 x_left = (i16)SDL_floor((actor->x - curBounds.x) / M_CELLSIZE);
 	const i16 x_right = (i16)SDL_floor((actor->x + curBounds.x) / M_CELLSIZE);
 
-	const Cell* cells = m_map.cells;
+	const m_cell* cells = m_map.cells;
 
 	const i8 inc = y_start > y_end ? -1 : 1;
 	for (i16 y = y_start; y != y_end; y += inc)
 	{
-		const Cell cell_left = cells[y * m_map.w + x_left];
-		const Cell cell_right = cells[y * m_map.w + x_right];
+		const m_cell cell_left = cells[y * m_map.w + x_left];
+		const m_cell cell_right = cells[y * m_map.w + x_right];
 
-		const Side side_left = d_y > 0 ? cell_left.s : cell_left.n;
-		const Side side_right = d_y > 0 ? cell_right.s : cell_right.n;
+		const m_side side_left = d_y > 0 ? cell_left.s : cell_left.n;
+		const m_side side_right = d_y > 0 ? cell_right.s : cell_right.n;
 
 		if ((side_left.type  && !(side_left.flags  & PASSABLE)) ||
 			(side_right.type && !(side_right.flags & PASSABLE)))

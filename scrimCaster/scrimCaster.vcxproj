@@ -341,9 +341,9 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="geometry.h" />
     <ClInclude Include="init.h" />
     <ClInclude Include="map\mapupdate.h" />
-    <ClInclude Include="map\maputil.h" />
     <ClInclude Include="render\colorramp.h" />
-    <ClInclude Include="render\lighting.h" />
+    <ClInclude Include="render\lighting\lighting.h" />
+    <ClInclude Include="render\lighting\smoothlight.h" />
     <ClInclude Include="render\skybox.h" />
     <ClInclude Include="render\texture.h" />
     <ClInclude Include="util\mathutil.h" />
@@ -386,8 +386,8 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="input\inputmap.c" />
     <ClCompile Include="map\map.c" />
     <ClCompile Include="map\mapupdate.c" />
-    <ClCompile Include="map\maputil.c" />
-    <ClCompile Include="render\lighting.c" />
+    <ClCompile Include="render\lighting\lighting.c" />
+    <ClCompile Include="render\lighting\smoothlight.c" />
     <ClCompile Include="render\skybox.c" />
     <ClCompile Include="render\texture.c" />
     <ClCompile Include="util\mathutil.c" />

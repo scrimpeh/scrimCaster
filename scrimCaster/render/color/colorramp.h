@@ -14,7 +14,7 @@
 
 #include <common.h>
 
-#include <render/colormap.h>
+#include <render/color/colormap.h>
 
 typedef struct
 {

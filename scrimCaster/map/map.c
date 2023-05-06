@@ -1,6 +1,6 @@
 #include <map/map.h>
 
-#include <actor.h>
+#include <game/actor/actor.h>
 #include <map/mapupdate.h>
 #include <render/gfxloader.h>
 #include <render/texture.h>

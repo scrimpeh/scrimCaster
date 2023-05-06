@@ -1,4 +1,4 @@
-#include <render/colorramp.h>
+#include <render/color/colorramp.h>
 
 #include <util/mathutil.h>
 
@@ -30,14 +30,14 @@ static const cm_ramp_setpoint CM_RAMP_DARK_PTS[] =
 };
 static const cm_ramp CM_RAMP_DARK = { CM_RAMP_DARK_PTS, SDL_arraysize(CM_RAMP_DARK_PTS) };
 
-static const cm_ramp_setpoint CM_RAMP_HALF_DARK_PTS[] =
+static const cm_ramp_setpoint CM_RAMP_TWILIGHT_PTS[] =
 {
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),   0.6f,   256.f},
 	{ CM_GET(   0,    0,    0),   0.6f, FLT_MAX},
 };
-static const cm_ramp CM_RAMP_HALF_DARK = { CM_RAMP_HALF_DARK_PTS, SDL_arraysize(CM_RAMP_HALF_DARK_PTS) };
+static const cm_ramp CM_RAMP_TWILIGHT = { CM_RAMP_TWILIGHT_PTS, SDL_arraysize(CM_RAMP_TWILIGHT_PTS) };
 
 static const cm_ramp_setpoint CM_RAMP_FOG_PTS[] =
 {

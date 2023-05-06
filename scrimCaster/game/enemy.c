@@ -1,11 +1,9 @@
-#include "enemy.h"
+#include <game/enemy.h>
 
-#include "actor.h"
-#include "actorcontainers.h"
+#include <game/actor/actor.h>
+#include <game/actor/actorcontainers.h>
 
-#include "SDL/SDL_assert.h"
-
-//Some basic definitions or somesuch
+// Some basic definitions or somesuch
 ActorVector levelEnemies;
 
 /* Enemy update functions will return a bool

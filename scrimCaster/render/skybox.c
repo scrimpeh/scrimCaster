@@ -1,6 +1,6 @@
 #include <render/skybox.h>
 
-#include <render/colorramp.h>
+#include <render/color/colorramp.h>
 #include <render/render.h>
 #include <render/gfxloader.h>
 

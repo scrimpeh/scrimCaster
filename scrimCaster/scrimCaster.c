@@ -1,7 +1,7 @@
 #include <scrimCaster.h>
 
 #include <cleanup.h>
-#include <game.h>
+#include <game/game.h>
 #include <init.h>
 #include <input/input.h>
 #include <input/mouselook.h>

@@ -4,9 +4,9 @@
 
 // Responsible for drawing the map
 
-#include <actor.h>
+#include <game/actor/actor.h>
 #include <geometry.h>
-#include <render/colormap.h>
+#include <render/color/colormap.h>
 
 #include <SDL/SDL_video.h>
 

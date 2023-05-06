@@ -1,10 +1,10 @@
 #include <render/automap.h>
 
-#include <camera.h>
-#include <enemy.h>
+#include <game/actor/player.h>
+#include <game/camera.h>
+#include <game/enemy.h>
 #include <input/input.h>
 #include <map/map.h>
-#include <player.h>
 #include <render/render.h>
 #include <render/renderutil.h>
 #include <render/skybox.h>

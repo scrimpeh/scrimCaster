@@ -1,10 +1,10 @@
-#include "renderdebug.h"
+#include <render/renderdebug.h>
 
-#include "colormap.h"
-#include "renderutil.h"
-#include "ttf.h"
+#include <render/color/colormap.h>
+#include <render/renderutil.h>
+#include <render/ttf.h>
 
-#include "SDL/SDL_ttf.h"
+#include <SDL/SDL_ttf.h>
 
 #define RD_BUF_SIZE 1024
 #define RD_BUF_VAL_SIZE 256

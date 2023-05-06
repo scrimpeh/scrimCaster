@@ -2,7 +2,7 @@
 
 #include <common.h>
 
-#include <actorcontainers.h>
+#include <game/actor/actorcontainers.h>
 #include <map/cell.h>
 
 typedef struct

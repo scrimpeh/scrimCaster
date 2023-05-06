@@ -1,6 +1,6 @@
-#include <actor.h>
+#include <game/actor/actor.h>
 
-#include <actorcontainers.h>
+#include <game/actor/actorcontainers.h>
 #include <map/map.h>
 #include <render/renderconstants.h>
 

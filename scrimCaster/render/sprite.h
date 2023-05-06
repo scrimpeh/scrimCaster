@@ -2,8 +2,8 @@
 
 #include <common.h>
 
-#include <actor.h>
-#include <actorcontainers.h>
+#include <game/actor/actor.h>
+#include <game/actor/actorcontainers.h>
 
 #include <SDL/SDL_surface.h>
 

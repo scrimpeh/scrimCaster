@@ -1,7 +1,7 @@
 #include <render/sprite.h>
 
 #include <map/map.h>
-#include <render/colorramp.h>
+#include <render/color/colorramp.h>
 #include <render/lighting/lighting.h>
 #include <render/renderconstants.h>
 #include <util/mathutil.h>

@@ -3,7 +3,7 @@
 #include <common.h>
 
 #include <map/cell.h>
-#include <render/colormap.h>
+#include <render/color/colormap.h>
 
 typedef enum
 {

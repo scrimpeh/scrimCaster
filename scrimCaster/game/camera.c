@@ -1,6 +1,6 @@
-#include <camera.h>
+#include <game/camera.h>
 
-#include <actor.h>
+#include <game/actor/actor.h>
 #include <input/input.h>
 #include <render/render.h>
 #include <render/scan.h>

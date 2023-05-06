@@ -1,10 +1,10 @@
 #include <render/scan.h>
 
-#include <camera.h>
+#include <game/camera.h>
 #include <geometry.h>
 #include <map/map.h>
-#include <render/colormap.h>
-#include <render/colorramp.h>
+#include <render/color/colormap.h>
+#include <render/color/colorramp.h>
 #include <render/lighting/lighting.h>
 #include <render/render.h>
 #include <render/renderconstants.h>

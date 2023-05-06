@@ -1,6 +1,6 @@
 #include <render/render.h>
 
-#include <camera.h>
+#include <game/camera.h>
 #include <input/input.h>
 #include <render/automap.h>
 #include <render/lighting/lighting.h>

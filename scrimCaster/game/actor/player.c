@@ -1,4 +1,4 @@
-#include <player.h>
+#include <game/actor/player.h>
 
 #include <input/input.h>
 #include <map/map.h>

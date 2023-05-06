@@ -1,7 +1,7 @@
 #include <input/mouselook.h>
 
-#include <actor.h>
-#include <game.h>
+#include <game/actor/actor.h>
+#include <game/game.h>
 
 float mouselook_sensitivity = 3.0;
 bool mouselook_enable = false;

@@ -2,7 +2,7 @@
 
 #include <common.h>
 
-#include <actor.h>
+#include <game/actor/actor.h>
 #include <geometry.h>
 #include <map/cell.h>
 

@@ -38,6 +38,32 @@ m_side* m_get_side(u16 x, u16 y, m_orientation o)
 	return m_cell_get_side(m_get_cell(x, y), o);
 }
 
+m_side* m_get_side_from_id(m_side_id id)
+{
+	return m_cell_get_side(m_get_cell(id.x, id.y), id.orientation);
+}
+
+m_side* m_get_opposite_side(u16 x, u16 y, m_orientation o)
+{
+	switch (o)
+	{
+	case M_EAST:  return x == m_map.w - 1 ? NULL : m_get_side(x + 1, y, M_WEST);
+	case M_NORTH: return y == 0 ?           NULL : m_get_side(x, y - 1, M_SOUTH);
+	case M_WEST:  return x == 0 ?           NULL : m_get_side(x - 1, y, M_EAST);
+	case M_SOUTH: return y == m_map.h - 1 ? NULL : m_get_side(x, y + 1, M_NORTH);
+	default:
+		SDL_assert(!"Invalid side!");
+		return NULL;
+	}
+}
+
+
+m_cell* m_get_next_cell(u16 x, u16 y, m_orientation o)
+{
+	return m_get_cell(m_get_next_x(x, o), m_get_next_y(y, o));
+}
+
+
 void m_load()
 {
 	u8 i, j, n;
@@ -146,9 +172,9 @@ void m_load()
 		cells[7][1].n.type = 6;
 		cells[7][1].n.flags = DOOR_V;
 		cells[7][1].n.door.state = 0;
-		cells[7][1].n.door.openspeed = 1;
+		cells[7][1].n.door.openspeed = 12;
 		cells[7][1].n.door.staytime = 12;
-		cells[7][1].n.door.closespeed = 1;
+		cells[7][1].n.door.closespeed = 12;
 		cells[7][1].n.door.door_flags = PLAYER_ACTIVATE;
 		cells[7][1].n.tag = cells[6][1].s.tag;
 		cells[7][1].n.target = cells[6][1].s.tag;
@@ -187,7 +213,7 @@ void m_load()
 
 		_m_flood_fill(0, 0, _m_flood_fill_cb_ceil, 7);
 		_m_flood_fill(0, 0, _m_flood_fill_cb_floor, 8);
-		_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 50);
+		_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 100);
 
 		{
 			m_side side = { 0 };
@@ -222,7 +248,7 @@ void m_load()
 
 	ActorArray* al = &m_map.levelObjs;
 	ActorArrayMake(al, 5);
-	
+
 	pil.x = 300;
 	pil.y = 100;
 	al->actor[0] = pil;
@@ -230,15 +256,15 @@ void m_load()
 	pil.x = 96;
 	pil.y = 480;
 	al->actor[1] = pil;
-	
+
 	pil.x = 448;
 	pil.y = 320;
 	al->actor[2] = pil;
-	
+
 	pil.x = 448;
 	pil.y = 256;
 	al->actor[3] = pil;
-	
+
 	pil.x = 448;
 	pil.y = 192;
 	al->actor[4] = pil;
@@ -261,7 +287,7 @@ void m_load()
 	z->angle = 90;
 	z->type = DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
-	
+
 	z = SDL_malloc(sizeof(Actor));
 	SDL_memset(z, 0, sizeof(Actor));
 	z->x = 8;
@@ -278,6 +304,12 @@ void m_load()
 	cells[1][3].brightness = 64;
 	cells[3][3].brightness = 64;
 	cells[3][1].brightness = 64;
+
+
+	cells[5][5].brightness = 0;
+
+	cells[8][2].brightness = 128;
+	cells[8][3].brightness = 128;
 	m_create_tags();
 };
 
@@ -316,7 +348,7 @@ static i32 m_create_tags()
 
 	// Allocate space for the tag lists
 	for (u32 i = 1; i <= m_max_tag; i++)
-		if (!(m_tags[i].sides = SDL_malloc(sizeof(m_side*) * m_tags[i].count)))
+		if (!(m_tags[i].sides = SDL_malloc(sizeof(m_side_id*) * m_tags[i].count)))
 			return -2;
 
 	// Now iterate through the map and build the side list for each tag
@@ -334,7 +366,11 @@ static i32 m_create_tags()
 				if (side->tag)
 				{
 					u32 next_tag = side_indices[side->tag]++;
-					m_tags[side->tag].sides[next_tag] = side;
+					m_side_id id;
+					id.x = x,
+					id.y = y;
+					id.orientation = orientation;
+					m_tags[side->tag].sides[next_tag] = id;
 				}
 			}
 		}
@@ -415,28 +451,6 @@ static void _m_flood_fill(u16 x, u16 y, _m_flood_fill_action func, void* data)
 // Sets the given side and the one on the oppsoite side
 static void _m_set_double_sided(u16 x, u16 y, m_orientation orientation, const m_side* side)
 {
-	m_orientation opposite;
-	u16 opposite_x = x;
-	u16 opposite_y = y;
-	switch (orientation)
-	{
-	case M_EAST:
-		opposite = M_WEST;
-		opposite_x++;
-		break;
-	case M_NORTH:
-		opposite = M_SOUTH;
-		opposite_y--;
-		break;
-	case M_WEST:
-		opposite = M_EAST;
-		opposite_x--;
-		break;
-	case M_SOUTH:
-		opposite = M_NORTH;
-		opposite_y++;
-		break;
-	}
 	SDL_memcpy(m_get_side(x, y, orientation), side, sizeof(m_side));
-	SDL_memcpy(m_get_side(opposite_x, opposite_y, opposite), side, sizeof(m_side));
+	SDL_memcpy(m_get_opposite_side(x, y, orientation), side, sizeof(m_side));
 }

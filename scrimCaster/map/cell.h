@@ -119,8 +119,17 @@ typedef struct
 	u32 target;
 } m_cell;
 
-m_cell* m_get_cell(u16 grid_x, u16 grid_y);
-m_side* m_get_side(u16 grid_x, u16 grid_y, m_orientation orientation);
+typedef struct
+{
+	i16 x;
+	i16 y;
+	m_orientation orientation;
+} m_side_id;
+
 m_side* m_cell_get_side(m_cell* cell, m_orientation orientation);
+
+m_orientation m_get_opposite_orientation(m_orientation orientation);
+i16 m_get_next_x(i16 x, m_orientation orientation);
+i16 m_get_next_y(i16 y, m_orientation orientation);
 
 typedef m_side** m_tag_array;

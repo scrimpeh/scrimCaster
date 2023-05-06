@@ -1,5 +1,7 @@
 #include <map/mapupdate.h>
 
+#include <render/lighting/lighting.h>
+
 #define DOOR_SCROLL_MAX (M_CELLHEIGHT - 4)
 #define DOOR_TICKS_PER_SEC 60
 #define PLAYER_HEIGHT 32
@@ -14,7 +16,6 @@ extern u32 m_max_tag;
 
 m_active_tag_list* m_active_tags = NULL;
 
-extern m_map_data m_map;
 
 void mu_update(u32 t_delta)
 {
@@ -61,7 +62,7 @@ void mu_activate_tag(u32 tag)
 
 		m_taglist* sides = m_get_tags(new_tag->tag);
 		for (u32 i = 0; i < sides->count; i++)
-			sides->sides[i]->state = 0;
+			m_get_side_from_id(sides->sides[i])->state = 0;
 	}
 }
 
@@ -80,8 +81,9 @@ void mu_clear()
 	}
 }
 
-static bool mu_update_side(m_side* side, u32 delta)
+static bool mu_update_side(m_side_id id, u32 delta)
 {
+	m_side* side = m_get_side_from_id(id);
 	DoorParams* params = &side->door;
 	const u8 ticks = params->timer_ticks + delta;
 
@@ -93,6 +95,7 @@ static bool mu_update_side(m_side* side, u32 delta)
 	case 0:		// Activated
 		side->flags = (m_side_flags)(side->flags | DOOR_OPEN);
 		params->timer_ticks = 0;
+		r_light_update(id.x - 1, id.y - 1, id.x + 1, id.y + 1);
 		++side->state;
 		return false;
 	case 1:		// Opening
@@ -117,7 +120,6 @@ static bool mu_update_side(m_side* side, u32 delta)
 		return false;
 	case 2:		//stay open
 		params->timer_staycounter -= delta;
-
 		if (params->timer_staycounter <= 0)
 			++side->state;
 		return false;
@@ -133,6 +135,7 @@ static bool mu_update_side(m_side* side, u32 delta)
 			side->flags = (m_side_flags)(side->flags & DOOR_CLOSED);
 			params->scroll = 0;
 			++side->state;
+			r_light_update(id.x - 1, id.y - 1, id.x + 1, id.y + 1);
 			return false;
 		}
 		return false;

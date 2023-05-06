@@ -48,7 +48,7 @@ i32 r_init(u16 w, u16 h)
 		return -1;
 	}
 
-	if (r_light_init(R_LIGHT_SMOOTH))
+	if (r_light_init(R_LIGHT_SMOOTH_FINE))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize lighting! %s", SDL_GetError());
 		return -1;

@@ -27,7 +27,7 @@ typedef struct
 
 typedef struct
 {
-	m_side** sides;
+	m_side_id* sides;
 	u32 count;
 } m_taglist;
 
@@ -38,6 +38,10 @@ extern m_map_data m_map;
 
 m_cell* m_get_cell(u16 x, u16 y);
 m_side* m_get_side(u16 x, u16 y, m_orientation o);
+m_side* m_get_opposite_side(u16 x, u16 y, m_orientation o);
+m_cell* m_get_next_cell(u16 x, u16 y, m_orientation o);
+m_side* m_get_side_from_id(m_side_id id);
+
 m_taglist* m_get_tags(u32 target);
 
 static i32 m_create_tags();

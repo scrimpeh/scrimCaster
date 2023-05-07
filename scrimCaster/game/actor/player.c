@@ -5,7 +5,7 @@
 #include <map/mapupdate.h>
 #include <util/mathutil.h>
 
-Actor player;
+ac_actor player;
 
 bool noclip = false;
 
@@ -28,7 +28,7 @@ static g_intercept player_fire_intercept;
 void player_spawn()
 {
 	watch_add_new(3, WCH_F64, "x: ", &player.x, WCH_F64, ", y: ", &player.y, WCH_F64, ", angle: ", &player.angle);
-	player.type = PLAYER;
+	player.type = AC_PLAYER;
 	player.x = 50;
 	player.y = 50;
 	player.angle = 0;
@@ -94,7 +94,7 @@ void player_update(u32 delta)
 	player.strafe = accel_strafe * delta;
 
 	u32 moveFlags = noclip ? 0 : 3;
-	MoveActor(&player, delta, moveFlags);
+	ac_move(&player, delta, moveFlags);
 }
 
 static inline void player_set_movement(u32 delta)

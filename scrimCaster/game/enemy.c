@@ -10,21 +10,21 @@ ActorVector levelEnemies;
  * indicating whether or not they have disappeared for the map.
  * In most cases, this should be FALSE 
  */
-static bool UpdateZeroEnemy(u32 timeStep, Actor* a)
+static bool UpdateZeroEnemy(u32 timeStep, ac_actor* a)
 {
 	return false;
 }
 
-static bool UpdateDummyEnemy(u32 timeStep, Actor* a)
+static bool UpdateDummyEnemy(u32 timeStep, ac_actor* a)
 {
-	if (MoveActor(a, timeStep, 3))
+	if (ac_move(a, timeStep, 3))
 	{
 		a->speed *= -1;
 	}
 	return false;
 }
 
-static bool (*update_enemy_functions[])(u32, Actor*) =
+static bool (*update_enemy_functions[])(u32, ac_actor*) =
 {
 	UpdateZeroEnemy,
 	UpdateDummyEnemy
@@ -35,7 +35,7 @@ void UpdateEnemies(u32 timeStep)
 	u32 remove_count = 0;
 	for (u32 i = 0; i < levelEnemies.count; ++i)
 	{
-		Actor* cur_enemy = levelEnemies.content[i];
+		ac_actor* cur_enemy = levelEnemies.content[i];
 
 		if (update_enemy_functions[cur_enemy->type](timeStep, cur_enemy))
 		{

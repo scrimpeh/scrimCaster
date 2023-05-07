@@ -7,7 +7,7 @@
 
 const u8 VIEWPORT_FOV_MIN = 20;
 const u8 VIEWPORT_FOV_MAX = 170;
-extern Actor player;
+extern ac_actor player;
 
 float viewport_angle;
 float viewport_x;

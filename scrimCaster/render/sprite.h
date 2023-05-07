@@ -11,7 +11,7 @@
 
 typedef struct
 {
-	const Actor* actor;
+	const ac_actor* actor;
 	double distance;
 	double angle;
 } ActorSprite;
@@ -48,7 +48,7 @@ typedef struct
 	const ActorFrameSheet *animation_frames;
 } ActorSpriteSheet;
 
-static inline bool ActorOnScreen(const Actor* actor, u32* ds_index);
+static inline bool ActorOnScreen(const ac_actor* actor, u32* ds_index);
 static void PopulateSpriteBufferList(const ActorList* actors, u32* ds_index);
 static void PopulateSpriteBufferArray(const ActorArray* actors, u32* ds_index);
 static inline WorldSprite GetWorldSprite(const ActorSprite* a);

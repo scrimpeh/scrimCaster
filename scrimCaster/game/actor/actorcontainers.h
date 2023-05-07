@@ -10,12 +10,12 @@
 typedef struct
 {
 	u32 count;
-	Actor* actor;
+	ac_actor* actor;
 } ActorArray;
 
 typedef struct ActorNode
 {
-	Actor* content;
+	ac_actor* content;
 	struct ActorNode* next;
 	struct ActorNode* prev;
 } ActorNode;
@@ -29,15 +29,15 @@ typedef struct
 
 typedef struct
 {
-	Actor** content;
+	ac_actor** content;
 	u32 count, capacity;
 } ActorVector;
 
-//Actor List function
+// Actor List function
 void ActorListMake(ActorList* al, u32 capacity);
 void ActorListDestroy(ActorList* al);
-Actor* ActorListNew(ActorList* al);
-bool ActorListRemove(ActorList* al, Actor* a);
+ac_actor* ActorListNew(ActorList* al);
+bool ActorListRemove(ActorList* al, ac_actor* a);
 ActorNode* ActorListDrop(ActorList* al, ActorNode* an);
 
 void ActorArrayMake(ActorArray* a, u32 count);
@@ -46,4 +46,4 @@ void ActorArrayDestroy(ActorArray* a);
 void ActorVectorMake(ActorVector* av, u32 capacity);
 void ActorVectorDestroy(ActorVector* av);
 void ActorVectorClear(ActorVector* av);
-Actor* ActorVectorAdd(ActorVector* av, Actor* a);
+ac_actor* ActorVectorAdd(ActorVector* av, ac_actor* a);

@@ -7,7 +7,7 @@ float mouselook_sensitivity = 3.0;
 bool mouselook_enable = false;
 bool mouselook_is_suspended = true; 
 
-extern Actor player;
+extern ac_actor player;
 
 void mouselook_suspend(bool suspend)
 {

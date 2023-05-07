@@ -243,8 +243,8 @@ void m_load()
 		cells[3 - 1][3 + 1].brightness = 0;
 	}
 
-	Actor pil;
-	pil.type = PILLAR;
+	ac_actor pil = { 0 };
+	pil.type = AC_PILLAR;
 
 	ActorArray* al = &m_map.levelObjs;
 	ActorArrayMake(al, 5);
@@ -270,31 +270,31 @@ void m_load()
 	al->actor[4] = pil;
 
 	ActorVectorMake(&levelEnemies, 32);
-	Actor* z = SDL_malloc(sizeof(Actor));
-	SDL_memset(z, 0, sizeof(Actor));
+	ac_actor* z = SDL_malloc(sizeof(ac_actor));
+	SDL_memset(z, 0, sizeof(ac_actor));
 	z->x = 300;
 	z->y = 200;
 	z->speed = 0.5;
 	z->angle = 90;
-	z->type = DUMMY_ENEMY;
+	z->type = AC_DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
-	z = SDL_malloc(sizeof(Actor));
-	SDL_memset(z, 0, sizeof(Actor));
+	z = SDL_malloc(sizeof(ac_actor));
+	SDL_memset(z, 0, sizeof(ac_actor));
 	z->x = 400;
 	z->y = 200;
 	z->speed = 0.5;
 	z->angle = 90;
-	z->type = DUMMY_ENEMY;
+	z->type = AC_DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
-	z = SDL_malloc(sizeof(Actor));
-	SDL_memset(z, 0, sizeof(Actor));
+	z = SDL_malloc(sizeof(ac_actor));
+	SDL_memset(z, 0, sizeof(ac_actor));
 	z->x = 8;
 	z->y = 200;
 	z->speed = 0.5;
 	z->angle = 90;
-	z->type = DUMMY_ENEMY;
+	z->type = AC_DUMMY_ENEMY;
 	//ActorVectorAdd(&levelEnemies, z);
 
 	//cells = SDL_malloc(sizeof(m_cell) * 32 * 32);

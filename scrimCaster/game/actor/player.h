@@ -5,7 +5,7 @@
 #include <game/actor/actor.h>
 #include <geometry.h>
 
-extern Actor player;
+extern ac_actor player;
 
 void player_spawn();
 void player_update(u32 delta);

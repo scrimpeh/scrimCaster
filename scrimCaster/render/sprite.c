@@ -139,13 +139,13 @@ void spr_draw(SDL_Surface* target)
 
 static inline WorldSprite GetWorldSprite(const ActorSprite* a)
 {
-	const u32 spr_i = GetActorSpriteIndex(a->actor->type);
+	const u32 spr_i = ac_get_frame(a->actor->type, a->actor->frame);
 	const ActorSpriteSheet actorSprites = spriteSheets[spr_i];
 	const ActorFrameSheet *actorFrames = actorSprites.animation_frames;
 	return actorFrames->sprites[0];
 }
 
-static inline bool ActorOnScreen(const Actor* actor, u32* ds_index)
+static inline bool ActorOnScreen(const ac_actor* actor, u32* ds_index)
 {
 	// 1.If sprite in back 180° skip it, it can't possibly be seen
 	// 2.If the sprite is in the view fov, draw it, it's definitely seen
@@ -245,7 +245,7 @@ static void PopulateSpriteBufferArray(const ActorArray* actors, u32 *ds_index)
 	if (*ds_index >= MAX_SPRITES) 
 		return;
 
-	const Actor* act;
+	const ac_actor* act;
 	for (u32 i = 0; i < actors->count; ++i)
 	{
 		act = &actors->actor[i];

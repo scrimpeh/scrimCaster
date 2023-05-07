@@ -10,7 +10,7 @@
 #include <render/skybox.h>
 
 
-// Cap the automap to the bounds of the map and inside this zone.
+// Cap the automap to the # of the map and inside this zone.
 #define AM_MARIGN (2 * M_CELLSIZE)
 
 // If am_foölow is false, center the map around the this point, otherwise,
@@ -144,10 +144,10 @@ static void am_draw_map(SDL_Surface* target)
 			am_draw_cell(target, x, y);
 }
 
-void am_draw_actor(SDL_Surface* target, Actor* actor)
+void am_draw_actor(SDL_Surface* target, ac_actor* actor)
 {
 	// Cast two rays showing FOV for the player
-	if (actor->type == PLAYER)
+	if (actor->type == AC_PLAYER)
 	{
 		const angle_d angle_l = angle_normalize_deg_d(player.angle + (viewport_x_fov / 2.));
 		const angle_d angle_r = angle_normalize_deg_d(player.angle - (viewport_x_fov / 2.));
@@ -168,13 +168,13 @@ void am_draw_actor(SDL_Surface* target, Actor* actor)
 		r_draw_line(target, am_map_h(actor->x), am_map_v(actor->y), intersect_r_x, intersect_r_y, CM_GET(0xFF, 0xFF, 0xFF));
 	}
 
-	const Bounds bounds = GetActorBounds(actor->type);
+	const ac_bounds bounds = ac_get_bounds(actor->type);
 	SDL_Rect r;
-	r.x = am_map_h(actor->x - bounds.x);
-	r.y = am_map_v(actor->y - bounds.y);
-	r.w = am_map_distance(bounds.x * 2);
-	r.h = am_map_distance(bounds.y * 2);
-	SDL_FillRect(target, &r, actor->type == PLAYER ? CM_GET(255, 255, 0) : CM_GET(255, 0, 255));
+	r.x = am_map_h(actor->x - bounds.w);
+	r.y = am_map_v(actor->y - bounds.h);
+	r.w = am_map_distance(bounds.w * 2);
+	r.h = am_map_distance(bounds.h * 2);
+	SDL_FillRect(target, &r, actor->type == AC_PLAYER ? CM_GET(255, 255, 0) : CM_GET(255, 0, 255));
 }
 
 void am_draw_actors(SDL_Surface* target)

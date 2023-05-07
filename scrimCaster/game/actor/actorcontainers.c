@@ -25,12 +25,12 @@ void ActorListDestroy(ActorList* al)
 }
 
 //Adds a new actor to the list and returns it for editing
-Actor* ActorListNew(ActorList* al)
+ac_actor* ActorListNew(ActorList* al)
 {
 	if (al->count >= al->capacity)
 		return NULL;
 
-	Actor* a = SDL_malloc(sizeof(Actor));
+	ac_actor* a = SDL_malloc(sizeof(ac_actor));
 	ActorNode* an = SDL_malloc(sizeof(ActorNode));
 	an->content = a;
 	an->next = NULL;
@@ -44,7 +44,7 @@ Actor* ActorListNew(ActorList* al)
 	return a;
 }
 
-bool ActorListRemove(ActorList* al, Actor* a)
+bool ActorListRemove(ActorList* al, ac_actor* a)
 {
 	// Removal not implemented yet
 	return false;
@@ -76,7 +76,7 @@ ActorNode* ActorListDrop(ActorList* al, ActorNode* an)
 
 void ActorArrayMake(ActorArray* a, u32 count)
 {
-	a->actor = (Actor*)SDL_calloc(count, sizeof(Actor));
+	a->actor = (ac_actor*)SDL_calloc(count, sizeof(ac_actor));
 	a->count = count;
 }
 
@@ -88,7 +88,7 @@ void ActorArrayDestroy(ActorArray* a)
 
 void ActorVectorMake(ActorVector* av, u32 capacity)
 {
-	av->content = (Actor**)SDL_calloc(capacity, sizeof(void*));
+	av->content = (ac_actor**)SDL_calloc(capacity, sizeof(void*));
 	av->count = 0;
 	av->capacity = av->content ? capacity : 0;
 }
@@ -105,13 +105,13 @@ void ActorVectorClear(ActorVector* av)
 {
 	for (u32 i = 0; i < av->count; ++i)
 	{
-		Actor* a = av->content[i];
+		ac_actor* a = av->content[i];
 		SDL_free(a);
 	}
 	av->count = 0;
 }
 
-Actor* ActorVectorAdd(ActorVector* av, Actor* a)
+ac_actor* ActorVectorAdd(ActorVector* av, ac_actor* a)
 {
 	if (av->count < av->capacity)
 	{

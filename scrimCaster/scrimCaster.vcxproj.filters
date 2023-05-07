@@ -136,9 +136,6 @@
     <ClInclude Include="game\camera.h">
       <Filter>Source Files\game</Filter>
     </ClInclude>
-    <ClInclude Include="game\enemy.h">
-      <Filter>Source Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="game\game.h">
       <Filter>Source Files\game</Filter>
     </ClInclude>
@@ -150,6 +147,12 @@
     </ClInclude>
     <ClInclude Include="game\actor\player.h">
       <Filter>Source Files\game\actor</Filter>
+    </ClInclude>
+    <ClInclude Include="map\mapobject.h">
+      <Filter>Source Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="game\gameobjects.h">
+      <Filter>Source Files\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -246,9 +249,6 @@
     <ClCompile Include="game\camera.c">
       <Filter>Source Files\game</Filter>
     </ClCompile>
-    <ClCompile Include="game\enemy.c">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
     <ClCompile Include="game\game.c">
       <Filter>Source Files\game</Filter>
     </ClCompile>
@@ -260,6 +260,18 @@
     </ClCompile>
     <ClCompile Include="game\actor\player.c">
       <Filter>Source Files\game\actor</Filter>
+    </ClCompile>
+    <ClCompile Include="game\actor\actorlogic.h">
+      <Filter>Source Files\game\actor</Filter>
+    </ClCompile>
+    <ClCompile Include="game\actor\actorlogic.c">
+      <Filter>Source Files\game\actor</Filter>
+    </ClCompile>
+    <ClCompile Include="map\mapobject.c">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="game\gameobjects.c">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

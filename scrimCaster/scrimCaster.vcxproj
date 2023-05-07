@@ -333,8 +333,9 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="game\actor\actorcontainers.h" />
     <ClInclude Include="game\actor\player.h" />
     <ClInclude Include="game\camera.h" />
-    <ClInclude Include="game\enemy.h" />
     <ClInclude Include="game\game.h" />
+    <ClInclude Include="game\gameobjects.h" />
+    <ClInclude Include="map\mapobject.h" />
     <ClInclude Include="render\automap.h" />
     <ClInclude Include="map\cell.h" />
     <ClInclude Include="cleanup.h" />
@@ -370,10 +371,13 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="angle.c" />
     <ClCompile Include="game\actor\actor.c" />
     <ClCompile Include="game\actor\actorcontainers.c" />
+    <ClCompile Include="game\actor\actorlogic.c" />
+    <ClCompile Include="game\actor\actorlogic.h" />
     <ClCompile Include="game\actor\player.c" />
     <ClCompile Include="game\camera.c" />
-    <ClCompile Include="game\enemy.c" />
     <ClCompile Include="game\game.c" />
+    <ClCompile Include="game\gameobjects.c" />
+    <ClCompile Include="map\mapobject.c" />
     <ClCompile Include="render\automap.c" />
     <ClCompile Include="map\cell.c" />
     <ClCompile Include="cleanup.c" />

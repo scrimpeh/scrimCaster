@@ -1,6 +1,7 @@
 #include <init.h>
 
-#include <camera.h>
+#include <game/camera.h>
+#include <game/game.h>
 #include <input/input.h>
 #include <input/mouselook.h>
 #include <map/map.h>
@@ -57,6 +58,7 @@ i32 InitGame(i32 argc, char** argv)
 	}
 
 	m_load();
+	game_init();
 	input_init();
 	mouselook_set_properties(true, 2.0);
 	SetViewportFov(90);

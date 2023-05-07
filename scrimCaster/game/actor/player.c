@@ -1,11 +1,10 @@
 #include <game/actor/player.h>
 
+#include <game/gameobjects.h>
 #include <input/input.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
 #include <util/mathutil.h>
-
-ac_actor player;
 
 bool noclip = false;
 
@@ -24,23 +23,23 @@ static g_intercept player_use_intercept;
 static bool player_fire_has_intercept;
 static g_intercept player_fire_intercept;
 
-
-void player_spawn()
+void player_make(ac_actor* ac, m_obj* obj)
 {
-	watch_add_new(3, WCH_F64, "x: ", &player.x, WCH_F64, ", y: ", &player.y, WCH_F64, ", angle: ", &player.angle);
-	player.type = AC_PLAYER;
-	player.x = 50;
-	player.y = 50;
-	player.angle = 0;
+	watch_add_new(3, WCH_F64, "x: ", &ac->x, WCH_F64, ", y: ", &ac->y, WCH_F64, ", angle: ", &ac->angle);
+	ac->type = obj->type;
+	ac->x = obj->x;
+	ac->y = obj->y;
+	ac->angle = obj->angle;
 }
 
 static void player_use()
 {
+	const ac_actor* player = ac_get_player();
 	player_use_has_intercept = false;
-	g_cast(player.x, player.y, TO_RADF(player.angle), player_use_check_intercept);
+	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept);
 	if (player_use_has_intercept)
 	{
-		const float distance = math_dist_f(player.x, player.y, player_use_intercept.x, player_use_intercept.y);
+		const float distance = math_dist_f(player->x, player->y, player_use_intercept.x, player_use_intercept.y);
 		if (distance < USELENGTH)
 		{
 			m_side* side = m_get_side(player_use_intercept.map_x, player_use_intercept.map_y, player_use_intercept.orientation);
@@ -60,12 +59,13 @@ static bool player_use_check_intercept(const g_intercept* intercept)
 
 static void player_fire()
 {
-	// Here be some weapon specific code, but for now, let's just draw a line and see what we hit
+	const ac_actor* player = ac_get_player();
 
+	// Here be some weapon specific code, but for now, let's just draw a line and see what we hit
 	// One: Trace a ray between the player and the nearest wall
 	// Two: Check if any one sprite could have been hit
 	player_use_has_intercept = false;
-	g_cast(player.x, player.y, TO_RADF(player.angle), player_use_check_intercept);
+	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept);
 	if (player_use_has_intercept)
 	{
 		// ...
@@ -81,7 +81,7 @@ static bool player_shoot_check_intercept(const g_intercept* intercept)
 }
 
 
-void player_update(u32 delta)
+bool player_update(ac_actor* ac, u32 delta)
 {
 	player_set_movement(delta);
 
@@ -90,19 +90,23 @@ void player_update(u32 delta)
 	if (input_tf.fire) 
 		player_fire();
 
-	player.speed = accel_forward * delta;
-	player.strafe = accel_strafe * delta;
+	ac->speed = accel_forward * delta;
+	ac->strafe = accel_strafe * delta;
 
-	u32 moveFlags = noclip ? 0 : 3;
-	ac_move(&player, delta, moveFlags);
+	const u32 flags = noclip ? 0 : (AC_MOVE_COLLIDE_WALL | AC_MOVE_COLLIDE_ACTOR);
+	ac_move(ac, delta, flags);
+
+	// The player may never disappear from the map
+	return false;
 }
 
 static inline void player_set_movement(u32 delta)
 {
+	ac_actor* player = ac_get_player();
 	if (input.turn_left)
-		player.angle += TURNSPEED * delta;
+		player->angle += TURNSPEED * delta;
 	if (input.turn_right)
-		player.angle -= TURNSPEED * delta;
+		player->angle -= TURNSPEED * delta;
 
 	if (input.forward)
 	{

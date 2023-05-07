@@ -1,8 +1,8 @@
 #include <render/automap.h>
 
-#include <game/actor/player.h>
+#include <game/actor/actorcontainers.h>
 #include <game/camera.h>
-#include <game/enemy.h>
+#include <game/gameobjects.h>
 #include <input/input.h>
 #include <map/map.h>
 #include <render/render.h>
@@ -48,8 +48,9 @@ void am_draw(SDL_Surface* target)
 
 	am_cell_size = (1.0 / 16) * am_zoom;
 
-	am_x = am_follow ? player.x : am_center_x;
-	am_y = am_follow ? player.y : am_center_y;
+	const ac_actor* player = ac_get_player();
+	am_x = am_follow ? player->x : am_center_x;
+	am_y = am_follow ? player->y : am_center_y;
 
 	const float viewport_ratio = (float) viewport_w / viewport_h;
 	const float am_margin_zoom = AM_MARIGN / am_zoom;
@@ -149,18 +150,19 @@ void am_draw_actor(SDL_Surface* target, ac_actor* actor)
 	// Cast two rays showing FOV for the player
 	if (actor->type == AC_PLAYER)
 	{
-		const angle_d angle_l = angle_normalize_deg_d(player.angle + (viewport_x_fov / 2.));
-		const angle_d angle_r = angle_normalize_deg_d(player.angle - (viewport_x_fov / 2.));
+		const ac_actor* player = ac_get_player();
+		const angle_d angle_l = angle_normalize_deg_d(player->angle + (viewport_x_fov / 2.));
+		const angle_d angle_r = angle_normalize_deg_d(player->angle - (viewport_x_fov / 2.));
 
 		double intersect_l_x;
 		double intersect_l_y;
-		g_cast(player.x, player.y, TO_RADF(angle_l), am_collect_intercept);
+		g_cast(player->x, player->y, TO_RADF(angle_l), am_collect_intercept);
 		intersect_l_x = am_map_h(r_map_intercept_x);
 		intersect_l_y = am_map_v(r_map_intercept_y);
 
 		double intersect_r_x;
 		double intersect_r_y;
-		g_cast(player.x, player.y, TO_RADF(angle_r), am_collect_intercept);
+		g_cast(player->x, player->y, TO_RADF(angle_r), am_collect_intercept);
 		intersect_r_x = am_map_h(r_map_intercept_x);
 		intersect_r_y = am_map_v(r_map_intercept_y);
 
@@ -179,12 +181,12 @@ void am_draw_actor(SDL_Surface* target, ac_actor* actor)
 
 void am_draw_actors(SDL_Surface* target)
 {
-	am_draw_actor(target, &player);
-
-	for (u32 i = 0; i < m_map.levelObjs.count; i++)
-		am_draw_actor(target, &m_map.levelObjs.actor[i]);
-	for (u32 i = 0; i < m_map.levelEnemies.count; i++)
-		am_draw_actor(target, &m_map.levelEnemies.actor[i]);
+	ac_list_node* cur = ac_actors.first;
+	while (cur)
+	{
+		am_draw_actor(target, &cur->actor);
+		cur = cur->next;
+	}
 }
 
 static bool am_collect_intercept(const g_intercept* intercept)

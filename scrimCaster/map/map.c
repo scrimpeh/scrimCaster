@@ -1,6 +1,7 @@
 #include <map/map.h>
 
 #include <game/actor/actor.h>
+#include <map/mapobject.h>
 #include <map/mapupdate.h>
 #include <render/gfxloader.h>
 #include <render/texture.h>
@@ -19,9 +20,18 @@ m_map_data m_map;
 
 const char* tx_sets[] = { "test.png" };
 
-extern ActorVector levelEnemies;
 
-m_cell cells[16][16];
+static m_cell cells[16][16];
+
+static const m_obj objects[] =
+{
+	{ AC_PLAYER, 50,  50,  0 },
+	{ AC_PILLAR, 300, 100, 0 },
+	{ AC_PILLAR, 96,  480, 0 },
+	{ AC_PILLAR, 448, 320, 0 },
+	{ AC_PILLAR, 448, 256, 0 },
+	{ AC_PILLAR, 448, 192, 0 }
+};
 
 u32 m_max_tag;
 m_taglist* m_tags;
@@ -57,12 +67,10 @@ m_side* m_get_opposite_side(u16 x, u16 y, m_orientation o)
 	}
 }
 
-
 m_cell* m_get_next_cell(u16 x, u16 y, m_orientation o)
 {
 	return m_get_cell(m_get_next_x(x, o), m_get_next_y(y, o));
 }
-
 
 void m_load()
 {
@@ -71,6 +79,8 @@ void m_load()
 	m_map.w = 16;
 	m_map.h = 16;
 	m_map.cells = cells[0];
+	m_map.objects = &objects[0];
+	m_map.obj_count = 6;
 	m_map.info.texture_set_count = 1;
 	m_map.info.texture_sets = tx_sets;
 	m_map.info.sky = 0;
@@ -243,62 +253,8 @@ void m_load()
 		cells[3 - 1][3 + 1].brightness = 0;
 	}
 
-	ac_actor pil = { 0 };
-	pil.type = AC_PILLAR;
 
-	ActorArray* al = &m_map.levelObjs;
-	ActorArrayMake(al, 5);
 
-	pil.x = 300;
-	pil.y = 100;
-	al->actor[0] = pil;
-
-	pil.x = 96;
-	pil.y = 480;
-	al->actor[1] = pil;
-
-	pil.x = 448;
-	pil.y = 320;
-	al->actor[2] = pil;
-
-	pil.x = 448;
-	pil.y = 256;
-	al->actor[3] = pil;
-
-	pil.x = 448;
-	pil.y = 192;
-	al->actor[4] = pil;
-
-	ActorVectorMake(&levelEnemies, 32);
-	ac_actor* z = SDL_malloc(sizeof(ac_actor));
-	SDL_memset(z, 0, sizeof(ac_actor));
-	z->x = 300;
-	z->y = 200;
-	z->speed = 0.5;
-	z->angle = 90;
-	z->type = AC_DUMMY_ENEMY;
-	//ActorVectorAdd(&levelEnemies, z);
-
-	z = SDL_malloc(sizeof(ac_actor));
-	SDL_memset(z, 0, sizeof(ac_actor));
-	z->x = 400;
-	z->y = 200;
-	z->speed = 0.5;
-	z->angle = 90;
-	z->type = AC_DUMMY_ENEMY;
-	//ActorVectorAdd(&levelEnemies, z);
-
-	z = SDL_malloc(sizeof(ac_actor));
-	SDL_memset(z, 0, sizeof(ac_actor));
-	z->x = 8;
-	z->y = 200;
-	z->speed = 0.5;
-	z->angle = 90;
-	z->type = AC_DUMMY_ENEMY;
-	//ActorVectorAdd(&levelEnemies, z);
-
-	//cells = SDL_malloc(sizeof(m_cell) * 32 * 32);
-	//SDL_assert(cells);
 	cells[0][0].brightness = 64;
 	cells[1][1].brightness = 64;
 	cells[1][3].brightness = 64;
@@ -315,12 +271,9 @@ void m_load()
 
 void m_unload()
 {
-	ActorArrayDestroy(&m_map.levelObjs);
-	ActorVectorDestroy(&levelEnemies);
 	mu_clear();
 	m_destroy_tags();
 	tx_unload();
-	//SDL_free(cells);
 };
 
 static i32 m_create_tags()

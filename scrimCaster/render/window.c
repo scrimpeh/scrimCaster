@@ -21,7 +21,7 @@ i32 win_y = SDL_WINDOWPOS_UNDEFINED;
 u32 win_mode = SDL_WINDOW_SHOWN;
 
 extern bool suspend_mouselook;
-extern bool inMenu;
+extern bool game_menu;
 
 extern SDL_Surface* r_surface_win;
 
@@ -39,7 +39,7 @@ void win_process_event(const SDL_Event* evt)
 	switch (evt->window.event)
 	{
 	case SDL_WINDOWEVENT_FOCUS_GAINED:
-		mouselook_suspend(inMenu);
+		mouselook_suspend(game_menu);
 		break;
 	case SDL_WINDOWEVENT_FOCUS_LOST:
 		mouselook_suspend(true);

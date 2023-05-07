@@ -55,6 +55,8 @@ i32 scan_init()
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize Z Buffer! %s", SDL_GetError());
 		return -1;
 	}
+	for (u32 i = 0; i < viewport_w * viewport_h; i++)
+		z_buffer[i] = FLT_MAX;
 
 	return 0;
 }
@@ -82,10 +84,6 @@ static inline bool collect_intercept(const g_intercept* intercept)
 
 void scan_draw(SDL_Surface* target)
 {
-	// Clear Z Buffer
-	for (u64 i = 0; i < (u64) viewport_w * viewport_h; i++)
-		z_buffer[i] = FLT_MAX;
-
 	const float angle_rad = TO_RADF(viewport_angle);
 	for (u16 col = 0; col < viewport_w; col++)
 	{
@@ -153,7 +151,11 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	i32 y_end = viewport_h - y_top;
 
 	if (side->type == TX_SKY)
+	{
 		r_sky_draw(target, col, y_top, y_end, intercept->angle);
+		for (u32 y = y_top; y < y_end; y++)
+			z_buffer[viewport_w * y + col] = FLT_MAX;
+	}
 	else
 	{
 		if (side->flags & DOOR_V)
@@ -195,6 +197,8 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	u32* floor_render_px_top = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
 	u32* floor_render_px_bottom = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
+	float* z_buffer_px_top = z_buffer + ((y_top - 1) * viewport_w) + col;
+	float* z_buffer_px_bottom = z_buffer + ((viewport_h - y_top) * viewport_w) + col;
 
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
@@ -221,6 +225,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			floor_px = cm_ramp_mix(floor_px, d);
 			*floor_render_px_bottom = floor_px;
 		}
+		*z_buffer_px_bottom = d;
 
 		u32 ceil_px = tx_get_point(&cell->ceil, cell_x, cell_y);
 		if (ceil_px == COLOR_KEY)
@@ -231,9 +236,12 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			ceil_px = cm_ramp_mix(ceil_px, d);
 			*floor_render_px_top = ceil_px;
 		}
+		*z_buffer_px_top = d;
 
 		floor_render_px_top -= viewport_w;
 		floor_render_px_bottom += viewport_w;
+		z_buffer_px_top -= viewport_w;
+		z_buffer_px_bottom += viewport_w;
 	}
 }
 

@@ -80,7 +80,6 @@ void r_draw()
 	// Do the rendering pipeline
 	r_show_map = input.map;
 
-
 	// Optional HOM avoidance
 	if (r_draw_background)
 		SDL_FillRect(r_surface_viewport, NULL, COLOR_KEY);

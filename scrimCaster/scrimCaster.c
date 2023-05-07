@@ -18,7 +18,7 @@
 // [X] Infinitely many draw sides
 // [X] Make E/W walls slightly darker than N/S walls
 // [X] Distance fog
-// [ ] Sprite rotation and animation system
+// [X] Sprite rotation and animation system
 // [ ] Sound (?)
 // [ ] Decals (Dynamic and static)
 // [X] Unified, general-purpose ray caster / geometry interceptor

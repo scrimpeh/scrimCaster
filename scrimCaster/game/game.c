@@ -1,13 +1,12 @@
-#include <game.h>
+#include <game/game.h>
 
-#include <actorcontainers.h>
-#include <camera.h>
-#include <enemy.h>
+#include <game/actor/player.h>
+#include <game/camera.h>
+#include <game/gameobjects.h>
 #include <input/input.h>
 #include <input/mouselook.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
-#include <player.h>
 
 // On game Objects:
 /* Do we want a unified Actor system, or break up several types
@@ -53,50 +52,45 @@
 const u32 TIMESTEP_MAX = 128;
 u64 ticks;
 
-ActorList tempEnemies;
-ActorList particles;
-ActorList projectiles;
-
-//Gamestate variables
-bool loadMap = true;
-bool inGame = false;
-bool inMenu = true;
-
-extern input_keys input, input_tf;
+bool game_menu;
 
 void SetMenu(bool open)
 {
 	mouselook_suspend(open);
-	inMenu = open;
+	game_menu = open;
 }
 
-void UpdateGame(u32 timeStep)
+i32 game_init()
+{
+	game_free();
+	ac_load(m_map.objects, m_map.obj_count);
+	SDL_assert(ac_actors.count > 0);
+	SDL_assert(ac_actors.first->actor.type == AC_PLAYER);
+	return 0;
+}
+
+void game_free()
+{
+
+}
+
+void UpdateGame(u32 delta)
 {
 	// Make sure we don't skip too much
-	if (timeStep > TIMESTEP_MAX) 
-		timeStep = TIMESTEP_MAX;
+	if (delta > TIMESTEP_MAX) 
+		delta = TIMESTEP_MAX;
 
-	if (loadMap)
-	{
-		player_spawn();
-		loadMap = false;
-		SetMenu(false);
-		inGame = true;
-		return;
-	}
-
-	if (inMenu)
+	if (game_menu)
 	{
 		if (input_tf.pause)
 			SetMenu(false);
 	}
-	else if (inGame)
+	else
 	{
-		ticks += timeStep;
-		UpdateEnemies(timeStep);
-		mu_update(timeStep);
-		player_update(timeStep);
-		UpdateCamera(timeStep);
+		ticks += delta;
+		mu_update(delta);
+		ac_update_objects(delta);
+		UpdateCamera(delta);
 		
 		if (input_tf.pause)
 			SetMenu(true);

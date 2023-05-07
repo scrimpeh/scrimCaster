@@ -1,17 +1,16 @@
 #include <game/actor/actor.h>
 
 #include <game/actor/actorcontainers.h>
+#include <game/gameobjects.h>
 #include <map/map.h>
 #include <render/renderconstants.h>
 
-#define AC_WALL_COLLISION  1
-#define AC_ACTOR_COLLISION 2
+#define AC_MOVE_COLLIDE_WALL  1
+#define AC_MOVE_COLLIDE_ACTOR 2
 
 const double MIN_WALL_DIST = 1e-12;
 
 extern m_map_data m_map;
-extern ActorList tempEnemies, projectiles, particles;
-extern ActorVector levelEnemies;
 
 static const ac_bounds AC_BOUNDS[] =
 {
@@ -21,30 +20,9 @@ static const ac_bounds AC_BOUNDS[] =
 	[AC_PILLAR]      = { 8., 8. }
 };
 
-static const u32* AC_FRAMES[] =
-{
-	[AC_DUMMY]       = (u32[]) { 0 },
-	[AC_PLAYER]      = (u32[]) { 0 },
-	[AC_DUMMY_ENEMY] = (u32[]) { 0 },
-	[AC_PILLAR]      = (u32[]) { 1 }
-};
-
-const static ActorList* const actorLists[] =
-	{ /*&currentMap.levelPickups, &projectiles, &particles,*/ &tempEnemies };
-const static ActorArray* const actorArrays[] =
-	{ &m_map.levelEnemies, &m_map.levelObjs };
-const static ActorVector* const actorVectors[] =
-	{ &levelEnemies };
-
-
 ac_bounds ac_get_bounds(ac_type type)
 {
 	return AC_BOUNDS[type];
-}
-
-u32 ac_get_frame(ac_type type, u8 frame)
-{
-	return AC_FRAMES[type][frame];
 }
 
 static bool ac_collide_h(const ac_actor* actor, double* p_dx)
@@ -186,37 +164,12 @@ static bool ac_intersect(ac_actor* actor, const ac_actor* obstacle, bool vertica
 static bool ac_collide_actor(ac_actor* actor, bool vertical, double* disp)
 {
 	bool collision = false;
-
-	// Run through all the actors in the list
-	for (u8 i = 0; i < SDL_arraysize(actorArrays); ++i)
+	const ac_list_node* node = ac_actors.first;
+	while (node)
 	{
-		const ActorArray* arr = actorArrays[i];
-		for (u32 j = 0; j < arr->count; ++j)
-		{
-			const ac_actor* const a = arr->actor + j;
-			collision |= ac_intersect(actor, a, vertical, disp);
-		}
-	}
-
-	for (u8 i = 0; i < SDL_arraysize(actorVectors); ++i)
-	{
-		const ActorVector* av = actorVectors[i];
-		for (u32 j = 0; j < av->count; ++j)
-		{
-			const ac_actor* const a = av->content[j];
-			collision |= ac_intersect(actor, a, vertical, disp);
-		}
-	}
-
-	for (u8 i = 0; i < SDL_arraysize(actorLists); ++i)
-	{
-		const ActorNode* an = actorLists[i]->first;
-		while (an)
-		{
-			const ac_actor* const a = an->content;
-			collision |= ac_intersect(actor, a, vertical, disp);
-			an = an->next;
-		}
+		const ac_actor* cur = &node->actor;
+		collision |= ac_intersect(actor, cur, vertical, disp);
+		node = node->next;
 	}
 
 	return collision;
@@ -239,15 +192,15 @@ bool ac_move(ac_actor* actor, u32 delta, u32 flags)
 	d_x += actor->strafe * sin_atan * -1;
 	d_y += actor->strafe * cos_atan * -1;
 
-	if (flags & AC_ACTOR_COLLISION)
+	if (flags & AC_MOVE_COLLIDE_ACTOR)
 		collision |= ac_collide_actor(actor, true, &d_y);
-	if (flags & AC_WALL_COLLISION)
+	if (flags & AC_MOVE_COLLIDE_WALL)
 		collision |= ac_collide_v(actor, &d_y);
 	actor->y += d_y;
 
-	if (flags & AC_ACTOR_COLLISION)
+	if (flags & AC_MOVE_COLLIDE_ACTOR)
 		collision |= ac_collide_actor(actor, false, &d_x);
-	if (flags & AC_WALL_COLLISION)
+	if (flags & AC_MOVE_COLLIDE_WALL)
 		collision |= ac_collide_h(actor, &d_x);
 	actor->x += d_x;
 

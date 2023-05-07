@@ -2,12 +2,12 @@
 
 #include <game/actor/actor.h>
 #include <game/game.h>
+#include <game/gameobjects.h>
 
 float mouselook_sensitivity = 3.0;
 bool mouselook_enable = false;
 bool mouselook_is_suspended = true; 
 
-extern ac_actor player;
 
 void mouselook_suspend(bool suspend)
 {
@@ -27,9 +27,10 @@ void mouselook_process_event(SDL_Event* evt)
 {
 	SDL_assert(evt->type == SDL_MOUSEMOTION);
 
+	ac_actor* player = ac_get_player();
 	if (mouselook_enable && !mouselook_is_suspended)
 	{
 		const double disp = (evt->motion.xrel / 24.) * mouselook_sensitivity;
-		player.angle -= disp;
+		player->angle -= disp;
 	}
 }

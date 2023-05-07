@@ -9,50 +9,53 @@
 
 #define MAXWIDTH 256 // Maximum width of a sprite in the sheet
 
+// An actor on screen
 typedef struct
 {
 	const ac_actor* actor;
 	double distance;
 	double angle;
-} ActorSprite;
+} spr_actor;
 
 typedef enum
 {
-	CENTER = 0,
-	FLOOR = 1,
-	CEIL = 2
-} Anchor;
+	SPR_CENTER = 0,
+	SPR_FLOOR  = 1,
+	SPR_CEIL   = 2
+} spr_anchor;
 
-// Defines a sprite as to draw on screen, static struct, should only be used
-// for data definition
+// Static sprite definition for one sprite
 typedef struct
 {
 	// The sprite sheet index to use
-	u16 spritesheet;
+	u16 sheet;
 	// The coordinates on the sprite sheet
-	SDL_Rect coords;
+	u16 x;
+	u16 y;
+	u16 w;
+	u16 h;
 	// The anchor
-	Anchor anchor;
+	spr_anchor anchor;
 	// How many pixels to draw the sprite from the anchor (applicable only to floor or ceil)
 	i16 offset;
-} WorldSprite;
+} spr_frame;
 
+// Bundles a set of spr_frames from several angle
 typedef struct
 {
 	u8 angles;
-	const WorldSprite *sprites;
-} ActorFrameSheet;
+	const spr_frame* sprites;
+} spr_frameset;
 
+// Maps all animation frames of an actor to a frameset
 typedef struct
 {
-	const ActorFrameSheet *animation_frames;
-} ActorSpriteSheet;
+	const spr_frameset* frames;
+} spr_actor_frame_map;
 
-static inline bool ActorOnScreen(const ac_actor* actor, u32* ds_index);
-static void PopulateSpriteBufferList(const ActorList* actors, u32* ds_index);
-static void PopulateSpriteBufferArray(const ActorArray* actors, u32* ds_index);
-static inline WorldSprite GetWorldSprite(const ActorSprite* a);
+static bool spr_is_visible(const ac_actor* actor, u32 ds_index);
+static const spr_frame* spr_get_frame(const spr_actor* a);
 
 void spr_draw(SDL_Surface* target);
 
-static u8 spr_get_y_offset(const WorldSprite* ws);
+static u8 spr_get_y_offset(const spr_frame* ws);

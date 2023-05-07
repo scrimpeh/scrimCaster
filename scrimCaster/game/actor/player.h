@@ -3,12 +3,11 @@
 #include <common.h>
 
 #include <game/actor/actor.h>
+#include <map/mapobject.h>
 #include <geometry.h>
 
-extern ac_actor player;
-
-void player_spawn();
-void player_update(u32 delta);
+void player_make(ac_actor* ac, m_obj* obj);
+bool player_update(ac_actor* ac, u32 delta);
 
 // Player functions
 static void player_use();

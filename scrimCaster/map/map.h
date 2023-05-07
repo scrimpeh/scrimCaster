@@ -4,6 +4,7 @@
 
 #include <game/actor/actorcontainers.h>
 #include <map/cell.h>
+#include <map/mapobject.h>
 
 typedef struct
 {
@@ -18,11 +19,9 @@ typedef struct
 	m_map_info info;
 	u16 w;
 	u16 h;
-	m_cell* cells;	//A pointer to a cell structure contained somewhere on the heap
-					//should contain exactly bounds X * bounds Y cells
-	ActorArray levelObjs;
-	ActorArray levelEnemies;
-	ActorList levelPickups;
+	m_cell* cells;
+	u16 obj_count;
+	m_obj* objects;
 } m_map_data;
 
 typedef struct

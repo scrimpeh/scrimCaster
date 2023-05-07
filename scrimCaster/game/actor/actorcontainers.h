@@ -4,46 +4,21 @@
 
 #include <game/actor/actor.h>
 
-//Various containers for actor types. Presumably, should have both a fixed "array type" container (simple), and
-//a linked list / variable size container (less simple)
+typedef struct ac_list_node
+{
+	ac_actor actor;
+	struct ac_list_node* next;
+	struct ac_list_node* prev;
+} ac_list_node;
 
 typedef struct
 {
 	u32 count;
-	ac_actor* actor;
-} ActorArray;
+	ac_list_node* first;
+	ac_list_node* last;
+} ac_list;
 
-typedef struct ActorNode
-{
-	ac_actor* content;
-	struct ActorNode* next;
-	struct ActorNode* prev;
-} ActorNode;
+void ac_list_clear(ac_list* list);
+ac_list_node* ac_list_add(ac_list* list, ac_actor* ac);
+ac_list_node* ac_list_drop(ac_list* list, ac_list_node* node);
 
-typedef struct
-{
-	u32 count, capacity;
-	ActorNode* first;
-	ActorNode* last;
-} ActorList;
-
-typedef struct
-{
-	ac_actor** content;
-	u32 count, capacity;
-} ActorVector;
-
-// Actor List function
-void ActorListMake(ActorList* al, u32 capacity);
-void ActorListDestroy(ActorList* al);
-ac_actor* ActorListNew(ActorList* al);
-bool ActorListRemove(ActorList* al, ac_actor* a);
-ActorNode* ActorListDrop(ActorList* al, ActorNode* an);
-
-void ActorArrayMake(ActorArray* a, u32 count);
-void ActorArrayDestroy(ActorArray* a);
-
-void ActorVectorMake(ActorVector* av, u32 capacity);
-void ActorVectorDestroy(ActorVector* av);
-void ActorVectorClear(ActorVector* av);
-ac_actor* ActorVectorAdd(ActorVector* av, ac_actor* a);

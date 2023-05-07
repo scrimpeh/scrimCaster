@@ -35,7 +35,9 @@ typedef struct
 	u32 flags;
 } ac_actor;
 
-u32 ac_get_frame(ac_type type, u8 frame);
+#define AC_MOVE_COLLIDE_WALL  1
+#define AC_MOVE_COLLIDE_ACTOR 2
+
 ac_bounds ac_get_bounds(ac_type type);
 bool ac_move(ac_actor* actor, u32 delta, u32 flags);
 

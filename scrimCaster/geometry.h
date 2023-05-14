@@ -4,6 +4,13 @@
 // Everything that needs to interact with the map, i.e., rendering, interacting with walls or shooting
 // should go through this module
 
+// A general note on coordinates:
+// Starting now, I want to have a unified naming system for coordinates
+
+// World coordinates should be wx (horizontal axis, west -> east), wy (vertical axis, north -> south), and wz (height, ceiling -> floor)
+// Map coordinates should be mx and my (dito)
+// Screen coordinates should be sx, sy, and sz (depth)
+
 #include <common.h>
 
 #include <map/cell.h>

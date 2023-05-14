@@ -25,12 +25,19 @@ static m_cell cells[16][16];
 
 static const m_obj objects[] =
 {
-	{ AC_PLAYER, 50,  50,  0 },
-	{ AC_PILLAR, 300, 100, 0 },
-	{ AC_PILLAR, 96,  480, 0 },
-	{ AC_PILLAR, 448, 320, 0 },
-	{ AC_PILLAR, 448, 256, 0 },
-	{ AC_PILLAR, 448, 192, 0 }
+	{ .type = AC_PLAYER, .x = 50,  .y = 50,  .angle = 0 },
+	{ .type = AC_PILLAR, .x = 300, .y = 100, .angle = 0 },
+	{ .type = AC_PILLAR, .x = 96,  .y = 480, .angle = 0 },
+	{ .type = AC_PILLAR, .x = 448, .y = 320, .angle = 0 },
+	{ .type = AC_PILLAR, .x = 448, .y = 256, .angle = 0 },
+	{ .type = AC_PILLAR, .x = 448, .y = 192, .angle = 0 }
+};
+
+static const r_decal_world decals[] =
+{
+	{ .type = 1, .id = { .orientation = M_NORTH, .x = 2, .y = 0 }, .x = 32, .y = 16, .ttl = 0 },
+	{ .type = 1, .id = { .orientation = M_FLOOR, .x = 4, .y = 2 }, .x = 48, .y = 16, .ttl = 0 },
+	{ .type = 1, .id = { .orientation = M_CEIL,  .x = 4, .y = 2 }, .x = 32, .y = 32, .ttl = 0 }
 };
 
 u32 m_max_tag;
@@ -84,6 +91,8 @@ void m_load()
 	m_map.info.texture_set_count = 1;
 	m_map.info.texture_sets = tx_sets;
 	m_map.info.sky = 0;
+	m_map.decal_count = 3;
+	m_map.decals = &decals[0];
 
 	tx_map_load(m_map.info.texture_set_count, m_map.info.texture_sets);
 	r_sky_set_current(m_map.info.sky);

@@ -1,14 +1,16 @@
-#include <init.h>
+#include <application.h>
 
 #include <game/camera.h>
 #include <game/game.h>
 #include <input/input.h>
 #include <input/mouselook.h>
+#include <map/block/blockmap.h>
 #include <map/map.h>
 #include <render/gfxloader.h>
 #include <render/render.h>
 #include <render/ttf.h>
 #include <render/window.h>
+#include <resource.h>
 
 #include <SDL/SDL.h>
 
@@ -21,10 +23,9 @@
 #endif
 
 
-extern char* app_dir;
+char* app_dir;
 
-//Returns 0 on success
-i32 InitGame(i32 argc, char** argv)
+i32 app_init()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING < 0))
 	{
@@ -36,6 +37,8 @@ i32 InitGame(i32 argc, char** argv)
 	SDL_Log("Loading Resources...");
 
 	app_dir = SDL_GetBasePath();
+	if (!app_dir)
+		return -1;
 
 	if (ttf_init())
 	{
@@ -58,10 +61,16 @@ i32 InitGame(i32 argc, char** argv)
 	}
 
 	m_load();
+
+	if (block_load_map())
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Fatal Error: Couldn't initialize blockmap. %s", SDL_GetError());
+		return -1;
+	}
+
 	game_init();
 	input_init();
 	mouselook_set_properties(true, 2.0);
-	SetViewportFov(90);
 
 	if (r_init(256, 192))
 	{
@@ -70,4 +79,19 @@ i32 InitGame(i32 argc, char** argv)
 	}
 
 	return 0;
+}
+
+void app_close()
+{
+	// TODO: Define a better symmetry between clean-up and close operations
+	r_close();
+	block_unload();
+	m_unload();
+	game_free();
+	gfx_unload();
+	win_destroy();
+
+	SDL_free(app_dir);
+
+	SDL_Quit();
 }

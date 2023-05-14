@@ -1,8 +1,7 @@
 #include <scrimCaster.h>
 
-#include <cleanup.h>
+#include <application.h>
 #include <game/game.h>
-#include <init.h>
 #include <input/input.h>
 #include <input/mouselook.h>
 #include <render/frame.h>
@@ -49,7 +48,7 @@ i32 main(i32 argc, char** argv)
 	u32 delta_ticks;
 	u32 render_ticks;
 
-	if (InitGame(argc, argv)) 
+	if (app_init(argc, argv)) 
 		return -1;
 
 	SDL_Log("Starting Main Loop");
@@ -86,13 +85,13 @@ i32 main(i32 argc, char** argv)
 		// Do game logic here
 		const u32 delta = SDL_GetTicks() - delta_ticks;
 		input_filter();
-		UpdateGame(delta);
+		game_update(delta);
 		delta_ticks = SDL_GetTicks();
 
 		r_draw();
 		frame_end(render_ticks);
 	}
 
-	CleanUp();
+	app_close();
 	return 0;
 }

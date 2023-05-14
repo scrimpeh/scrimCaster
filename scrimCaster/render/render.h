@@ -10,11 +10,7 @@
 
 #include <geometry.h>
 
-#include <SDL/SDL_render.h>
-
-extern u16 viewport_w;
-extern u16 viewport_h;
-extern u8 viewport_x_fov;
+#include <SDL/SDL_video.h>
 
 i32 r_init(u16 w, u16 h);
 

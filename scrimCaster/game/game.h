@@ -4,5 +4,5 @@
 
 i32 game_init();
 void game_free();
-void UpdateGame(u32 delta);
-void SetMenu(bool open);
+void game_update(u32 delta);
+void game_pause(bool pause);

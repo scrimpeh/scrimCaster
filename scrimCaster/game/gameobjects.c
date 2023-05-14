@@ -2,7 +2,7 @@
 
 #include <game/actor/actorlogic.h>
 
-extern ac_list ac_actors;
+ac_list ac_actors;
 
 i32 ac_load(const m_obj* obj, u32 count)
 {
@@ -28,7 +28,7 @@ void ac_update_objects(u32 delta)
 	ac_list_node* cur = ac_actors.first;
 	while (cur)
 	{
-		if (ac_update(cur, delta))
+		if (ac_update(&cur->actor, delta))
 			cur = ac_list_drop(&ac_actors, cur);
 		else
 			cur = cur->next;

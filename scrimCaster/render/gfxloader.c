@@ -1,5 +1,6 @@
 #include <render/gfxloader.h>
 
+#include <application.h>
 #include <render/renderconstants.h>
 #include <render/skybox.h>
 
@@ -11,8 +12,6 @@ const char* WORLD_SPRITE_NAMES[] =
 {
 	"lev.png"
 };
-
-extern char* app_dir;
 
 #define WORLD_SPRITE_BUF_SIZE 1
 SDL_Surface* gfx_ws_buffer[WORLD_SPRITE_BUF_SIZE] = 

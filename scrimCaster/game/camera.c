@@ -1,28 +1,42 @@
 #include <game/camera.h>
 
-#include <game/actor/actor.h>
 #include <game/gameobjects.h>
 #include <input/input.h>
 #include <render/render.h>
 #include <render/scan.h>
 
-const u8 VIEWPORT_FOV_MIN = 20;
-const u8 VIEWPORT_FOV_MAX = 170;
-
-float viewport_angle;
+angle_f viewport_angle;
 float viewport_x;
 float viewport_y;
 
-void SetViewportFov(u8 fov)
+static ac_actor* cam_actor = NULL;
+
+void cam_set_actor(ac_actor* actor)
 {
-	if (VIEWPORT_FOV_MIN < fov && fov < VIEWPORT_FOV_MAX)
-		viewport_x_fov = fov;
+	cam_actor = actor;
+}
+
+ac_actor* cam_get_actor()
+{
+	return cam_actor;
 }
 	
-void UpdateCamera(u32 delta)
+void cam_update(u32 delta)
 {
-	const ac_actor* player = ac_get_player();
-	viewport_angle = (float) player->angle;
-	viewport_x = (float) player->x;
-	viewport_y = (float) player->y;
+	const ac_actor* viewport_actor = cam_get_actor();
+
+	if (!viewport_actor)
+	{
+		viewport_angle = 315;
+		viewport_x = 0;
+		viewport_y = 0;
+	}
+	else
+	{
+		viewport_angle = (angle_f) viewport_actor->angle;
+		viewport_x = (float) viewport_actor->x;
+		viewport_y = (float) viewport_actor->y;
+	}
+
+
 }

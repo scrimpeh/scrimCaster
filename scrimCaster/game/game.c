@@ -5,6 +5,7 @@
 #include <game/gameobjects.h>
 #include <input/input.h>
 #include <input/mouselook.h>
+#include <map/block/blockmap.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
 
@@ -54,7 +55,7 @@ u64 ticks;
 
 bool game_menu;
 
-void SetMenu(bool open)
+void game_pause(bool open)
 {
 	mouselook_suspend(open);
 	game_menu = open;
@@ -66,6 +67,7 @@ i32 game_init()
 	ac_load(m_map.objects, m_map.obj_count);
 	SDL_assert(ac_actors.count > 0);
 	SDL_assert(ac_actors.first->actor.type == AC_PLAYER);
+	cam_set_actor(ac_get_player());
 	return 0;
 }
 
@@ -74,7 +76,7 @@ void game_free()
 
 }
 
-void UpdateGame(u32 delta)
+void game_update(u32 delta)
 {
 	// Make sure we don't skip too much
 	if (delta > TIMESTEP_MAX) 
@@ -83,16 +85,19 @@ void UpdateGame(u32 delta)
 	if (game_menu)
 	{
 		if (input_tf.pause)
-			SetMenu(false);
+			game_pause(false);
 	}
 	else
 	{
 		ticks += delta;
 		mu_update(delta);
+		// TODO: Creating / deleting actors will not be reflected in the blockmap
+		// So I need to make sure to defer this until the end of the frame
+		block_fill();
 		ac_update_objects(delta);
-		UpdateCamera(delta);
+		cam_update(delta);
 		
 		if (input_tf.pause)
-			SetMenu(true);
+			game_pause(true);
 	}
 }

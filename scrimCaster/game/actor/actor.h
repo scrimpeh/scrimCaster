@@ -2,11 +2,15 @@
 
 #include <common.h>
 
+#include <map/cell.h>
+
 typedef struct
 {
 	double w;
 	double h;
 } ac_bounds;
+
+#define AC_BOUNDS_MAX M_CELLSIZE
 
 typedef enum
 {

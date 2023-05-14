@@ -29,8 +29,8 @@ typedef double angle_rad_d;
 #define TO_RAD(a) ((a) * (M_PI / 180))
 #define TO_DEG(a) ((a) * (180 / M_PI))
 
-#define TO_RADF(a) ((a) * (float)(M_PI / 180))
-#define TO_DEGF(a) ((a) * (float)(180 / M_PI))
+#define TO_RADF(a) ((a) * (float) (M_PI / 180))
+#define TO_DEGF(a) ((a) * (float) (180 / M_PI))
 
 angle_rad_f angle_normalize_rad_f(angle_rad_f angle);
 angle_rad_d angle_normalize_rad_d(angle_rad_d angle);

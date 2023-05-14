@@ -4,18 +4,30 @@
 #include <input/input.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
-#include <util/mathutil.h>
 
-bool noclip = false;
+#include <map/block/block_iterator.h>
 
-double accel_forward = 0;
-double accel_strafe = 0;
+bool player_noclip = false;
 
-#define TURNSPEED .2
-#define MAXSPEED .38
-#define MAXSTRAFE .35
+double player_accel_forward = 0;
+double player_accel_strafe = 0;
 
-#define USELENGTH (M_CELLSIZE / 2)
+#define PLAYER_TURNSPEED .2
+#define PLAYER_MAXSPEED .38
+#define PLAYER_MAXSTRAFE .35
+
+#define PLAYER_MAXSPEED_WALK .18
+#define PLAYER_MAXSTRAFE_WALK .15
+
+#define PLAYER_ACCEL .04
+#define PLAYER_ACCEL_STRAFE .01
+#define PLAYER_ACCEL_WALK .02
+#define PLAYER_ACCEL_STRAFE_WALK .01
+
+#define PLAYER_FRICTION .002
+#define PLAYER_FRICTION_STRAFE .0018
+
+#define PLAYER_USELENGTH (M_CELLSIZE / 2)
 
 static bool player_use_has_intercept;
 static g_intercept player_use_intercept;
@@ -23,9 +35,11 @@ static g_intercept player_use_intercept;
 static bool player_fire_has_intercept;
 static g_intercept player_fire_intercept;
 
+static u32 _block_object_count = 0;
+
 void player_make(ac_actor* ac, m_obj* obj)
 {
-	watch_add_new(3, WCH_F64, "x: ", &ac->x, WCH_F64, ", y: ", &ac->y, WCH_F64, ", angle: ", &ac->angle);
+	watch_add_new(1, WCH_U32, "objects: ", &_block_object_count);
 	ac->type = obj->type;
 	ac->x = obj->x;
 	ac->y = obj->y;
@@ -40,7 +54,7 @@ static void player_use()
 	if (player_use_has_intercept)
 	{
 		const float distance = math_dist_f(player->x, player->y, player_use_intercept.x, player_use_intercept.y);
-		if (distance < USELENGTH)
+		if (distance < PLAYER_USELENGTH)
 		{
 			m_side* side = m_get_side(player_use_intercept.map_x, player_use_intercept.map_y, player_use_intercept.orientation);
 			if (side->target)
@@ -83,6 +97,18 @@ static bool player_shoot_check_intercept(const g_intercept* intercept)
 
 bool player_update(ac_actor* ac, u32 delta)
 {
+	watch_add_new(3, WCH_F64, "x: ", &ac->x, WCH_F64, ", y: ", &ac->y, WCH_F64, ", angle: ", &ac->angle);
+	_block_object_count = 0;
+	block_iterator* iter = block_iterator_make_actor(ac);
+	block_reference* r = block_iterator_next(iter);
+	while (r)
+	{
+		if (r->reference.actor != ac)
+			_block_object_count++;
+		r = block_iterator_next(iter);
+	}
+	block_iterator_free(iter);
+
 	player_set_movement(delta);
 
 	if (input_tf.use) 
@@ -90,10 +116,10 @@ bool player_update(ac_actor* ac, u32 delta)
 	if (input_tf.fire) 
 		player_fire();
 
-	ac->speed = accel_forward * delta;
-	ac->strafe = accel_strafe * delta;
+	ac->speed = player_accel_forward * delta;
+	ac->strafe = player_accel_strafe * delta;
 
-	const u32 flags = noclip ? 0 : (AC_MOVE_COLLIDE_WALL | AC_MOVE_COLLIDE_ACTOR);
+	const u32 flags = player_noclip ? 0 : (AC_MOVE_COLLIDE_WALL | AC_MOVE_COLLIDE_ACTOR);
 	ac_move(ac, delta, flags);
 
 	// The player may never disappear from the map
@@ -103,58 +129,34 @@ bool player_update(ac_actor* ac, u32 delta)
 static inline void player_set_movement(u32 delta)
 {
 	ac_actor* player = ac_get_player();
+
+	const double turnspeed = PLAYER_TURNSPEED;
 	if (input.turn_left)
-		player->angle += TURNSPEED * delta;
+		player->angle += turnspeed * delta;
 	if (input.turn_right)
-		player->angle -= TURNSPEED * delta;
+		player->angle -= turnspeed * delta;
 
+	const double maxspeed = input.walk ? PLAYER_MAXSPEED_WALK : PLAYER_MAXSPEED;
+	const double accel = input.walk ? PLAYER_ACCEL_WALK : PLAYER_ACCEL;
+	const double friction = PLAYER_FRICTION;
 	if (input.forward)
-	{
-		accel_forward += .04 * delta;
-		if (accel_forward > MAXSPEED)
-			accel_forward = MAXSPEED;
-	}
+		player_accel_forward = SDL_min(player_accel_forward + accel * delta, maxspeed);
 	else if (input.backward)
-	{
-		accel_forward -= .04 * delta;
-		if (accel_forward < -MAXSPEED)
-			accel_forward = -MAXSPEED;
-	}
-	else if (accel_forward > 0)
-	{
-		accel_forward -= .002 * delta;
-		if (accel_forward < 0)
-			accel_forward = 0;
-	}
+		player_accel_forward = SDL_max(player_accel_forward - accel * delta, -maxspeed);
+	else if (player_accel_forward > 0)
+		player_accel_forward = SDL_max(player_accel_forward - friction * delta, 0);
 	else
-	{
-		accel_forward += .002 * delta;
-		if (accel_forward > 0)
-			accel_forward = 0;
-	}
+		player_accel_forward = SDL_min(player_accel_forward + friction * delta, 0);
 
+	const double accel_strafe = input.walk ? PLAYER_ACCEL_STRAFE : PLAYER_ACCEL_STRAFE_WALK;
+	const double maxstrafe = input.walk ? PLAYER_MAXSTRAFE_WALK : PLAYER_MAXSTRAFE;
+	const double friction_strafe = PLAYER_FRICTION_STRAFE;
 	if (input.strafe_left)
-	{
-		accel_strafe += .01 * delta;
-		if (accel_strafe > MAXSTRAFE)
-			accel_strafe = MAXSTRAFE;
-	}
+		player_accel_strafe = SDL_min(player_accel_strafe + accel_strafe * delta, maxstrafe);
 	else if (input.strafe_right)
-	{
-		accel_strafe -= .01 * delta;
-		if (accel_strafe < -MAXSTRAFE)
-			accel_strafe = -MAXSTRAFE;
-	}
+		player_accel_strafe = SDL_max(player_accel_strafe - accel_strafe * delta, -maxstrafe);
 	else if (accel_strafe > 0)
-	{
-		accel_strafe -= .0018 * delta;
-		if (accel_strafe < 0)
-			accel_strafe = 0;
-	}
+		player_accel_strafe = SDL_max(player_accel_strafe - friction_strafe * delta, 0);
 	else
-	{
-		accel_strafe += .0018 * delta;
-		if (accel_strafe > 0)
-			accel_strafe = 0;
-	}
+		player_accel_strafe = SDL_min(player_accel_strafe + friction_strafe * delta, 0);
 }

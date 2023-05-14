@@ -27,6 +27,7 @@ void input_map_load_bindings()
 	input_map_scancodes[SDL_SCANCODE_LCTRL] = offsetof(input_keys, fire);
 
 	input_map_scancodes[SDL_SCANCODE_TAB] = offsetof(input_keys, map);
+	input_map_scancodes[SDL_SCANCODE_LALT] = offsetof(input_keys, walk);
 
 	input_map_scancodes[SDL_SCANCODE_PAUSE] = offsetof(input_keys, pause);
 } 

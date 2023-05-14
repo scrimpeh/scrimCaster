@@ -3,22 +3,18 @@
 #include <game/camera.h>
 #include <input/input.h>
 #include <render/automap.h>
+#include <render/decal.h>
 #include <render/lighting/lighting.h>
 #include <render/renderconstants.h>
 #include <render/renderdebug.h>
 #include <render/renderutil.h>
 #include <render/scan.h>
 #include <render/sprite.h>
-
-// These are decoupled from the window width and height and should equal to or smaller than the window
-u16 viewport_w;
-u16 viewport_h;
-u8 viewport_x_fov;
+#include <render/viewport.h>
 
 extern TTF_Font* ttf_font_debug;
 
 extern SDL_Window* win_main;
-SDL_Surface* r_surface_viewport = NULL;
 SDL_Surface* r_surface_win = NULL;
 
 extern u64 frame_count;
@@ -32,19 +28,9 @@ i32 r_init(u16 w, u16 h)
 {
 	r_close();	// Close the old renderer first
 
-	viewport_w = w;
-	viewport_h = h;
-
-	r_surface_viewport = SDL_CreateRGBSurface(0, viewport_w, viewport_h, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
-	if (!r_surface_viewport)
+	if (viewport_init(w, h))
 	{
 		SDL_LogError(SDL_LOG_PRIORITY_CRITICAL, "Couldn't initialize viewport! %s", SDL_GetError());
-		return -1;
-	}
-
-	if (scan_init())
-	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize map renderer! %s", SDL_GetError());
 		return -1;
 	}
 
@@ -54,15 +40,20 @@ i32 r_init(u16 w, u16 h)
 		return -1;
 	}
 
+	if (r_decal_load()) 
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Can't initialize decals! %s", SDL_GetError());
+		return -1;
+	}
+
 	am_init();
 	return 0;
 }
 
 void r_close()
 {
-	scan_close();
-	SDL_FreeSurface(r_surface_viewport);
-	r_surface_viewport = NULL;
+	viewport_destroy();
+	r_decal_unload();
 }
 
 void r_draw_crosshair(SDL_Surface* target)
@@ -82,18 +73,20 @@ void r_draw()
 
 	// Optional HOM avoidance
 	if (r_draw_background)
-		SDL_FillRect(r_surface_viewport, NULL, COLOR_KEY);
+		SDL_FillRect(viewport_surface, NULL, COLOR_KEY);
 
-	scan_draw(r_surface_viewport);
-	spr_draw(r_surface_viewport);
+	scan_draw(viewport_surface);
+	spr_draw(viewport_surface);
+	r_decal_draw(viewport_surface);
+
 	if (r_show_map)
-		am_draw(r_surface_viewport);
+		am_draw(viewport_surface);
 	else if (r_show_crosshair) 
-		r_draw_crosshair(r_surface_viewport);
+		r_draw_crosshair(viewport_surface);
 	
-	rd_render_debug(r_surface_viewport);
+	rd_render_debug(viewport_surface);
 	
-	SDL_BlitScaled(r_surface_viewport, NULL, r_surface_win, NULL);
+	SDL_BlitScaled(viewport_surface, NULL, r_surface_win, NULL);
 	SDL_UpdateWindowSurface(win_main);
 }
 

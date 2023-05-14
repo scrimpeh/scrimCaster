@@ -10,66 +10,15 @@
 #include <render/renderconstants.h>
 #include <render/skybox.h>
 #include <render/texture.h>
+#include <render/viewport.h>
 #include <util/mathutil.h>
 
 #include <math.h>	//fmod is obsolete: maybe replace?
 #include <float.h>
 
-extern m_map_data m_map;
-extern u8 viewport_x_fov;
-u8 viewport_x_fov_half;
-
-u16 viewport_w_half;
-
-float projection_dist;
-
-// The Z Buffer is used for masking sprites against the wall. It covers every pixel on the screen to support blending spriets
-// against transparency layers
-float* z_buffer;
-
 // For drawing transparent surfaces, we keep a stack of (dynamically allocated) draw side
 g_intercept_stack* intercept_stack = NULL;
 
-float* angle_offsets;
-
-i32 scan_init()
-{
-	// Set up global rendering parameters
-	viewport_w_half = viewport_w / 2;
-	viewport_x_fov_half = viewport_x_fov / 2;
-	projection_dist = viewport_w_half / tanf(TO_RADF(viewport_x_fov_half));
-
-	angle_offsets = SDL_malloc(sizeof(float) * viewport_w);
-	if (!angle_offsets)
-	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR,"Couldn't initialize offset buffer! %s", SDL_GetError());
-		return -1;
-	}
-
-	for (u16 i = 0; i < viewport_w; i++)
-		angle_offsets[i] = atanf((i - viewport_w_half) / projection_dist);
-
-	z_buffer = SDL_malloc(sizeof(float) * viewport_w * viewport_h);
-	if (!z_buffer) 
-	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize Z Buffer! %s", SDL_GetError());
-		return -1;
-	}
-	for (u32 i = 0; i < viewport_w * viewport_h; i++)
-		z_buffer[i] = FLT_MAX;
-
-	return 0;
-}
-
-// To be called whenever the viewport FOV is changed
-void scan_close()
-{
-	SDL_free(z_buffer);
-	z_buffer = NULL;
-
-	SDL_free(angle_offsets);
-	angle_offsets = NULL;
-}
 
 static inline bool collect_intercept(const g_intercept* intercept)
 {
@@ -84,10 +33,9 @@ static inline bool collect_intercept(const g_intercept* intercept)
 
 void scan_draw(SDL_Surface* target)
 {
-	const float angle_rad = TO_RADF(viewport_angle);
 	for (u16 col = 0; col < viewport_w; col++)
 	{
-		const float angle = angle_normalize_rad_f(angle_rad - angle_offsets[col]);
+		const angle_rad_f angle = viewport_x_to_angle(TO_RADF(viewport_angle), col);
 		g_cast(viewport_x, viewport_y, angle, collect_intercept);
 
 		while (intercept_stack) 
@@ -115,15 +63,6 @@ static u8 scan_get_tx_slice_y(i64 wall_h, i64 y, u8 start_y)
 	return (u8) tx + start_y;
 }
 
-static i32 scan_get_wall_height(i16 height, float distance, angle_rad_f angle)
-{
-	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
-	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
-	distance *= cosf(angle);
-	i32 h = (i32) projection_dist * height / distance;
-	return h + (h & 1);
-}
-
 static void scan_draw_column(SDL_Surface* target, float x, float y, const g_intercept* intercept, u16 col)
 {
 	// For doors, we basically have to work out how open the door is (presumably as a ratio between
@@ -137,7 +76,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
 	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
-	i32 wall_h = (i32) (projection_dist * R_CELL_H / distance_corrected);
+	i32 wall_h = (i32) (viewport_projection_distance * R_CELL_H / distance_corrected);
 	if (wall_h & 1)
 		wall_h++;
 	i32 wall_y = (viewport_h - wall_h) / 2;
@@ -154,7 +93,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	{
 		r_sky_draw(target, col, y_top, y_end, intercept->angle);
 		for (u32 y = y_top; y < y_end; y++)
-			z_buffer[viewport_w * y + col] = FLT_MAX;
+			viewport_z_buffer[viewport_w * y + col] = FLT_MAX;
 	}
 	else
 	{
@@ -165,7 +104,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		}
 
 		u32* render_px = (u32*) target->pixels;
-		float* z_buffer_px = z_buffer;
+		float* z_buffer_px = viewport_z_buffer;
 
 		render_px += (y_top * viewport_w) + col;
 		z_buffer_px += (y_top * viewport_w) + col;
@@ -197,13 +136,12 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	u32* floor_render_px_top = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
 	u32* floor_render_px_bottom = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
-	float* z_buffer_px_top = z_buffer + ((y_top - 1) * viewport_w) + col;
-	float* z_buffer_px_bottom = z_buffer + ((viewport_h - y_top) * viewport_w) + col;
+	float* z_buffer_px_top = viewport_z_buffer + ((y_top - 1) * viewport_w) + col;
+	float* z_buffer_px_bottom = viewport_z_buffer + ((viewport_h - y_top) * viewport_w) + col;
 
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
-		const u16 height = viewport_h - (2 * y_px);
-		const float d = (projection_dist * R_CELL_H) / height;
+		const float d = viewport_y_to_distance(y_px);
 		float xa;
 		float ya;
 		math_vec_cast_f(x, y, intercept->angle, d / cosf(angle), &xa, &ya);
@@ -218,25 +156,31 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 		u32 floor_px = tx_get_point(&cell->floor, cell_x, cell_y);
 		if (floor_px == COLOR_KEY)
+		{
 			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
+			*z_buffer_px_bottom = FLT_MAX;
+		}
 		else
 		{
 			floor_px = r_light_px(grid_xa, grid_ya, M_FLOOR, floor_px, cell_x, cell_y);
 			floor_px = cm_ramp_mix(floor_px, d);
 			*floor_render_px_bottom = floor_px;
+			*z_buffer_px_bottom = d;
 		}
-		*z_buffer_px_bottom = d;
 
 		u32 ceil_px = tx_get_point(&cell->ceil, cell_x, cell_y);
 		if (ceil_px == COLOR_KEY)
+		{
 			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
+			*z_buffer_px_top = FLT_MAX;
+		}
 		else
 		{
 			ceil_px = r_light_px(grid_xa, grid_ya, M_CEIL, ceil_px, cell_x, cell_y);
 			ceil_px = cm_ramp_mix(ceil_px, d);
 			*floor_render_px_top = ceil_px;
+			*z_buffer_px_top = d;
 		}
-		*z_buffer_px_top = d;
 
 		floor_render_px_top -= viewport_w;
 		floor_render_px_bottom += viewport_w;

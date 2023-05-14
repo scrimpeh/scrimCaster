@@ -3,6 +3,7 @@
 #include <render/color/colorramp.h>
 #include <render/render.h>
 #include <render/gfxloader.h>
+#include <render/viewport.h>
 
 const char* R_SKY_PATH = "tx/sky/";
 

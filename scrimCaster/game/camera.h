@@ -1,11 +1,13 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-extern u8 viewport_x_fov;
+#include <game/actor/actor.h>
+
 extern float viewport_angle;
 extern float viewport_x;
 extern float viewport_y;
 
-void SetViewportFov(u8 fov);
-void UpdateCamera(u32 delta);
+void cam_set_actor(ac_actor* actor);
+ac_actor* cam_get_actor();
+void cam_update(u32 delta);

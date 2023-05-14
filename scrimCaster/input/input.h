@@ -19,6 +19,7 @@ typedef struct Input
 
 	u8 fire;
 	u8 altfire;
+	u8 walk;
 
 	u8 pause;
 	u8 use;

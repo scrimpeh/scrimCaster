@@ -5,6 +5,7 @@
 #include <game/actor/actorcontainers.h>
 #include <map/cell.h>
 #include <map/mapobject.h>
+#include <render/decal.h>
 
 typedef struct
 {
@@ -22,6 +23,9 @@ typedef struct
 	m_cell* cells;
 	u16 obj_count;
 	m_obj* objects;
+	u16 decal_count;
+	// TODO: The map should have a different data structure not part of "render/..."
+	r_decal_world* decals;
 } m_map_data;
 
 typedef struct

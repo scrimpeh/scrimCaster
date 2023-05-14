@@ -16,7 +16,6 @@ u16 viewport_h;
 extern TTF_Font* ttf_font_debug;
 
 extern SDL_Window* win_main;
-SDL_Surface* r_surface_viewport = NULL;
 SDL_Surface* r_surface_win = NULL;
 
 extern u64 frame_count;

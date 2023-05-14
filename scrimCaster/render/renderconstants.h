@@ -2,6 +2,7 @@
 
 #include <common.h>
 
+#include <map/cell.h>
 #include <render/color/colormap.h>
 
 #define ATAN_INTERNAL(a, halfcircle, circle) ((a) < (halfcircle) ? (a) : (-(circle)) + (a))

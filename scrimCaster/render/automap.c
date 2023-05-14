@@ -8,6 +8,7 @@
 #include <render/render.h>
 #include <render/renderutil.h>
 #include <render/skybox.h>
+#include <render/viewport.h>
 
 
 // Cap the automap to the # of the map and inside this zone.
@@ -19,6 +20,7 @@ float am_zoom = 1.25;
 float am_center_x = 0.f;
 float am_center_y = 0.f;
 bool am_follow = true;
+bool am_draw_grid = true;
 
 static const float AM_ZOOM_MIN = 0.5;
 static const float AM_ZOOM_MAX = 3;
@@ -140,6 +142,13 @@ static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const m_si
 
 static void am_draw_map(SDL_Surface* target)
 {
+	if (am_draw_grid)
+	{
+		for (u16 y = 0; y <= m_map.h; y++)
+			r_draw_line(target, am_map_h(0 * M_CELLSIZE), am_map_v(y * M_CELLSIZE), am_map_h(m_map.w * M_CELLSIZE), am_map_v(y * M_CELLSIZE), CM_GET(128, 128, 128));
+		for (u16 x = 0; x <= m_map.w; x++)
+			r_draw_line(target, am_map_h(x * M_CELLSIZE), am_map_v(0 * M_CELLSIZE), am_map_h(x * M_CELLSIZE), am_map_v(m_map.h * M_CELLSIZE), CM_GET(96, 96, 96));
+	}
 	for (u16 y = 0; y < m_map.h; y++)
 		for (u16 x = 0; x < m_map.w; x++)
 			am_draw_cell(target, x, y);

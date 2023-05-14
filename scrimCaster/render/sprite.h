@@ -14,7 +14,7 @@ typedef struct
 {
 	const ac_actor* actor;
 	double distance;
-	double angle;
+	angle_d angle;
 } spr_actor;
 
 typedef enum
@@ -54,8 +54,8 @@ typedef struct
 } spr_actor_frame_map;
 
 static bool spr_is_visible(const ac_actor* actor, u32 ds_index);
-static const spr_frame* spr_get_frame(const spr_actor* a);
+static const spr_frame* spr_get_frame(const ac_actor* a);
 
 void spr_draw(SDL_Surface* target);
 
-static u8 spr_get_y_offset(const spr_frame* ws);
+static i32 spr_get_y_offset(const spr_frame* ws);

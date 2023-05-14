@@ -1,7 +1,7 @@
 #include <game/actor/actor.h>
 
 #include <game/actor/actorcontainers.h>
-#include <game/gameobjects.h>
+#include <map/block/block_iterator.h>
 #include <map/map.h>
 #include <render/renderconstants.h>
 
@@ -45,14 +45,13 @@ static bool ac_collide_h(const ac_actor* actor, double* p_dx)
 	const i8 inc = x_start > x_end ? -1 : 1;
 	for (i16 x = x_start; x != x_end; x += inc)
 	{
-		const m_cell cell_top = cells[y_top * m_map.w + x];
-		const m_cell cell_bottom = cells[y_bottom * m_map.w + x];
+		const m_cell* cell_n = &cells[y_top    * m_map.w + x];
+		const m_cell* cell_s = &cells[y_bottom * m_map.w + x];
 
-		const m_side side_top = d_x > 0 ? cell_top.e : cell_top.w;
-		const m_side side_bottom = d_x > 0 ? cell_bottom.e : cell_bottom.w;
+		const m_side* side_n = d_x > 0 ? &cell_n->e : &cell_n->w;
+		const m_side* side_s = d_x > 0 ? &cell_s->e : &cell_s->w;
 
-		if ((side_top.type && !(side_top.flags  & PASSABLE)) ||
-			(side_bottom.type && !(side_bottom.flags & PASSABLE)))
+		if ((side_n->type && !(side_n->flags & PASSABLE)) || (side_s->type && !(side_s->flags & PASSABLE)))
 		{
 			double new_x = (double) (x * M_CELLSIZE) - bounds_x;
 			if (d_x >= 0) 
@@ -85,14 +84,13 @@ static bool ac_collide_v(const ac_actor* actor, double* p_dy)
 	const i8 inc = y_start > y_end ? -1 : 1;
 	for (i16 y = y_start; y != y_end; y += inc)
 	{
-		const m_cell cell_left = cells[y * m_map.w + x_left];
-		const m_cell cell_right = cells[y * m_map.w + x_right];
+		const m_cell* cell_w = &cells[y * m_map.w + x_left];
+		const m_cell* cell_e = &cells[y * m_map.w + x_right];
 
-		const m_side side_left = d_y > 0 ? cell_left.s : cell_left.n;
-		const m_side side_right = d_y > 0 ? cell_right.s : cell_right.n;
+		const m_side* side_w = d_y > 0 ? &cell_w->s : &cell_w->n;
+		const m_side* side_e = d_y > 0 ? &cell_e->s : &cell_e->n;
 
-		if ((side_left.type  && !(side_left.flags  & PASSABLE)) ||
-			(side_right.type && !(side_right.flags & PASSABLE)))
+		if ((side_w->type && !(side_w->flags  & PASSABLE)) || (side_e->type && !(side_e->flags & PASSABLE)))
 		{
 			double new_y = (double) (y * M_CELLSIZE) - bounds_y;
 			if (d_y >= 0) 
@@ -164,13 +162,15 @@ static bool ac_intersect(ac_actor* actor, const ac_actor* obstacle, bool vertica
 static bool ac_collide_actor(ac_actor* actor, bool vertical, double* disp)
 {
 	bool collision = false;
-	const ac_list_node* node = ac_actors.first;
-	while (node)
+	block_iterator* iter = block_iterator_make_actor(actor);
+	block_reference* r = block_iterator_next(iter);
+	while (r)
 	{
-		const ac_actor* cur = &node->actor;
-		collision |= ac_intersect(actor, cur, vertical, disp);
-		node = node->next;
+		if (r->type == BLOCK_TYPE_ACTOR && r->reference.actor != actor)
+			collision |= ac_intersect(actor, r->reference.actor, vertical, disp);
+		r = block_iterator_next(iter);
 	}
+	block_iterator_free(iter);
 
 	return collision;
 }
@@ -181,16 +181,13 @@ bool ac_move(ac_actor* actor, u32 delta, u32 flags)
 	actor->angle = angle_normalize_deg_d(actor->angle);
 
 	bool collision = false;
-	double arctan, d_x, d_y;
-	arctan = TO_RAD(ATAN_DEG(actor->angle));
-
+	
+	const double arctan = TO_RAD(ATAN_DEG(actor->angle));
 	const double cos_atan = SDL_cos(arctan);
 	const double sin_atan = SDL_sin(arctan);
 
-	d_x = actor->speed * cos_atan;
-	d_y = actor->speed * sin_atan * -1;
-	d_x += actor->strafe * sin_atan * -1;
-	d_y += actor->strafe * cos_atan * -1;
+	const double d_x =  (actor->speed * cos_atan) - (actor->strafe * sin_atan);
+	const double d_y = -(actor->speed * sin_atan) - (actor->strafe * cos_atan);
 
 	if (flags & AC_MOVE_COLLIDE_ACTOR)
 		collision |= ac_collide_actor(actor, true, &d_y);

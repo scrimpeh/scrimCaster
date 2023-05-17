@@ -9,41 +9,40 @@ void block_tree_free(block_tree* tree)
 	SDL_free(tree);
 }
 
-i64 block_tree_size(const block_tree* tree)
+block_tree* block_tree_insert(block_tree* tree, block_pt pt)
 {
-	if (!tree)
-		return 0;
-	return 1 + block_tree_size(tree->l) + block_tree_size(tree->r);
+	return block_tree_add(NULL, tree, pt);
 }
 
-block_tree* block_tree_add(block_tree* tree, i32 mx, i32 my)
+block_tree* block_tree_add(block_tree* parent, block_tree* tree, block_pt pt)
 {
 	if (!tree)
-		return block_tree_create_node(mx, my);
+		return block_tree_create_node(parent, pt);
 
-	const i8 cmp = block_tree_key_cmp(mx, my, tree);
+	const i8 cmp = block_tree_key_cmp(tree, pt);
 	if (cmp < 0)
-		tree->l = block_tree_add(tree->l, mx, my);
+		tree->l = block_tree_add(tree, tree->l, pt);
 	else if (cmp > 0)
-		tree->r = block_tree_add(tree->r, mx, my);
+		tree->r = block_tree_add(tree, tree->r, pt);
 	else
 		return tree;
 
+	// TODO: Rotation is dangerously untested
 	const i32 balance = block_tree_balance(tree);
 
-	if (balance > 1 && block_tree_key_cmp(mx, my, tree->l) < 0)    // LL
+	if (balance > 1 && block_tree_key_cmp(tree->l, pt) < 0)    // LL
 		return block_tree_rotate_r(tree);
 
-	if (balance < -1 && block_tree_key_cmp(mx, my, tree->r) > 0)   // RR
+	if (balance < -1 && block_tree_key_cmp(tree->r, pt) > 0)   // RR
 		return block_tree_rotate_l(tree);
 
-	if (balance > 1 && block_tree_key_cmp(mx, my, tree->l) > 0)    // LR
+	if (balance > 1 && block_tree_key_cmp(tree->l, pt) > 0)    // LR
 	{
 		tree->l = block_tree_rotate_l(tree->l);
 		return block_tree_rotate_r(tree);
 	}
 
-	if (balance < -1 && block_tree_key_cmp(mx, my, tree->r) < 0)   // RL
+	if (balance < -1 && block_tree_key_cmp(tree->r, pt) < 0)   // RL
 	{
 		tree->r = block_tree_rotate_r(tree->r);
 		return block_tree_rotate_l(tree);
@@ -52,30 +51,7 @@ block_tree* block_tree_add(block_tree* tree, i32 mx, i32 my)
 	return tree;
 }
 
-bool block_tree_contains(const block_tree* tree, i32 mx, i32 my)
-{
-	if (!tree)
-		return false;
-	const i8 cmp = block_tree_key_cmp(mx, my, tree);
-	if (cmp == 0)
-		return true;
-	return block_tree_contains(mx, my, cmp < 0 ? tree->l : tree->r);
-}
-
-static i8 block_tree_key_cmp(i32 mx_a, i32 my_a, const block_tree* t)
-{
-	if (my_a > t->my)
-		return 1;
-	if (my_a < t->my)
-		return -1;
-	if (mx_a > t->mx)
-		return 1;
-	if (mx_a < t->mx)
-		return -1;
-	return 0;
-}
-
-block_tree* block_tree_create_node(i32 mx, i32 my)
+static block_tree* block_tree_create_node(block_tree* parent, block_pt pt)
 {
 	block_tree* tree = SDL_malloc(sizeof(block_tree));
 	if (!tree)
@@ -83,9 +59,54 @@ block_tree* block_tree_create_node(i32 mx, i32 my)
 	tree->l = NULL;
 	tree->r = NULL;
 	tree->h = 0;
-	tree->mx = mx;
-	tree->my = my;
+	tree->pt = pt;
+
+	tree->parent = parent;
+	tree->processed = false;
 	return tree;
+}
+
+bool block_tree_contains(const block_tree* tree, block_pt pt)
+{
+	if (!tree)
+		return false;
+	const i8 cmp = block_tree_key_cmp(tree, pt);
+	if (cmp == 0)
+		return true;
+	return block_tree_contains(cmp < 0 ? tree->l : tree->r, pt);
+}
+
+static i8 block_tree_key_cmp(const block_tree* tree, block_pt pt)
+{
+	if (pt.y > tree->pt.y)
+		return 1;
+	if (pt.y < tree->pt.y)
+		return -1;
+	if (pt.x > tree->pt.x)
+		return 1;
+	if (pt.x < tree->pt.x)
+		return -1;
+	return 0;
+}
+
+block_tree* block_tree_next(block_tree* current)
+{
+	while (true)
+	{
+		if (current->l && !current->l->processed)
+			current = current->l;
+		else if (!current->processed)
+		{
+			current->processed = true;
+			return current;
+		}
+		else if (current->r && !current->r->processed)
+			current = current->r;
+		else if (current->parent)
+			current = current->parent;
+		else
+			return NULL;
+	}
 }
 
 static i32 block_tree_height(block_tree* tree)
@@ -105,6 +126,10 @@ static block_tree* block_tree_rotate_l(block_tree* x)
 
 	y->l = x;
 	x->r = yl;
+	
+	y->parent = x->parent;
+	x->parent = y;
+	yl->parent = x;
 
 	x->h = SDL_max(block_tree_height(x->l), block_tree_height(x->r)) + 1;
 	y->h = SDL_max(block_tree_height(y->l), block_tree_height(y->r)) + 1;
@@ -120,24 +145,12 @@ static block_tree* block_tree_rotate_r(block_tree* y)
 	x->r = y;
 	y->l = xr;
 
+	x->parent = y->parent;
+	y->parent = x;
+	xr->parent = y;
+
 	y->h = SDL_max(block_tree_height(y->l), block_tree_height(y->r)) + 1;
 	x->h = SDL_max(block_tree_height(x->l), block_tree_height(x->r)) + 1;
 
 	return x;
-}
-
-void block_tree_nodes(const block_tree* tree, block_pt* to_write)
-{
-	block_tree_nodes_inner(tree, to_write, 0);
-}
-
-static i64 block_tree_nodes_inner(const block_tree* tree, block_pt* to_write, i64 pos)
-{
-	if (!tree)
-		return pos;
-	pos = block_tree_nodes_inner(tree->l, to_write, pos);
-	to_write[pos].x = tree->mx;
-	to_write[pos].y = tree->my;
-	pos = block_tree_nodes_inner(tree->r, to_write, pos + 1);
-	return pos + 1;
 }

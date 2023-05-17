@@ -84,8 +84,8 @@ typedef struct
 	u8 staytime;			  //the amount of (half-)seconds that a door stays open
 	DoorFlags door_flags;
 
-	u8 state; //0: closed/inactive, 1: opening, 2: open, 3: opened
-	i16 scroll; //from 0 - 255, represents how open the door is, with 128 representing half
+	u8 state; // 0: closed/inactive, 1: opening, 2: open, 3: opened
+	i16 scroll; // from 0 - 255, represents how open the door is, with 128 representing half
 	i16 timer_staycounter;
 	u8 timer_ticks;
 } DoorParams;

@@ -4,8 +4,11 @@
 #include <input/input.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
+#include <util/mathutil.h>
 
+// Debug
 #include <map/block/block_iterator.h>
+
 
 bool player_noclip = false;
 
@@ -148,14 +151,14 @@ static inline void player_set_movement(u32 delta)
 	else
 		player_accel_forward = SDL_min(player_accel_forward + friction * delta, 0);
 
-	const double accel_strafe = input.walk ? PLAYER_ACCEL_STRAFE : PLAYER_ACCEL_STRAFE_WALK;
+	const double accel_strafe = input.walk ? PLAYER_ACCEL_STRAFE_WALK : PLAYER_ACCEL_STRAFE;
 	const double maxstrafe = input.walk ? PLAYER_MAXSTRAFE_WALK : PLAYER_MAXSTRAFE;
 	const double friction_strafe = PLAYER_FRICTION_STRAFE;
 	if (input.strafe_left)
 		player_accel_strafe = SDL_min(player_accel_strafe + accel_strafe * delta, maxstrafe);
 	else if (input.strafe_right)
 		player_accel_strafe = SDL_max(player_accel_strafe - accel_strafe * delta, -maxstrafe);
-	else if (accel_strafe > 0)
+	else if (player_accel_strafe > 0)
 		player_accel_strafe = SDL_max(player_accel_strafe - friction_strafe * delta, 0);
 	else
 		player_accel_strafe = SDL_min(player_accel_strafe + friction_strafe * delta, 0);

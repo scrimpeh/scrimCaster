@@ -64,7 +64,7 @@ static void block_map_list_free(block_ref_list* list);
 
 static void block_enter_actor(const ac_actor* actor);
 static void block_enter_actor_point(const ac_actor* actor, block_pt* pts, u8 current);
-bool block_pt_eq(const block_pt* a, const block_pt* b);
+bool block_pt_eq(block_pt a, block_pt b);
 
 block_ref_list* block_ref_list_get(const block_pt pt);
 void block_set_actor_points(const ac_actor* actor, block_pt* pts);

@@ -70,11 +70,11 @@ static void block_enter_actor(const ac_actor* actor)
 	block_set_actor_points(actor, pts);
 
 	block_enter_actor_point(actor, pts, 0);
-	if (!block_pt_eq(&pts[1], &pts[0]))
+	if (!block_pt_eq(pts[1], pts[0]))
 		block_enter_actor_point(actor, pts, 1);
-	if (!block_pt_eq(&pts[2], &pts[1]) && !block_pt_eq(&pts[2], &pts[0]))
+	if (!block_pt_eq(pts[2], pts[1]) && !block_pt_eq(pts[2], pts[0]))
 		block_enter_actor_point(actor, pts, 2);
-	if (!block_pt_eq(&pts[3], &pts[2]) && !block_pt_eq(&pts[3], &pts[1]) && !block_pt_eq(&pts[3], &pts[0]))
+	if (!block_pt_eq(pts[3], pts[2]) && !block_pt_eq(pts[3], pts[1]) && !block_pt_eq(pts[3], pts[0]))
 		block_enter_actor_point(actor, pts, 3);
 }
 
@@ -139,7 +139,7 @@ void block_set_actor_points(const ac_actor* actor, block_pt* pts)
 	}
 }
 
-bool block_pt_eq(const block_pt* a, const block_pt* b)
+bool block_pt_eq(block_pt a, block_pt b)
 {
-	return a->x == b->x && a->y == b->y;
+	return a.x == b.x && a.y == b.y;
 }

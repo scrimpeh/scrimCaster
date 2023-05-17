@@ -99,7 +99,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	{
 		if (side->flags & DOOR_V)
 		{
-			const i32 door_h = (i32) (wall_h * ((R_CELL_H - side->door.scroll) / (float) (R_CELL_H)));
+			const i32 door_h = (i32) (wall_h * ((R_CELL_H - side->door.scroll) / (float) R_CELL_H));
 			y_end = SDL_min(viewport_h, wall_y + door_h);
 		}
 

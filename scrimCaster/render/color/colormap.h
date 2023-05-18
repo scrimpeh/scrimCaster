@@ -16,6 +16,12 @@
 typedef u32 cm_color;
 typedef u8 cm_channel;
 
+typedef struct
+{
+	cm_color color;
+	float alpha;
+} cm_alpha_color;
+
 #define CM_R_MASK 0x00FF0000
 #define CM_G_MASK 0x0000FF00
 #define CM_B_MASK 0x000000FF

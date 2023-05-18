@@ -93,6 +93,9 @@ void spr_draw(SDL_Surface* target)
 	while (ds_index--)
 	{
 		const spr_actor* ds = &sprite_slot_buffer[ds_index];
+		if (ds->distance <= 0)
+			continue;
+
 		const spr_frame* ws = spr_get_frame(ds->actor);
 
 		const angle_d angle = angle_normalize_deg_d(ds->angle - (viewport_x_fov / 2));
@@ -116,6 +119,15 @@ void spr_draw(SDL_Surface* target)
 		const u32* spr_ptr_begin = (u32*) gfx_ws_buffer[ws->sheet]->pixels + (ws->y * spritesheet_width) + ws->x;
 
 		float sprcol_x = spr_rect.x >= 0 ? 0 : -spr_rect.x * x_inc;
+
+		const i16 map_x = (i16) floor(ds->actor->x / M_CELLSIZE);
+		const i16 map_y = (i16) floor(ds->actor->y / M_CELLSIZE);
+		const i16 cell_x = (i16) fmod(ds->actor->x, M_CELLSIZE);
+		const i16 cell_y = (i16) fmod(ds->actor->y, M_CELLSIZE);
+
+		const float brightness = r_light_get_alpha(map_x, map_y, ws->anchor == SPR_CEIL ? M_CEIL : M_FLOOR, cell_x, cell_y);
+		const cm_alpha_color distance_fog = cm_ramp_get_px(ds->distance);
+
 		for (i32 x_i = x_start; x_i < x_end; ++x_i)
 		{
 			float sprcol_y = spr_rect.y >= 0 ? 0 : -spr_rect.y * y_inc;
@@ -127,13 +139,7 @@ void spr_draw(SDL_Surface* target)
 				u32 spr_px = *(ws_px + (u16) sprcol_y * spritesheet_width);
 				if (spr_px != COLOR_KEY && *z_buffer_px >= ds->distance)
 				{
-					const i16 map_x = (i16) floor(ds->actor->x / M_CELLSIZE);
-					const i16 map_y = (i16) floor(ds->actor->y / M_CELLSIZE);
-					const i16 cell_x = (i16) fmod(ds->actor->x, M_CELLSIZE);
-					const i16 cell_y = (i16) fmod(ds->actor->y, M_CELLSIZE);
-					spr_px = r_light_px(map_x, map_y, ws->anchor == SPR_CEIL ? M_CEIL : M_FLOOR, spr_px, cell_x, cell_y);
-					spr_px = cm_ramp_mix(spr_px, ds->distance);
-					*render_px = spr_px;
+					*render_px = cm_ramp_apply(r_light_apply(spr_px, brightness), distance_fog);
 					*z_buffer_px = ds->distance;
 				}
 				sprcol_y += y_inc;

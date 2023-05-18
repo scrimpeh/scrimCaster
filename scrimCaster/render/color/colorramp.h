@@ -39,5 +39,8 @@ const cm_ramp* cm_ramp_get();
 // Test integrity of color ramp
 static bool cm_ramp_valid(const cm_ramp* ramp);
 
-cm_color cm_ramp_mix(cm_color color, float distance);
+
+cm_alpha_color cm_ramp_get_px(float distance);
+
+cm_color cm_ramp_apply(cm_color color, cm_alpha_color mix);
 cm_color cm_ramp_mix_infinite(cm_color color);

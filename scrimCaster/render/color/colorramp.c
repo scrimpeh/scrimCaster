@@ -100,7 +100,7 @@ static bool cm_ramp_valid(const cm_ramp* ramp)
 	}
 }
 
-cm_color cm_ramp_mix(cm_color color, float distance)
+cm_alpha_color cm_ramp_get_px(float distance)
 {
 	// Find the nearest two setpoints. Linear search is okay for this, we only need to do this every pixel (lol)
 	u32 i = 0;
@@ -111,13 +111,20 @@ cm_color cm_ramp_mix(cm_color color, float distance)
 	const cm_ramp_setpoint* pt_a = &cm_ramp_current->points[i - 1];
 	const cm_ramp_setpoint* pt_b = &cm_ramp_current->points[i];
 
-	const float alpha = math_lerp(pt_a->distance, pt_b->distance, distance, pt_a->alpha, pt_b->alpha);
+	cm_alpha_color mix;
+	mix.alpha = math_lerp(pt_a->distance, pt_b->distance, distance, pt_a->alpha, pt_b->alpha);
+
 	const u8 r = (u8) math_lerp(pt_a->distance, pt_b->distance, distance, CM_R(pt_a->color), CM_R(pt_b->color));
 	const u8 g = (u8) math_lerp(pt_a->distance, pt_b->distance, distance, CM_G(pt_a->color), CM_G(pt_b->color));
 	const u8 b = (u8) math_lerp(pt_a->distance, pt_b->distance, distance, CM_B(pt_a->color), CM_B(pt_b->color));
-	
-	const cm_color mix = CM_GET(r, g, b);
-	return cm_map(color, mix, alpha);
+	mix.color = CM_GET(r, g, b);
+
+	return mix;
+}
+
+cm_color cm_ramp_apply(cm_color color, cm_alpha_color mix)
+{
+	return cm_map(color, mix.color, mix.alpha);
 }
 
 cm_color cm_ramp_mix_infinite(cm_color color)

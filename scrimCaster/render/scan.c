@@ -109,16 +109,17 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		render_px += (y_top * viewport_w) + col;
 		z_buffer_px += (y_top * viewport_w) + col;
 
+		// Calculate lighting and distance fog for side
+		const float brightness = r_light_get_alpha(intercept->map_x, intercept->map_y, intercept->orientation, intercept->column, 0);
+		const cm_alpha_color distance_fog = cm_ramp_get_px(distance_corrected);
+
 		for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
 		{
 			const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, scan_get_slice_y_start(side));
 			u32 tex_col = *(slice + slice_px);
 			if (tex_col != COLOR_KEY)
 			{
-				tex_col = r_light_px(intercept->map_x, intercept->map_y, intercept->orientation, tex_col, intercept->column, slice_px);
-				tex_col = cm_ramp_mix(tex_col, distance_corrected);
-
-				*render_px = tex_col;
+				*render_px = cm_ramp_apply(r_light_apply(tex_col, brightness), distance_fog);
 				*z_buffer_px = distance_corrected;
 			}
 
@@ -142,19 +143,20 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
 		const float d = viewport_y_to_distance(y_px);
-		float xa;
-		float ya;
-		math_vec_cast_f(x, y, intercept->angle, d / cosf(angle), &xa, &ya);
+		math_vec_2f w_target = math_vec_cast_f(x, y, intercept->angle, d / cosf(angle));
 
-		const i16 grid_xa = (i16) (floorf(xa / M_CELLSIZE));
-		const i16 grid_ya = (i16) (floorf(ya / M_CELLSIZE));
+		const i16 mx = w_target.x / M_CELLSIZE;
+		const i16 my = w_target.y / M_CELLSIZE;
 
-		const i16 cell_x = (i16) (fmodf(floorf(xa), (float)(M_CELLSIZE)));
-		const i16 cell_y = (i16) (fmodf(floorf(ya), (float)(M_CELLSIZE)));
+		const i16 cx = fmodf(w_target.x, M_CELLSIZE);
+		const i16 cy = fmodf(w_target.y, M_CELLSIZE);
 
-		const m_cell* cell = m_get_cell(grid_xa, grid_ya);
+		const float brightness = r_light_get_alpha(mx, my, M_FLOOR, cx, cy);
+		const cm_alpha_color distance_fog = cm_ramp_get_px(d);
 
-		u32 floor_px = tx_get_point(&cell->floor, cell_x, cell_y);
+		const m_cell* cell = m_get_cell(mx, my);
+
+		u32 floor_px = tx_get_point(&cell->floor, cx, cy);
 		if (floor_px == COLOR_KEY)
 		{
 			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
@@ -162,13 +164,11 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		}
 		else
 		{
-			floor_px = r_light_px(grid_xa, grid_ya, M_FLOOR, floor_px, cell_x, cell_y);
-			floor_px = cm_ramp_mix(floor_px, d);
-			*floor_render_px_bottom = floor_px;
+			*floor_render_px_bottom = cm_ramp_apply(r_light_apply(floor_px, brightness), distance_fog);
 			*z_buffer_px_bottom = d;
 		}
 
-		u32 ceil_px = tx_get_point(&cell->ceil, cell_x, cell_y);
+		u32 ceil_px = tx_get_point(&cell->ceil, cx, cy);
 		if (ceil_px == COLOR_KEY)
 		{
 			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
@@ -176,9 +176,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		}
 		else
 		{
-			ceil_px = r_light_px(grid_xa, grid_ya, M_CEIL, ceil_px, cell_x, cell_y);
-			ceil_px = cm_ramp_mix(ceil_px, d);
-			*floor_render_px_top = ceil_px;
+			*floor_render_px_top = cm_ramp_apply(r_light_apply(ceil_px, brightness), distance_fog);
 			*z_buffer_px_top = d;
 		}
 

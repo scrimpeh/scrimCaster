@@ -23,5 +23,5 @@ void cm_to_sdl_color(SDL_Color* color, cm_color source)
 
 static cm_channel cm_mix_channel(cm_channel source, cm_channel target, float alpha)
 {
-	return (cm_channel)((1.f - alpha) * source) + (alpha * target);
+	return (cm_channel) ((1.f - alpha) * source) + (alpha * target);
 }

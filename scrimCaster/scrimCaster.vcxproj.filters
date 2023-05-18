@@ -41,6 +41,9 @@
     <Filter Include="Source Files\map\block">
       <UniqueIdentifier>{3c44ea86-7f3f-4350-8794-058c28d28a6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\game\actor\trigger">
+      <UniqueIdentifier>{abe891e5-6e00-4773-83a3-28dafc762850}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="render\window.h">
@@ -168,6 +171,12 @@
     </ClInclude>
     <ClInclude Include="map\block\block_tree.h">
       <Filter>Source Files\map\block</Filter>
+    </ClInclude>
+    <ClInclude Include="game\actor\trigger\light.h">
+      <Filter>Source Files\game\actor\trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="util\random.h">
+      <Filter>Source Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -299,6 +308,12 @@
     </ClCompile>
     <ClCompile Include="map\block\block_tree.c">
       <Filter>Source Files\map\block</Filter>
+    </ClCompile>
+    <ClCompile Include="game\actor\trigger\light.c">
+      <Filter>Source Files\game\actor\trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="util\random.c">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

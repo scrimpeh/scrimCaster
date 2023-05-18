@@ -17,8 +17,14 @@ typedef enum
 	AC_DUMMY,
 	AC_PLAYER,
 	AC_DUMMY_ENEMY,
-	AC_PILLAR
+	AC_PILLAR,
+	AC_T_LIGHT_FLICKER
 } ac_type;
+
+typedef enum
+{
+	AC_FLAG_SOLID = 0x1
+} ac_flags;
 
 typedef struct
 {
@@ -35,7 +41,7 @@ typedef struct
 	// they can be used for whatever makes sense for the type
 	u16 hp;
 	u8 state;
-	u8 timer;
+	i16 timer;
 	u32 flags;
 } ac_actor;
 

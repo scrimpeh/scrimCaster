@@ -11,7 +11,6 @@
 
 #include <math.h>
 
-
 // Static Sprite definition
 // TODO: Use textures instead and put each texture on its own frame
 static const spr_actor_frame_map SPR_DEF[] =
@@ -64,6 +63,19 @@ static const spr_actor_frame_map SPR_DEF[] =
 				(spr_frame[])
 				{
 					{ .sheet = 0, .x = 0, .y = 0, .w = 28, .h = 64, .anchor = SPR_FLOOR, .offset = 0 },
+				}
+			}
+		}
+	},
+	[AC_T_LIGHT_FLICKER] =
+	{
+		(spr_frameset[])
+		{
+			{
+				1,
+				(spr_frame[])
+				{
+					{ .sheet = 0, .x = 0, .y = 0, .w = 0, .h = 0, .anchor = SPR_FLOOR, .offset = 0 },
 				}
 			}
 		}

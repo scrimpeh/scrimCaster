@@ -14,10 +14,20 @@ extern m_map_data m_map;
 
 static const ac_bounds AC_BOUNDS[] =
 {
-	[AC_DUMMY]       = { 0., 0. },
-	[AC_PLAYER]      = { 8., 8. },
-	[AC_DUMMY_ENEMY] = { 8., 8. },
-	[AC_PILLAR]      = { 8., 8. }
+	[AC_DUMMY]           = { 0., 0. },
+	[AC_PLAYER]          = { 8., 8. },
+	[AC_DUMMY_ENEMY]     = { 8., 8. },
+	[AC_PILLAR]          = { 8., 8. },
+	[AC_T_LIGHT_FLICKER] = { 0., 0. }
+};
+
+static const ac_flags AC_FLAGS[] =
+{
+	[AC_DUMMY] = 0,
+	[AC_PLAYER] = 0,
+	[AC_DUMMY_ENEMY] = 0,
+	[AC_PILLAR] = AC_FLAG_SOLID,
+	[AC_T_LIGHT_FLICKER] = 0,
 };
 
 ac_bounds ac_get_bounds(ac_type type)
@@ -105,7 +115,7 @@ static bool ac_collide_v(const ac_actor* actor, double* p_dy)
 
 static bool ac_intersect(ac_actor* actor, const ac_actor* obstacle, bool vertical, double* disp)
 {
-	if (actor == obstacle) 
+	if (actor == obstacle || !(AC_FLAGS[obstacle->type] & AC_FLAG_SOLID))
 		return false;
 
 	const ac_bounds cur_bounds = ac_get_bounds(actor->type);

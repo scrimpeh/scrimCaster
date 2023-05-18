@@ -222,7 +222,7 @@ static void r_light_smooth_get_cell_xy(u8 x, u8 y, m_orientation orientation, u8
 
 i32 r_light_smooth_update(i16 x_start, i16 y_start, i16 x_end, i16 y_end)
 {
-	for (i32 y = y_start - 1; y <= y_end - 1; y++)
+	for (i32 y = y_start - 1; y <= y_end + 1; y++)
 	{
 		for (i32 x = x_start - 1; x <= x_end + 1; x++)
 		{

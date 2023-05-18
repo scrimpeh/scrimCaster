@@ -25,12 +25,13 @@ static m_cell cells[16][16];
 
 static const m_obj objects[] =
 {
-	{ .type = AC_PLAYER, .x = 50,  .y = 50,  .angle = 0 },
-	{ .type = AC_PILLAR, .x = 300, .y = 100, .angle = 0 },
-	{ .type = AC_PILLAR, .x = 96,  .y = 480, .angle = 0 },
-	{ .type = AC_PILLAR, .x = 448, .y = 320, .angle = 0 },
-	{ .type = AC_PILLAR, .x = 448, .y = 256, .angle = 0 },
-	{ .type = AC_PILLAR, .x = 448, .y = 192, .angle = 0 }
+	{ .type = AC_PLAYER,          .x = 50,  .y =  50, .angle = 0 },
+	{ .type = AC_PILLAR,          .x = 300, .y = 128, .angle = 0 },
+	{ .type = AC_PILLAR,          .x = 96,  .y = 480, .angle = 0 },
+	{ .type = AC_PILLAR,          .x = 448, .y = 320, .angle = 0 },
+	{ .type = AC_PILLAR,          .x = 448, .y = 256, .angle = 0 },
+	{ .type = AC_PILLAR,          .x = 448, .y = 192, .angle = 0 },
+	{ .type = AC_T_LIGHT_FLICKER, .x = 288, .y = 224, .angle = 0 }
 };
 
 static const r_decal_world decals[] =
@@ -87,7 +88,7 @@ void m_load()
 	m_map.h = 16;
 	m_map.cells = cells[0];
 	m_map.objects = &objects[0];
-	m_map.obj_count = 6;
+	m_map.obj_count = 7;
 	m_map.info.texture_set_count = 1;
 	m_map.info.texture_sets = tx_sets;
 	m_map.info.sky = 0;
@@ -247,8 +248,12 @@ void m_load()
 		cells[0][6].w.flags = BLOCK_SMOOTH_LIGHT;
 		cells[0][6].brightness = 128;
 
+	
+
 		_m_flood_fill(8, 2, _m_flood_fill_cb_ceil, 0);
 		_m_flood_fill(8, 2, _m_flood_fill_cb_floor, 7);
+
+		cells[3][4].ceil.type = 9;
 
 		_m_flood_fill(4, 7, _m_flood_fill_cb_ceil, 0);
 		_m_flood_fill(4, 7, _m_flood_fill_cb_brightness, 255);

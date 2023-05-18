@@ -2,15 +2,17 @@
 
 #include <game/actor/actorcontainers.h>
 #include <game/actor/player.h>
+#include <game/actor/trigger/light.h>
 
 ac_list ac_actors;
 
 static const ac_logic AC_LOGIC[] =
 {
-	[AC_DUMMY]       = { ac_logic_make_dummy, ac_logic_update_dummy },
-	[AC_PLAYER]      = { player_make,         player_update         },
-	[AC_DUMMY_ENEMY] = { ac_logic_make_dummy, ac_logic_update_dummy },
-	[AC_PILLAR]      = { ac_logic_make_dummy, ac_logic_update_dummy }
+	[AC_DUMMY]           = { ac_logic_make_dummy, ac_logic_update_dummy  },
+	[AC_PLAYER]          = { player_make,         player_update          },
+	[AC_DUMMY_ENEMY]     = { ac_logic_make_dummy, ac_logic_update_dummy  },
+	[AC_PILLAR]          = { ac_logic_make_dummy, ac_logic_update_dummy  },
+	[AC_T_LIGHT_FLICKER] = { ac_logic_make_dummy, ac_logic_light_flicker }
 };
 
 void ac_make(ac_actor* ac, m_obj* obj)

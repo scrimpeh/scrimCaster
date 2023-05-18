@@ -8,6 +8,7 @@
 #include <map/block/blockmap.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
+#include <util/random.h>
 
 // On game Objects:
 /* Do we want a unified Actor system, or break up several types
@@ -64,6 +65,7 @@ void game_pause(bool open)
 i32 game_init()
 {
 	game_free();
+	random_srand(0);
 	ac_load(m_map.objects, m_map.obj_count);
 	SDL_assert(ac_actors.count > 0);
 	SDL_assert(ac_actors.first->actor.type == AC_PLAYER);

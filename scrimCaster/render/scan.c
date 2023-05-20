@@ -2,6 +2,8 @@
 
 #include <game/camera.h>
 #include <geometry.h>
+#include <map/block/blockmap.h>
+#include <map/block/block_iterator.h>
 #include <map/map.h>
 #include <render/color/colormap.h>
 #include <render/color/colorramp.h>
@@ -62,6 +64,8 @@ static u8 scan_get_tx_slice_y(i64 wall_h, i64 y, u8 start_y)
 	const float tx = (float) y_rel / wall_h * TX_SIZE;
 	return (u8) tx + start_y;
 }
+
+#include <map/block/block_iterator.h>
 
 static void scan_draw_column(SDL_Surface* target, float x, float y, const g_intercept* intercept, u16 col)
 {
@@ -135,10 +139,10 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	if (intercept->type == G_INTERCEPT_NON_SOLID)
 		return;
 
-	u32* floor_render_px_top = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
-	u32* floor_render_px_bottom = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
-	float* z_buffer_px_top = viewport_z_buffer + ((y_top - 1) * viewport_w) + col;
-	float* z_buffer_px_bottom = viewport_z_buffer + ((viewport_h - y_top) * viewport_w) + col;
+	u32* render_px_ceil = (u32*) target->pixels + ((y_top - 1) * viewport_w) + col;
+	u32* render_px_floor = (u32*) target->pixels + ((viewport_h - y_top) * viewport_w) + col;
+	float* z_buffer_px_ceil = viewport_z_buffer + ((y_top - 1) * viewport_w) + col;
+	float* z_buffer_px_floor = viewport_z_buffer + ((viewport_h - y_top) * viewport_w) + col;
 
 	for (i32 y_px = y_top - 1; y_px != -1; y_px--)
 	{
@@ -159,31 +163,49 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		u32 floor_px = tx_get_point(&cell->floor, cx, cy);
 		if (floor_px == COLOR_KEY)
 		{
-			*floor_render_px_bottom = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
-			*z_buffer_px_bottom = FLT_MAX;
+			*render_px_floor = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
+			*z_buffer_px_floor = FLT_MAX;
 		}
 		else
 		{
-			*floor_render_px_bottom = cm_ramp_apply(r_light_apply(floor_px, brightness), distance_fog);
-			*z_buffer_px_bottom = d;
+			*render_px_floor = cm_ramp_apply(r_light_apply(floor_px, brightness), distance_fog);
+			*z_buffer_px_floor = d;
 		}
 
 		u32 ceil_px = tx_get_point(&cell->ceil, cx, cy);
 		if (ceil_px == COLOR_KEY)
 		{
-			*floor_render_px_top = r_sky_get_pixel(y_px, intercept->angle);
-			*z_buffer_px_top = FLT_MAX;
+			*render_px_ceil = r_sky_get_pixel(y_px, intercept->angle);
+			*z_buffer_px_ceil = FLT_MAX;
 		}
 		else
 		{
-			*floor_render_px_top = cm_ramp_apply(r_light_apply(ceil_px, brightness), distance_fog);
-			*z_buffer_px_top = d;
+			*render_px_ceil = cm_ramp_apply(r_light_apply(ceil_px, brightness), distance_fog);
+			*z_buffer_px_ceil = d;
 		}
 
-		floor_render_px_top -= viewport_w;
-		floor_render_px_bottom += viewport_w;
-		z_buffer_px_top -= viewport_w;
-		z_buffer_px_bottom += viewport_w;
+		//Check for decals
+		const block_ref_list_entry* decal_ref = block_ref_list_get(block_get_pt(mx, my), BLOCK_TYPE_DECAL_FLAT)->first;
+		while (decal_ref)
+		{
+			const r_decal_world* decal = decal_ref->reference;
+			const float decal_dist = math_dist_f
+			(
+				decal->id.x * M_CELLSIZE + decal->x, decal->id.y * M_CELLSIZE + decal->y,
+				w_target.x, w_target.y
+			);
+			if (decal_dist < 10)
+			{
+				u32* px = decal->id.orientation == M_CEIL ? render_px_ceil : render_px_floor;
+				*px = CM_GET(0, 255, 255);
+			}
+			decal_ref = decal_ref->next;
+		}
+
+		render_px_ceil -= viewport_w;
+		render_px_floor += viewport_w;
+		z_buffer_px_ceil -= viewport_w;
+		z_buffer_px_floor += viewport_w;
 	}
 }
 

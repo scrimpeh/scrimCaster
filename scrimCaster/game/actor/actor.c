@@ -172,13 +172,13 @@ static bool ac_intersect(ac_actor* actor, const ac_actor* obstacle, bool vertica
 static bool ac_collide_actor(ac_actor* actor, bool vertical, double* disp)
 {
 	bool collision = false;
-	block_iterator* iter = block_iterator_make_actor(actor);
-	block_reference* r = block_iterator_next(iter);
-	while (r)
+	block_iterator* iter = block_iterator_make_actor(BLOCK_TYPE_ACTOR, actor);
+	const ac_actor* ac = block_iterator_next(iter);
+	while (ac)
 	{
-		if (r->type == BLOCK_TYPE_ACTOR && r->reference.actor != actor)
-			collision |= ac_intersect(actor, r->reference.actor, vertical, disp);
-		r = block_iterator_next(iter);
+		if (ac != actor)
+			collision |= ac_intersect(actor, ac, vertical, disp);
+		ac = block_iterator_next(iter);
 	}
 	block_iterator_free(iter);
 

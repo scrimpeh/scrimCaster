@@ -8,7 +8,7 @@
 
 // Debug
 #include <map/block/block_iterator.h>
-
+#include <render/decal.h>
 
 bool player_noclip = false;
 
@@ -97,18 +97,17 @@ static bool player_shoot_check_intercept(const g_intercept* intercept)
 	return intercept->type == G_INTERCEPT_NON_SOLID;
 }
 
-
 bool player_update(ac_actor* ac, u32 delta)
 {
 	watch_add_new(3, WCH_F64, "x: ", &ac->x, WCH_F64, ", y: ", &ac->y, WCH_F64, ", angle: ", &ac->angle);
 	_block_object_count = 0;
-	block_iterator* iter = block_iterator_make_actor(ac);
-	block_reference* r = block_iterator_next(iter);
-	while (r)
+	block_iterator* iter = block_iterator_make_actor(BLOCK_TYPE_DECAL_SIDE, ac);
+	r_decal_world* decal = block_iterator_next(iter);
+	while (decal)
 	{
-		if (r->reference.actor != ac)
-			_block_object_count++;
-		r = block_iterator_next(iter);
+		//if (r->reference != ac)
+		_block_object_count++;
+		decal = block_iterator_next(iter);
 	}
 	block_iterator_free(iter);
 

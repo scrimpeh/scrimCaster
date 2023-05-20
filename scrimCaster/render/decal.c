@@ -29,8 +29,9 @@ static const r_decal_static R_DECALS[] =
 	[1] = { .sheet = 0, .x = 0, .y = 0, .w = 28, .h = 64 }
 };
 
-static r_decal_world* r_decals_map = NULL;
-static r_decal_world* r_decals_dynamic = NULL;
+r_decal_world* r_decals_map = NULL;
+r_decal_world* r_decals_dynamic = NULL;
+
 static u16* r_decal_dynamic_slots = NULL;
 static u16 r_decal_dynamic_next_slot = 0;
 
@@ -242,4 +243,9 @@ static bool r_decal_visible(const r_decal_world* decal)
 		   viewport_point_on_screen(x_a, y_b) ||
 		   viewport_point_on_screen(x_b, y_a) ||
 		   viewport_point_on_screen(x_b, y_b);
-}	
+}
+
+const r_decal_static* r_decal_get_static(const r_decal_world* world_decal)
+{
+	return &R_DECALS[world_decal->type];
+}

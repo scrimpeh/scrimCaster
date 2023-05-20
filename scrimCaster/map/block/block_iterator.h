@@ -18,6 +18,7 @@
 typedef struct
 {
 	block_tree* cell_tree;
+	block_type type;
 	i32 size;
 
 	i32 i;
@@ -25,14 +26,13 @@ typedef struct
 	block_ref_list_entry* cur;
 } block_iterator;
 
-block_iterator* block_iterator_make_empty();
-block_iterator* block_iterator_make_pt(i64 wx, i64 wy);
-block_iterator* block_iterator_make_actor(const ac_actor* ac);
-
+block_iterator* block_iterator_make_empty(block_type type);
+block_iterator* block_iterator_make_pt(block_type type, i64 wx, i64 wy);
+block_iterator* block_iterator_make_actor(block_type type, const ac_actor* ac);
 
 void block_iterator_add_cell(block_iterator* iterator, block_pt pt);
 
-block_ref_list_entry* block_iterator_next(block_iterator* iterator);
+void* block_iterator_next(block_iterator* iterator);
 
 // TODO: maybe auto free
 void block_iterator_free(block_iterator* iterator);

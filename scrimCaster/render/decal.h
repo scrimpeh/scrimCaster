@@ -34,6 +34,8 @@ typedef struct {
 
 extern u16 r_decal_dynamic_max;
 
+extern r_decal_world* r_decals_map;
+extern r_decal_world* r_decals_dynamic;
 
 i32 r_decal_load();
 void r_decal_unload();
@@ -45,3 +47,5 @@ static void r_decal_draw_decal(SDL_Surface* target, const r_decal_world* decal);
 
 static void r_decal_clear(r_decal_world* decal);
 static bool r_decal_visible(const r_decal_world* decal);
+
+const r_decal_static* r_decal_get_static(const r_decal_world* world_decal);

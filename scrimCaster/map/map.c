@@ -36,9 +36,13 @@ static const m_obj objects[] =
 
 static const r_decal_world decals[] =
 {
-	{ .type = 1, .id = { .orientation = M_NORTH, .x = 2, .y = 0 }, .x = 32, .y = 16, .ttl = 0 },
-	{ .type = 1, .id = { .orientation = M_FLOOR, .x = 4, .y = 2 }, .x = 48, .y = 16, .ttl = 0 },
-	{ .type = 1, .id = { .orientation = M_CEIL,  .x = 4, .y = 2 }, .x = 32, .y = 32, .ttl = 0 }
+	{ .type = 1, .id = { .orientation = M_NORTH, .x = 2, .y = 0 }, .x =  0, .y = 22, .ttl = 0 },
+	{ .type = 1, .id = { .orientation = M_NORTH, .x = 3, .y = 0 }, .x = 32, .y = 22, .ttl = 0 },
+	{ .type = 1, .id = { .orientation = M_NORTH, .x = 5, .y = 0 }, .x =  0, .y = 22, .ttl = 0 },
+	{ .type = 2, .id = { .orientation = M_FLOOR, .x = 1, .y = 6 }, .x = 32, .y = 32, .ttl = 0 },
+	{ .type = 3, .id = { .orientation =  M_CEIL, .x = 1, .y = 6 }, .x = 63, .y =  0, .ttl = 0 },
+	{ .type = 2, .id = { .orientation =  M_WEST, .x = 0, .y = 6 }, .x = 32, .y = 32, .ttl = 0 },
+	{ .type = 3, .id = { .orientation = M_SOUTH, .x = 1, .y = 6 }, .x = 32, .y = 17, .ttl = 0 }
 };
 
 u32 m_max_tag;
@@ -92,7 +96,7 @@ void m_load()
 	m_map.info.texture_set_count = 1;
 	m_map.info.texture_sets = tx_sets;
 	m_map.info.sky = 0;
-	m_map.decal_count = 3;
+	m_map.decal_count = 7;
 	m_map.decals = &decals[0];
 
 	tx_map_load(m_map.info.texture_set_count, m_map.info.texture_sets);

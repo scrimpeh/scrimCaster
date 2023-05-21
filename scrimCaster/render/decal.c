@@ -4,11 +4,10 @@
 #include <map/map.h>
 #include <render/color/colormap.h>
 #include <render/color/colorramp.h>
+#include <render/gfxloader.h>
 #include <render/viewport.h>
 #include <util/mathutil.h>
 
-// Debug only
-#include <render/renderutil.h>
 
 // The general idea with decal drawing is I draw them decal by decal.
 // For every floor / ceiling decal, I find the four corner points in the viewport to derive a maximum bounding box.
@@ -25,8 +24,10 @@ u16 r_decal_dynamic_max = 30;
 // For now, decals use the same graphics as sprites
 static const r_decal_static R_DECALS[] =
 {
-	[0] = { .sheet = 0, .x = 0, .y = 0,  .w = 0,  .h = 0 }, // Dummy
-	[1] = { .sheet = 0, .x = 0, .y = 0, .w = 28, .h = 64 }
+	[0] = { .sheet = 0,  .x = 0,  .y = 0,  .w = 0,  .h = 0 }, // Dummy
+	[1] = { .sheet = 0, .x = 28,  .y = 0, .w = 26, .h = 27 }, // Window
+	[2] = { .sheet = 0, .x = 56,  .y = 0, .w = 11, .h = 12 }, // Bullet Hole 1
+	[3] = { .sheet = 0, .x = 56, .y = 12, .w = 11, .h = 13 }, // Bullet Hole 2
 };
 
 r_decal_world* r_decals_map = NULL;
@@ -98,154 +99,139 @@ void r_decal_unload()
 	r_decal_dynamic_slots = NULL;
 }
 
-void r_decal_draw(SDL_Surface* target)
+void r_decal_update(u32 t_delta)
 {
-	// TODO: Visibility filtering and geometric datastructure
-	for (u32 i = 0; i < m_map.decal_count; i++)
-		r_decal_draw_decal(target, &r_decals_map[i]);
-
 	for (u32 i = 0; i < r_decal_dynamic_max; i++)
 	{
 		r_decal_world* decal = &r_decals_dynamic[i];
 		if (decal->type)
 		{
-			r_decal_draw_decal(target, decal);
-			if (decal->ttl && (--decal->ttl == 0))
+			if (decal->ttl)
 			{
-				r_decal_clear(decal);
-				r_decal_dynamic_slots[r_decal_dynamic_next_slot] = i;
+				decal->ttl -= t_delta;
+				if (decal->ttl < 0)
+				{
+					r_decal_clear(decal);
+					r_decal_dynamic_slots[r_decal_dynamic_next_slot] = i;
+				}
 			}
 		}
 	}
 }
 
-static void r_decal_draw_decal(SDL_Surface* target, const r_decal_world* decal)
-{
-	if (!r_decal_visible(decal))
-		return;
-
-	float decal_x;
-	float decal_y;
-	float decal_z;
-
-	switch (decal->id.orientation)
-	{
-	case M_EAST:
-		decal_x = (decal->id.x + 1) * M_CELLSIZE;
-		decal_y = decal->id.y * M_CELLSIZE + decal->x;
-		decal_z = decal->y;
-		break;
-	case M_NORTH:
-		decal_x = decal->id.x * M_CELLSIZE + decal->x;
-		decal_y = decal->id.y * M_CELLSIZE;
-		decal_z = decal->y;
-		break;
-	case M_WEST:
-		decal_x = decal->id.x * M_CELLSIZE;
-		decal_y = decal->id.y * M_CELLSIZE + (M_CELLSIZE - decal->x);
-		decal_z = decal->y;
-		break;
-	case M_SOUTH:
-		decal_x = decal->id.x * M_CELLSIZE + (M_CELLSIZE - decal->x);
-		decal_y = (decal->id.y + 1) * M_CELLSIZE;
-		decal_z = decal->y;
-		break;
-	case M_FLOOR:
-		decal_x = decal->id.x * M_CELLSIZE + decal->x;
-		decal_y = decal->id.y * M_CELLSIZE + decal->y;
-		decal_z = M_CELLHEIGHT;
-		break;
-	case M_CEIL:
-		decal_x = decal->id.x * M_CELLSIZE + decal->x;
-		decal_y = decal->id.y * M_CELLSIZE + decal->y;
-		decal_z = 0;
-		break;
-	}
-
-	const float dx = decal_x - viewport_x;
-	const float dy = decal_y - viewport_y;
-	const angle_f slope = angle_get_deg_f(dx, -dy);
-	const angle_rad_f angle = TO_RADF(viewport_angle - slope);
-
-	const float distance = math_dist_f(viewport_x, viewport_y, decal_x, decal_y);
-	const float distance_corrected = distance * cosf(angle);
-
-	const angle_f fov_min_half = angle_normalize_deg_f(viewport_angle + viewport_x_fov / 2);
-	const angle_f fov_max_half = angle_normalize_deg_f(viewport_angle - viewport_x_fov / 2);
-	const angle_f viewport_angle = angle_normalize_deg_f(fov_min_half - slope - (viewport_x_fov / 2));
-
-	const i32 x = viewport_angle_to_x(TO_RADF(viewport_angle));
-	const i32 y = viewport_distance_to_y(distance_corrected, decal_z);
-
-	r_draw_pixel(target, x, y, CM_GET(255, 255, 255));
-	r_draw_pixel(target, x + 1, y, CM_GET(255, 0, 255));
-	r_draw_pixel(target, x, y + 1, CM_GET(255, 0, 255));
-	r_draw_pixel(target, x - 1, y, CM_GET(255, 0, 255));
-	r_draw_pixel(target, x, y - 1, CM_GET(255, 0, 255));
-}
-
-static bool r_decal_visible(const r_decal_world* decal)
-{
-	float x_a;
-	float x_b;
-	float y_a;
-	float y_b;
-
-	const r_decal_static* static_decal = &R_DECALS[decal->type];
-
-	// Cull backfaces
-	const angle_f viewport_angle_min = angle_normalize_deg_f(viewport_angle + viewport_x_fov / 2);
-	const angle_f viewport_angle_max = angle_normalize_deg_f(viewport_angle - viewport_x_fov / 2);
-	switch (decal->id.orientation)
-	{
-	case M_EAST:
-		if (viewport_angle_max > 90 && viewport_angle_min < 270)
-			return false;
-		x_a = (decal->id.x + 1) * M_CELLSIZE;
-		y_a = decal->id.y * M_CELLSIZE + decal->x - (static_decal->w / 2);
-		x_b = x_a;
-		y_b = decal->id.y * M_CELLSIZE + decal->x + (static_decal->w / 2);
-		break;
-	case M_NORTH:
-		if (viewport_angle_max > 180 && viewport_angle_min > viewport_angle_max)
-			return false;
-		x_a = decal->id.x * M_CELLSIZE + decal->x - (static_decal->w / 2);
-		y_a = decal->id.y * M_CELLSIZE;
-		x_b = decal->id.x * M_CELLSIZE + decal->x + (static_decal->w / 2);
-		y_b = y_a;
-		break;
-	case M_WEST:
-		if (viewport_angle_max > 270 && viewport_angle_min < 90)
-			return false;
-		x_a = decal->id.x * M_CELLSIZE;
-		y_a = decal->id.y * M_CELLSIZE + (M_CELLSIZE - decal->x) + (static_decal->w / 2);
-		x_b = x_a;
-		y_b = decal->id.y * M_CELLSIZE + (M_CELLSIZE - decal->x) - (static_decal->w / 2);
-		break;
-	case M_SOUTH:
-		if (viewport_angle_min < 180 && viewport_angle_max < viewport_angle_min)
-			return false;
-		x_a = decal->id.x * M_CELLSIZE + (M_CELLSIZE - decal->x) + (static_decal->w / 2);
-		y_a = (decal->id.y + 1) * M_CELLSIZE;
-		x_b = decal->id.x * M_CELLSIZE + (M_CELLSIZE - decal->x) - (static_decal->w / 2);
-		y_b = y_a;
-		break;
-	case M_FLOOR:
-	case M_CEIL:
-		x_a = decal->id.x * M_CELLSIZE + decal->x - (static_decal->w / 2);
-		y_a = decal->id.y * M_CELLSIZE + decal->y - (static_decal->h / 2);
-		x_b = decal->id.x * M_CELLSIZE + decal->x + (static_decal->w / 2);
-		y_b = decal->id.y * M_CELLSIZE + decal->y + (static_decal->h / 2);
-		break;
-	}
-	
-	return viewport_point_on_screen(x_a, y_a) ||
-		   viewport_point_on_screen(x_a, y_b) ||
-		   viewport_point_on_screen(x_b, y_a) ||
-		   viewport_point_on_screen(x_b, y_b);
-}
-
 const r_decal_static* r_decal_get_static(const r_decal_world* world_decal)
 {
 	return &R_DECALS[world_decal->type];
+}
+
+void r_decal_get_map_bounds(const r_decal_world* decal, r_decal_bounds* bounds)
+{
+	SDL_assert(decal->type);
+
+	// TODO: Account for things like mirroring or rotation here
+
+	const r_decal_static* static_decal = &R_DECALS[decal->type];
+
+	switch (decal->id.orientation)
+	{
+	case M_FLOOR:
+	case M_CEIL:
+	{
+		const i32 wx = decal->id.x * M_CELLSIZE + decal->x;
+		const i32 wy = decal->id.y * M_CELLSIZE + decal->y;
+		bounds->x_a = (wx - (static_decal->w / 2));
+		bounds->y_a = (wy - (static_decal->h / 2));
+		bounds->x_b = (wx + (static_decal->w / 2));
+		bounds->y_b = (wy + (static_decal->h / 2));
+		return;
+	}
+	case M_NORTH:
+	case M_SOUTH:
+	{
+		const i32 wx_offs = decal->id.orientation == M_NORTH ? decal->x : M_CELLSIZE - 1 - decal->x;
+		const i32 wx = decal->id.x * M_CELLSIZE + wx_offs;
+		bounds->x_a = (wx - (static_decal->w / 2));
+		bounds->y_a = decal->id.y * M_CELLSIZE;
+		bounds->x_b = (wx + (static_decal->w / 2));
+		bounds->y_b = decal->id.y * M_CELLSIZE;
+		return;
+	}
+	case M_EAST:
+	case M_WEST:
+	{
+		const i32 wy_offs = decal->id.orientation == M_EAST ? decal->x : M_CELLSIZE - 1 - decal->x;
+		const i32 wy = decal->id.y * M_CELLSIZE + wy_offs;
+		bounds->x_a = decal->id.x * M_CELLSIZE;
+		bounds->y_a = (wy - (static_decal->w / 2));
+		bounds->x_b = decal->id.x * M_CELLSIZE;
+		bounds->y_b = (wy - (static_decal->w / 2));
+		return;
+	}
+	}
+}
+
+i16 r_decal_get_col(const r_decal_world* decal, i16 mx, i16 my, u8 side_col)
+{
+	SDL_assert(decal->type);
+	SDL_assert(decal->id.orientation != M_FLOOR && decal->id.orientation != M_CEIL);
+
+	// TODO: Account for things like mirroring or rotation here
+
+	const r_decal_static* static_decal = &R_DECALS[decal->type];
+
+	i16 col_decal;
+	i16 col_current;
+	switch (decal->id.orientation)
+	{
+	case M_EAST:  
+		col_decal = decal->id.y * M_CELLSIZE + decal->x;           
+		col_current = my * M_CELLSIZE + side_col;
+		break;
+	case M_NORTH: 
+		col_decal = decal->id.x * M_CELLSIZE + decal->x;
+		col_current = mx * M_CELLSIZE + side_col;
+		break;
+	case M_WEST:  
+		col_decal = decal->id.y * M_CELLSIZE + M_CELLSIZE - 1 - decal->x;
+		col_current = my * M_CELLSIZE + M_CELLSIZE - 1 - side_col;
+		break;
+	case M_SOUTH: 
+		col_decal = decal->id.x * M_CELLSIZE + M_CELLSIZE - 1 - decal->x;
+		col_current = mx * M_CELLSIZE + M_CELLSIZE - 1 - side_col;
+		break;
+	}
+	
+	return col_current - (col_decal - (static_decal->w / 2));
+}
+
+r_decal_pt r_decal_get_pt(const r_decal_world* decal, i32 wx, i32 wy)
+{
+	SDL_assert(decal->type);
+	SDL_assert(decal->id.orientation == M_FLOOR || decal->id.orientation == M_CEIL);
+
+	// TODO: Account for things like mirroring or rotation here
+
+	const r_decal_static* static_decal = &R_DECALS[decal->type];
+
+	const i32 wx_decal = decal->id.x * M_CELLSIZE + decal->x;
+	const i32 wy_decal = decal->id.y * M_CELLSIZE + decal->y;
+
+	const i32 wx_origin = wx_decal - static_decal->w / 2;
+	const i32 wy_origin = wy_decal - static_decal->h / 2;
+
+	r_decal_pt pt;
+	pt.x = wx - wx_origin;
+	pt.y = wy - wy_origin;
+	return pt;
+}
+
+bool r_decal_in_bounds(const r_decal_static* decal, r_decal_pt pt)
+{
+	return pt.x >= 0 && pt.x <= decal->w && pt.y >= 0 && pt.y <= decal->h;
+}
+
+const cm_color r_decal_get_px(const r_decal_static* decal, r_decal_pt pt)
+{
+	const u32* pixels = gfx_ws_buffer[decal->sheet]->pixels;
+	return pixels[(decal->y + pt.y) * gfx_ws_buffer[decal->sheet]->w + (decal->x + pt.x)];
 }

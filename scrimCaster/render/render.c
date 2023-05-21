@@ -77,7 +77,6 @@ void r_draw()
 
 	scan_draw(viewport_surface);
 	spr_draw(viewport_surface);
-	r_decal_draw(viewport_surface);
 
 	if (r_show_map)
 		am_draw(viewport_surface);
@@ -92,20 +91,20 @@ void r_draw()
 
 i16 r_hud_px_h(float x)
 {
-	return (i16)(x * viewport_w);
+	return (i16) (x * viewport_w);
 }
 
 i16 r_hud_px_v(float y)
 {
-	return (i16)(y * viewport_h);
+	return (i16) (y * viewport_h);
 }
 
 float r_hud_hu_h(i16 x)
 {
-	return (float)x / viewport_x;
+	return (float) x / viewport_x;
 }
 
 float r_hud_hu_v(i16 y)
 {
-	return (float)y / viewport_y;
+	return (float) y / viewport_y;
 }

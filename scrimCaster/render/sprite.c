@@ -4,6 +4,7 @@
 #include <game/gameobjects.h>
 #include <map/map.h>
 #include <render/color/colorramp.h>
+#include <render/gfxloader.h>
 #include <render/lighting/lighting.h>
 #include <render/renderconstants.h>
 #include <render/viewport.h>
@@ -85,8 +86,6 @@ static const spr_actor_frame_map SPR_DEF[] =
 #define MAX_SPRITES 256
 
 static spr_actor sprite_slot_buffer[MAX_SPRITES];
-
-extern SDL_Surface* gfx_ws_buffer[];
 
 void spr_draw(SDL_Surface* target)
 {

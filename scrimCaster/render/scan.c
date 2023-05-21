@@ -21,7 +21,6 @@
 // For drawing transparent surfaces, we keep a stack of (dynamically allocated) draw side
 g_intercept_stack* intercept_stack = NULL;
 
-
 static inline bool collect_intercept(const g_intercept* intercept)
 {
 	g_intercept_stack* store_intercept = SDL_malloc(sizeof(g_intercept_stack));
@@ -59,13 +58,11 @@ static u8 scan_get_slice_y_start(const m_side* side)
 
 static u8 scan_get_tx_slice_y(i64 wall_h, i64 y, u8 start_y)
 {
-	const i64 wall_y = (viewport_h - wall_h) / 2;
-	const i64 y_rel = y - wall_y;
+	const i64 y_top = (viewport_h - wall_h) / 2;
+	const i64 y_rel = y - y_top;
 	const float tx = (float) y_rel / wall_h * TX_SIZE;
 	return (u8) tx + start_y;
 }
-
-#include <map/block/block_iterator.h>
 
 static void scan_draw_column(SDL_Surface* target, float x, float y, const g_intercept* intercept, u16 col)
 {
@@ -80,7 +77,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
 	// below and above the wall. This simplifies floor rendering at the cost of some accuracy.
-	i32 wall_h = (i32) (viewport_projection_distance * R_CELL_H / distance_corrected);
+	i32 wall_h = viewport_distance_to_length(R_CELL_H, distance_corrected);
 	if (wall_h & 1)
 		wall_h++;
 	i32 wall_y = (viewport_h - wall_h) / 2;
@@ -107,28 +104,80 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			y_end = SDL_min(viewport_h, wall_y + door_h);
 		}
 
-		u32* render_px = (u32*) target->pixels;
-		float* z_buffer_px = viewport_z_buffer;
-
-		render_px += (y_top * viewport_w) + col;
-		z_buffer_px += (y_top * viewport_w) + col;
+		u32* render_px = (u32*) target->pixels + (y_top * viewport_w) + col;
+		float* z_buffer_px = viewport_z_buffer + (y_top * viewport_w) + col;
 
 		// Calculate lighting and distance fog for side
 		const float brightness = r_light_get_alpha(intercept->map_x, intercept->map_y, intercept->orientation, intercept->column, 0);
 		const cm_alpha_color distance_fog = cm_ramp_get_px(distance_corrected);
-
-		for (i32 draw_y = y_top; draw_y < y_end; ++draw_y)
+		
+		const u8 slice_start = scan_get_slice_y_start(side);
+		// First, draw pure wall slice
+		for (i32 draw_y = y_top; draw_y < y_end; draw_y++)
 		{
-			const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, scan_get_slice_y_start(side));
-			u32 tex_col = *(slice + slice_px);
+			u32 tex_col = *(slice + scan_get_tx_slice_y(wall_h, draw_y, slice_start));
 			if (tex_col != COLOR_KEY)
 			{
-				*render_px = cm_ramp_apply(r_light_apply(tex_col, brightness), distance_fog);
+				*render_px = tex_col;
 				*z_buffer_px = distance_corrected;
 			}
 
 			render_px += viewport_w;
 			z_buffer_px += viewport_w;
+		}
+
+		// Now check what slices the decal contains
+		const block_ref_list_entry* decal_ref = block_ref_list_get(block_get_pt(intercept->map_x, intercept->map_y), BLOCK_TYPE_DECAL_SIDE)->first;
+		while (decal_ref)
+		{
+			const r_decal_world* decal = decal_ref->reference;
+			if (decal->id.orientation == intercept->orientation)
+			{
+				const r_decal_static* static_decal = r_decal_get_static(decal);
+				const i16 decal_col = r_decal_get_col(decal, intercept->map_x, intercept->map_y, intercept->column);
+				if (decal_col >= 0 && decal_col <= static_decal->w)
+				{
+					// There is a decal column to draw, find the start and end height of the decal.
+					// Align the decal to the texture grid - to do this, we invert the texture pixel mapping  (scan_get_tx_slice_y)
+
+					const i32 decal_wz_top = decal->y - static_decal->h / 2 - slice_start;
+					const i32 decal_sz_top = ceil(((float) decal_wz_top / TX_SIZE) * wall_h) + wall_y;
+
+					const i32 decal_wz_end = decal_wz_top + static_decal->h + 1;
+					const i32 decal_sz_end = ceil(((float) decal_wz_end / TX_SIZE) * wall_h) + wall_y;
+
+					const i32 decal_draw_start = SDL_max(decal_sz_top, y_top);
+					const i32 decal_draw_end = SDL_min(decal_sz_end, y_end);
+
+					render_px = (u32*) target->pixels + (decal_draw_start * viewport_w) + col;
+
+					for (i32 draw_y = decal_draw_start; draw_y < decal_draw_end; draw_y++)
+					{
+						const u8 slice_px = scan_get_tx_slice_y(wall_h, draw_y, slice_start);
+						r_decal_pt pt;
+						pt.x = decal_col;
+						pt.y = slice_px - decal->y + (static_decal->h / 2);
+						const cm_color decal_px = r_decal_get_px(static_decal, pt);
+						if (decal_px != COLOR_KEY && *(slice + slice_px) != COLOR_KEY)
+							*render_px = decal_px;
+
+						render_px += viewport_w;
+					}
+				}
+			}
+
+			decal_ref = decal_ref->next;
+		}
+
+		// Finally, apply distance fog and lighting
+		render_px = (u32*) target->pixels + (y_top * viewport_w) + col;
+		for (i32 draw_y = y_top; draw_y < y_end; draw_y++)
+		{
+			const u32 tex_col = *(slice + scan_get_tx_slice_y(wall_h, draw_y, slice_start));
+			if (tex_col != COLOR_KEY)
+				*render_px = cm_ramp_apply(r_light_apply(*render_px, brightness), distance_fog);
+			
+			render_px += viewport_w;
 		}
 	}
 
@@ -158,9 +207,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		const float brightness = r_light_get_alpha(mx, my, M_FLOOR, cx, cy);
 		const cm_alpha_color distance_fog = cm_ramp_get_px(d);
 
-		const m_cell* cell = m_get_cell(mx, my);
-
-		u32 floor_px = tx_get_point(&cell->floor, cx, cy);
+		const u32 floor_px = scan_get_flat_px(mx, my, cx, cy, M_FLOOR);
 		if (floor_px == COLOR_KEY)
 		{
 			*render_px_floor = r_sky_get_pixel(viewport_h - y_px - 1, intercept->angle);
@@ -172,7 +219,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			*z_buffer_px_floor = d;
 		}
 
-		u32 ceil_px = tx_get_point(&cell->ceil, cx, cy);
+		const u32 ceil_px = scan_get_flat_px(mx, my, cx, cy, M_CEIL);
 		if (ceil_px == COLOR_KEY)
 		{
 			*render_px_ceil = r_sky_get_pixel(y_px, intercept->angle);
@@ -184,24 +231,6 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			*z_buffer_px_ceil = d;
 		}
 
-		//Check for decals
-		const block_ref_list_entry* decal_ref = block_ref_list_get(block_get_pt(mx, my), BLOCK_TYPE_DECAL_FLAT)->first;
-		while (decal_ref)
-		{
-			const r_decal_world* decal = decal_ref->reference;
-			const float decal_dist = math_dist_f
-			(
-				decal->id.x * M_CELLSIZE + decal->x, decal->id.y * M_CELLSIZE + decal->y,
-				w_target.x, w_target.y
-			);
-			if (decal_dist < 10)
-			{
-				u32* px = decal->id.orientation == M_CEIL ? render_px_ceil : render_px_floor;
-				*px = CM_GET(0, 255, 255);
-			}
-			decal_ref = decal_ref->next;
-		}
-
 		render_px_ceil -= viewport_w;
 		render_px_floor += viewport_w;
 		z_buffer_px_ceil -= viewport_w;
@@ -209,3 +238,33 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	}
 }
 
+static cm_color scan_get_flat_px(i16 mx, i16 my, u8 cx, u8 cy, m_orientation orientation)
+{
+	const m_cell* cell = m_get_cell(mx, my);
+	const cm_color px = tx_get_point(orientation == M_CEIL ? &cell->ceil : &cell->floor, cx, cy);
+	if (px == COLOR_KEY)
+		return px;
+
+	// Look for a decal pixel
+	// TODO: (Optional) Alpha blending
+	const block_ref_list_entry* decal_ref = block_ref_list_get(block_get_pt(mx, my), BLOCK_TYPE_DECAL_FLAT)->first;
+	while (decal_ref)
+	{
+		const r_decal_world* decal = decal_ref->reference;
+		if (decal->id.orientation == orientation)
+		{
+			const r_decal_static* static_decal = r_decal_get_static(decal);
+			const r_decal_pt decal_pt = r_decal_get_pt(decal, mx * M_CELLSIZE + cx, my * M_CELLSIZE + cy);
+			if (r_decal_in_bounds(static_decal, decal_pt))
+			{
+				const cm_color decal_px = r_decal_get_px(static_decal, decal_pt);
+				if (decal_px != COLOR_KEY)
+					return decal_px;
+			}
+		}
+
+		decal_ref = decal_ref->next;
+	}
+
+	return px;
+}

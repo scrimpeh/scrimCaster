@@ -4,6 +4,8 @@
 
 #include <SDL/SDL_video.h>
 
+extern SDL_Surface* gfx_ws_buffer[];
+
 SDL_Surface* gfx_load(const char* filename);
 
 i32 gfx_load_global();

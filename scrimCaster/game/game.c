@@ -8,6 +8,7 @@
 #include <map/block/blockmap.h>
 #include <map/map.h>
 #include <map/mapupdate.h>
+#include <render/decal.h>
 #include <util/random.h>
 
 // On game Objects:
@@ -93,6 +94,7 @@ void game_update(u32 delta)
 	{
 		ticks += delta;
 		mu_update(delta);
+		r_decal_update(delta);
 		// TODO: Creating / deleting actors will not be reflected in the blockmap
 		// So I need to make sure to defer this until the end of the frame
 		block_fill();

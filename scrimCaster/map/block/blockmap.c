@@ -116,61 +116,37 @@ static void block_enter_decal(const r_decal_world* decal)
 		return;
 
 	const r_decal_static* static_decal = r_decal_get_static(decal);
-	block_rect rect;
-	block_type type;
+	r_decal_bounds bounds;
+	r_decal_get_map_bounds(decal, &bounds);
+	block_rect rect; 
+	rect.x_a = bounds.x_a / M_CELLSIZE;
+	rect.y_a = bounds.y_a / M_CELLSIZE;
+	rect.x_b = bounds.x_b / M_CELLSIZE;
+	rect.y_b = bounds.y_b / M_CELLSIZE;
 
-	switch (decal->id.orientation)
+	if (decal->id.orientation == M_CEIL || decal->id.orientation == M_FLOOR)
 	{
-	case M_CEIL:
-	case M_FLOOR:
-	{
-		const i32 wx = decal->id.x * M_CELLSIZE + decal->x;
-		const i32 wy = decal->id.y * M_CELLSIZE + decal->y;
-		rect.x_a = (wx - (static_decal->w / 2)) / M_CELLSIZE;
-		rect.y_a = (wy - (static_decal->h / 2)) / M_CELLSIZE;
-		rect.x_b = (wx + (static_decal->w / 2)) / M_CELLSIZE;
-		rect.y_b = (wy + (static_decal->h / 2)) / M_CELLSIZE;
-		type = BLOCK_TYPE_DECAL_FLAT;
-		break;
-	}
-	case M_NORTH:
-	case M_SOUTH:
-	{
-		const i32 wx_offs = decal->id.orientation == M_NORTH ? decal->x : M_CELLSIZE - 1 - decal->x;
-		const i32 wx = decal->id.x * M_CELLSIZE + wx_offs;
-		rect.x_a = (wx - (static_decal->w / 2)) / M_CELLSIZE;
-		rect.y_a = decal->id.y;
-		rect.x_b = (wx + (static_decal->w / 2)) / M_CELLSIZE;
-		rect.y_b = decal->id.y;
-		type = BLOCK_TYPE_DECAL_SIDE;
-		break;
-	}
-	case M_EAST:
-	case M_WEST:
-	{
-		const i32 wy_offs = decal->id.orientation == M_EAST ? decal->x : M_CELLSIZE - 1 - decal->x;
-		const i32 wy = decal->id.y * M_CELLSIZE + wy_offs;
-		rect.x_a = decal->id.x;
-		rect.y_a = (wy - (static_decal->w / 2)) / M_CELLSIZE;
-		rect.x_b = decal->id.x;
-		rect.y_b = (wy - (static_decal->w / 2)) / M_CELLSIZE;
-		type = BLOCK_TYPE_DECAL_SIDE;
-		break;
-	}
-	}
+		block_pt ne = block_get_pt(rect.x_b, rect.y_a);
+		block_pt nw = block_get_pt(rect.x_a, rect.y_a);
+		block_pt sw = block_get_pt(rect.x_a, rect.y_b);
+		block_pt se = block_get_pt(rect.x_b, rect.y_b);
 
-	block_pt ne = block_get_pt(rect.x_b, rect.y_a);
-	block_pt nw = block_get_pt(rect.x_a, rect.y_a);
-	block_pt sw = block_get_pt(rect.x_a, rect.y_b);
-	block_pt se = block_get_pt(rect.x_b, rect.y_b);
-
-	block_enter_point(decal, type, &rect, ne);
-	if (!block_pt_eq(nw, ne))
-		block_enter_point(decal, type, &rect, nw);
-	if (!block_pt_eq(sw, nw) && !block_pt_eq(sw, ne))
-		block_enter_point(decal, type, &rect, sw);
-	if (!block_pt_eq(se, sw) && !block_pt_eq(se, nw) && !block_pt_eq(se, ne))
-		block_enter_point(decal, type, &rect, se);
+		block_enter_point(decal, BLOCK_TYPE_DECAL_FLAT, &rect, ne);
+		if (!block_pt_eq(nw, ne))
+			block_enter_point(decal, BLOCK_TYPE_DECAL_FLAT, &rect, nw);
+		if (!block_pt_eq(sw, nw) && !block_pt_eq(sw, ne))
+			block_enter_point(decal, BLOCK_TYPE_DECAL_FLAT, &rect, sw);
+		if (!block_pt_eq(se, sw) && !block_pt_eq(se, nw) && !block_pt_eq(se, ne))
+			block_enter_point(decal, BLOCK_TYPE_DECAL_FLAT, &rect, se);
+	}
+	else
+	{
+		block_pt a = block_get_pt(rect.x_b, rect.y_a);
+		block_pt b = block_get_pt(rect.x_a, rect.y_a);
+		block_enter_point(decal, BLOCK_TYPE_DECAL_SIDE, &rect, a);
+		if (!block_pt_eq(a, b))
+			block_enter_point(decal, BLOCK_TYPE_DECAL_SIDE, &rect, b);
+	}
 }
 
 

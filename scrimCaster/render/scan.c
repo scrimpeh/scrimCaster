@@ -72,7 +72,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 
 	// Do triangular correction on the distance
 	const angle_rad_f angle = TO_RADF(viewport_angle) - intercept->angle;
-	const float distance = math_dist_f(x, y, intercept->x, intercept->y);
+	const float distance = math_dist_f(x, y, intercept->wx, intercept->wy);
 	const float distance_corrected = distance * cosf(angle);
 
 	// Round up the wall height to the nearest multiple of two so there's an equal number of pixels
@@ -83,7 +83,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 	i32 wall_y = (viewport_h - wall_h) / 2;
 
 	// Get the texture
-	const m_side* side = m_get_side(intercept->map_x, intercept->map_y, intercept->orientation);
+	const m_side* side = m_get_side(intercept->mx, intercept->my, intercept->orientation);
 	const tx_slice slice = tx_get_slice(side, intercept->column);
 
 	// Now draw the texture slice
@@ -108,7 +108,7 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		float* z_buffer_px = viewport_z_buffer + (y_top * viewport_w) + col;
 
 		// Calculate lighting and distance fog for side
-		const float brightness = r_light_get_alpha(intercept->map_x, intercept->map_y, intercept->orientation, intercept->column, 0);
+		const float brightness = r_light_get_alpha(intercept->mx, intercept->my, intercept->orientation, intercept->column, 0);
 		const cm_alpha_color distance_fog = cm_ramp_get_px(distance_corrected);
 		
 		const u8 slice_start = scan_get_slice_y_start(side);
@@ -127,14 +127,14 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 		}
 
 		// Now check what slices the decal contains
-		const block_ref_list_entry* decal_ref = block_ref_list_get(block_get_pt(intercept->map_x, intercept->map_y), BLOCK_TYPE_DECAL_SIDE)->first;
+		const block_ref_list_entry* decal_ref = block_ref_list_get(block_get_pt(intercept->mx, intercept->my), BLOCK_TYPE_DECAL_SIDE)->first;
 		while (decal_ref)
 		{
 			const r_decal_world* decal = decal_ref->reference;
 			if (decal->id.orientation == intercept->orientation)
 			{
 				const r_decal_static* static_decal = r_decal_get_static(decal);
-				const i16 decal_col = r_decal_get_col(decal, intercept->map_x, intercept->map_y, intercept->column);
+				const i16 decal_col = r_decal_get_col(decal, intercept->mx, intercept->my, intercept->column);
 				if (decal_col >= 0 && decal_col <= static_decal->w)
 				{
 					// There is a decal column to draw, find the start and end height of the decal.

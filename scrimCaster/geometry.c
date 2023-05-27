@@ -51,10 +51,10 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 				intercept.orientation = g_is_north(orientation) ? M_NORTH : M_SOUTH;
 				intercept.type = g_get_intercept_type(side, edge);
 				intercept.angle = angle;
-				intercept.x = x_inv;
-				intercept.y = y_inv;
-				intercept.map_x = grid_x;
-				intercept.map_y = y_cell;
+				intercept.wx = x_inv;
+				intercept.wy = y_inv;
+				intercept.mx = grid_x;
+				intercept.my = y_cell;
 				intercept.column = g_is_north(orientation) ? (u32)floorf(x_inv) % TEX_SIZE : TEX_SIZE - 1 - (u32)floorf(x_inv) % TEX_SIZE;
 
 				// Add the intercept
@@ -82,10 +82,10 @@ void g_cast(float x, float y, angle_rad_f angle, g_intercept_collector intercept
 			intercept.orientation = g_is_west(orientation) ? M_WEST : M_EAST;
 			intercept.type = g_get_intercept_type(side, edge);
 			intercept.angle = angle;
-			intercept.x = x;
-			intercept.y = y;
-			intercept.map_x = grid_x;
-			intercept.map_y = grid_y;
+			intercept.wx = x;
+			intercept.wy = y;
+			intercept.mx = grid_x;
+			intercept.my = grid_y;
 			intercept.column = g_is_east(orientation) ? (u32)floorf(y) % TEX_SIZE : TEX_SIZE - 1 - (u32)floorf(y) % TEX_SIZE;
 
 			// Add the intercept

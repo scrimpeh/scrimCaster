@@ -19,12 +19,14 @@
 // [X] Distance fog
 // [X] Sprite rotation and animation system
 // [ ] Sound (?)
-// [ ] Decals (Dynamic and static)
+// [X] Decals (Dynamic and static)
+//     - [ ] Rotation / flip support
+//     - [ ] Transparency
 // [X] Unified, general-purpose ray caster / geometry interceptor
 // [ ] Code cleanup
 // [X] Port to C (C99 or newer)
 // [ ] Update SDL to newest
-// [ ] Reorganize source files to match VS structure
+// [X] Reorganize source files to match VS structure
 // [X] Floor rendering (I think I might actually know how)
 // [X] Skybox texture with cylinder projection or similar
 // [ ] Optimize performance with the following methods (otpional)
@@ -34,11 +36,11 @@
 //     - [ ] General optimizations
 // [X] Cell lighting
 //     - [X] Smooth light blending between adjacent cells
-//     - [ ] Dynamic lighting
+//     - [X] Dynamic lighting
 // [ ] Add some proper textures
 // [ ] Material system, with animated textures and more
 // [ ] Geometric data structure for sprite rendering, or maybe even marking all cells that we saw
-// [ ] Simplify all the actor and level object handling in general
+// [X] Simplify all the actor and level object handling in general
 
 char* app_dir = NULL;
 

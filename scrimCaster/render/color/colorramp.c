@@ -7,7 +7,7 @@
 static const cm_ramp_setpoint CM_RAMP_NONE_PTS[] =
 {
 	{ CM_GET(0, 0, 0), 0.f,     0.f},
-	{ CM_GET(0, 0, 0), 0.f, FLT_MAX},
+	{ CM_GET(0, 0, 0), 0.f, FLT_MAX}
 };
 static const cm_ramp CM_RAMP_NONE = { CM_RAMP_NONE_PTS, SDL_arraysize(CM_RAMP_NONE_PTS) };
 
@@ -17,7 +17,7 @@ static const cm_ramp_setpoint CM_RAMP_TEST_PTS[] =
 	{ CM_GET(   0,    0, 0xFF),  0.1f,    128.f},
 	{ CM_GET(0xFF,    0, 0xFF),  1.0f,    256.f},
 	{ CM_GET(   0,    0, 0xFF), 0.35f,    768.f},
-	{ CM_GET(   0,    0, 0xFF), 0.35f,  FLT_MAX},
+	{ CM_GET(   0,    0, 0xFF), 0.35f,  FLT_MAX}
 };
 static const cm_ramp CM_RAMP_TEST = { CM_RAMP_TEST_PTS, SDL_arraysize(CM_RAMP_TEST_PTS) };
 
@@ -26,7 +26,7 @@ static const cm_ramp_setpoint CM_RAMP_DARK_PTS[] =
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),  0.95f,   256.f},
-	{ CM_GET(   0,    0,    0),  0.95f, FLT_MAX},
+	{ CM_GET(   0,    0,    0),  0.95f, FLT_MAX}
 };
 static const cm_ramp CM_RAMP_DARK = { CM_RAMP_DARK_PTS, SDL_arraysize(CM_RAMP_DARK_PTS) };
 
@@ -35,7 +35,7 @@ static const cm_ramp_setpoint CM_RAMP_TWILIGHT_PTS[] =
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),   0.6f,   256.f},
-	{ CM_GET(   0,    0,    0),   0.6f, FLT_MAX},
+	{ CM_GET(   0,    0,    0),   0.6f, FLT_MAX}
 };
 static const cm_ramp CM_RAMP_TWILIGHT = { CM_RAMP_TWILIGHT_PTS, SDL_arraysize(CM_RAMP_TWILIGHT_PTS) };
 
@@ -44,7 +44,7 @@ static const cm_ramp_setpoint CM_RAMP_FOG_PTS[] =
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(   0,    0,    0),    0.f,     0.f},
 	{ CM_GET(0x70, 0x60, 0x30),   0.3f,   192.f},
-	{ CM_GET(0x70, 0x60, 0x30),   0.3f, FLT_MAX},
+	{ CM_GET(0x70, 0x60, 0x30),   0.3f, FLT_MAX}
 };
 static const cm_ramp CM_RAMP_FOG = { CM_RAMP_FOG_PTS, SDL_arraysize(CM_RAMP_FOG_PTS) };
 

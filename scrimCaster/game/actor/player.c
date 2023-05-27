@@ -56,10 +56,10 @@ static void player_use()
 	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept);
 	if (player_use_has_intercept)
 	{
-		const float distance = math_dist_f(player->x, player->y, player_use_intercept.x, player_use_intercept.y);
+		const float distance = math_dist_f(player->x, player->y, player_use_intercept.wx, player_use_intercept.wy);
 		if (distance < PLAYER_USELENGTH)
 		{
-			m_side* side = m_get_side(player_use_intercept.map_x, player_use_intercept.map_y, player_use_intercept.orientation);
+			m_side* side = m_get_side(player_use_intercept.mx, player_use_intercept.my, player_use_intercept.orientation);
 			if (side->target)
 				mu_activate_tag(side->target);
 		}

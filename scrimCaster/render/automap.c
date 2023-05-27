@@ -201,8 +201,8 @@ void am_draw_actors(SDL_Surface* target)
 static bool am_collect_intercept(const g_intercept* intercept)
 {
 	// This is not re-entrant, and I'd rather have a closure, but oh well
-	r_map_intercept_x = intercept->x;
-	r_map_intercept_y = intercept->y;
+	r_map_intercept_x = intercept->wx;
+	r_map_intercept_y = intercept->wy;
 	return intercept->type == G_INTERCEPT_NON_SOLID;
 }
 

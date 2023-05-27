@@ -1,4 +1,4 @@
-#include "colormap.h"
+#include <render/color/colormap.h>
 
 cm_color cm_map(cm_color source, cm_color target, float alpha)
 {

@@ -53,7 +53,7 @@ static void player_use()
 {
 	const ac_actor* player = ac_get_player();
 	player_use_has_intercept = false;
-	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept);
+	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept, NULL);
 	if (player_use_has_intercept)
 	{
 		const float distance = math_dist_f(player->x, player->y, player_use_intercept.wx, player_use_intercept.wy);
@@ -82,7 +82,7 @@ static void player_fire()
 	// One: Trace a ray between the player and the nearest wall
 	// Two: Check if any one sprite could have been hit
 	player_use_has_intercept = false;
-	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept);
+	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept, NULL);
 	if (player_use_has_intercept)
 	{
 		// ...

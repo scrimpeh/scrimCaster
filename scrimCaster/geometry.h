@@ -52,8 +52,11 @@ typedef struct g_intercept {
 // adding them to a stack and rendering them back-to-front
 typedef bool (*g_intercept_collector)(const g_intercept*);
 
+// Callback for when an intercept encounters a cell
+typedef bool (*g_cell_collector)(i16 mx, i16 my);
+
 // The main catch-all ray casting function
-void g_cast(float origin_x, float origin_y, angle_rad_f angle, g_intercept_collector intercept_collector);
+void g_cast(float wx, float wy, angle_rad_f angle, g_intercept_collector intercept_collector, g_cell_collector cell_collector);
 
 static inline g_orientation g_get_orientation(angle_rad_f angle);
 static inline bool g_is_north(g_orientation orientation);

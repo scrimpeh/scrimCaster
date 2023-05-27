@@ -15,21 +15,28 @@
 #include <render/viewport.h>
 #include <util/mathutil.h>
 
-#include <math.h>	//fmod is obsolete: maybe replace?
+#include <math.h>
 #include <float.h>
+block_iterator* scan_sprite_iter = NULL;
 
 // For drawing transparent surfaces, we keep a stack of (dynamically allocated) draw side
-g_intercept_stack* intercept_stack = NULL;
+scan_intercept_stack* scan_intercepts = NULL;
 
-static inline bool collect_intercept(const g_intercept* intercept)
+static bool scan_collect_intercept(const g_intercept* intercept)
 {
-	g_intercept_stack* store_intercept = SDL_malloc(sizeof(g_intercept_stack));
+	scan_intercept_stack* store_intercept = SDL_malloc(sizeof(scan_intercept_stack));
 	if (!store_intercept)
 		return false;
 	SDL_memcpy(&store_intercept->intercept, intercept, sizeof(g_intercept));
-	store_intercept->next = intercept_stack;
-	intercept_stack = store_intercept;
+	store_intercept->next = scan_intercepts;
+	scan_intercepts = store_intercept;
 	return intercept->type == G_INTERCEPT_NON_SOLID;
+}
+
+static bool scan_collect_cell(i16 mx, i16 my)
+{
+	block_iterator_add_cell(scan_sprite_iter, block_get_pt(mx, my));
+	return true;
 }
 
 void scan_draw(SDL_Surface* target)
@@ -37,13 +44,13 @@ void scan_draw(SDL_Surface* target)
 	for (u16 col = 0; col < viewport_w; col++)
 	{
 		const angle_rad_f angle = viewport_x_to_angle(TO_RADF(viewport_angle), col);
-		g_cast(viewport_x, viewport_y, angle, collect_intercept);
+		g_cast(viewport_x, viewport_y, angle, scan_collect_intercept, scan_collect_cell);
 
-		while (intercept_stack) 
+		while (scan_intercepts)
 		{
-			g_intercept_stack* cur_intercept = intercept_stack;
+			scan_intercept_stack* cur_intercept = scan_intercepts;
 			scan_draw_column(target, viewport_x, viewport_y, &cur_intercept->intercept, col);
-			intercept_stack = intercept_stack->next;
+			scan_intercepts = scan_intercepts->next;
 			SDL_free(cur_intercept);
 		}
 	}

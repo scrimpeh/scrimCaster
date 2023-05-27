@@ -2,6 +2,8 @@
 
 void block_tree_free(block_tree* tree)
 {
+	if (!tree)
+		return;
 	if (tree->l)
 		block_tree_free(tree->l);
 	if (tree->r)

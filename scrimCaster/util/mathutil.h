@@ -16,6 +16,8 @@ typedef struct
 
 #define MATH_DIVCEIL(a, b) (((a) / (b)) + ((a) % (b) ? 1 : 0))
 
+#define MATH_CAP(min, value, max) (SDL_max(min, SDL_min(value, max)))
+
 double math_dist(double a_x, double a_y, double b_x, double b_y);
 float math_dist_f(float a_x, float a_y, float b_x, float b_y);
 

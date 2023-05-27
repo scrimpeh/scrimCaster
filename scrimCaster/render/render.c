@@ -2,6 +2,7 @@
 
 #include <game/camera.h>
 #include <input/input.h>
+#include <map/block/block_iterator.h>
 #include <render/automap.h>
 #include <render/decal.h>
 #include <render/lighting/lighting.h>
@@ -75,8 +76,12 @@ void r_draw()
 	if (r_draw_background)
 		SDL_FillRect(viewport_surface, NULL, COLOR_KEY);
 
+	// Draw the geometry and sprites. We collect all sprites that we encountered in a blockmap iterator
+	// to quickly retrieve them when drawing sprites
+	scan_sprite_iter = block_iterator_make_empty(BLOCK_TYPE_ACTOR);
 	scan_draw(viewport_surface);
 	spr_draw(viewport_surface);
+	block_iterator_free(scan_sprite_iter);
 
 	if (r_show_map)
 		am_draw(viewport_surface);

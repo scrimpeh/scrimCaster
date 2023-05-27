@@ -9,14 +9,6 @@
 
 #define MAXWIDTH 256 // Maximum width of a sprite in the sheet
 
-// An actor on screen
-typedef struct
-{
-	const ac_actor* actor;
-	double distance;
-	angle_d angle;
-} spr_actor;
-
 typedef enum
 {
 	SPR_CENTER = 0,
@@ -53,8 +45,8 @@ typedef struct
 	const spr_frameset* frames;
 } spr_actor_frame_map;
 
-static bool spr_is_visible(const ac_actor* actor, u32 ds_index);
 static const spr_frame* spr_get_frame(const ac_actor* a);
+static void spr_draw_actor(SDL_Surface* target, const ac_actor* ac);
 
 void spr_draw(SDL_Surface* target);
 

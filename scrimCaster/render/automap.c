@@ -10,7 +10,6 @@
 #include <render/skybox.h>
 #include <render/viewport.h>
 
-
 // Cap the automap to the # of the map and inside this zone.
 #define AM_MARIGN (2 * M_CELLSIZE)
 
@@ -37,8 +36,8 @@ extern i64 input_mwheel;
 
 void am_init()
 {
-	am_center_x = (float)m_map.w * M_CELLSIZE / 2;
-	am_center_y = (float)m_map.h * M_CELLSIZE / 2;
+	am_center_x = (float) m_map.w * M_CELLSIZE / 2;
+	am_center_y = (float) m_map.h * M_CELLSIZE / 2;
 }
 
 void am_draw(SDL_Surface* target)
@@ -139,7 +138,6 @@ static void am_draw_side(SDL_Surface* target, i16 grid_x, i16 grid_y, const m_si
 	r_draw_line(target, x_a, y_a, x_b, y_b, am_get_color(side));
 }
 
-
 static void am_draw_map(SDL_Surface* target)
 {
 	if (am_draw_grid)
@@ -157,7 +155,7 @@ static void am_draw_map(SDL_Surface* target)
 void am_draw_actor(SDL_Surface* target, ac_actor* actor)
 {
 	// Cast two rays showing FOV for the player
-	if (actor->type == AC_PLAYER)
+	if (actor == ac_get_player())
 	{
 		const ac_actor* player = ac_get_player();
 		const angle_d angle_l = angle_normalize_deg_d(player->angle + (viewport_x_fov / 2.));
@@ -165,13 +163,13 @@ void am_draw_actor(SDL_Surface* target, ac_actor* actor)
 
 		double intersect_l_x;
 		double intersect_l_y;
-		g_cast(player->x, player->y, TO_RADF(angle_l), am_collect_intercept);
+		g_cast(player->x, player->y, TO_RADF(angle_l), am_collect_intercept, NULL);
 		intersect_l_x = am_map_h(r_map_intercept_x);
 		intersect_l_y = am_map_v(r_map_intercept_y);
 
 		double intersect_r_x;
 		double intersect_r_y;
-		g_cast(player->x, player->y, TO_RADF(angle_r), am_collect_intercept);
+		g_cast(player->x, player->y, TO_RADF(angle_r), am_collect_intercept, NULL);
 		intersect_r_x = am_map_h(r_map_intercept_x);
 		intersect_r_y = am_map_v(r_map_intercept_y);
 

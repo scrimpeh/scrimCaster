@@ -20,7 +20,6 @@ m_map_data m_map;
 
 const char* tx_sets[] = { "test.png" };
 
-
 static m_cell cells[16][16];
 
 static const m_obj objects[] =
@@ -139,13 +138,11 @@ void m_load()
 		cells[1][1].e.type = 4;
 		cells[1][1].s.type = 2;
 		cells[1][1].s.flags = SCROLL_H;
-		// cellgrid[1][1].s.param1 = 8;
 		cells[0][2].s.type = 6;
 		cells[1][3].s.type = 2;
 		cells[1][3].w.type = 2;
 		cells[2][4].w.type = 6;
 		cells[2][4].w.flags = (m_side_flags) (MIRR_H | SCROLL_H);
-		// cellgrid[2][4].w.param1 = -8;
 		cells[2][0].e.type = 6;
 		cells[3][1].e.type = 2;
 		cells[3][1].n.type = 2;
@@ -203,7 +200,6 @@ void m_load()
 		cells[7][1].n.tag = cells[6][1].s.tag;
 		cells[7][1].n.target = cells[6][1].s.tag;
 
-
 		for (u8 x = 7; x < 12; x++)
 			cells[0][x].n.type = TX_SKY;
 		for (u8 x = 7; x < 12; x++)
@@ -244,15 +240,12 @@ void m_load()
 			side.type = 5;
 			side.flags = PASSABLE | TRANSLUCENT;
 			_m_set_double_sided(4, 6, M_SOUTH, &side);
-
 		}
 
 		cells[0][6].floor.type = 3;
 		cells[0][6].ceil.type = 3;
 		cells[0][6].w.flags = BLOCK_SMOOTH_LIGHT;
 		cells[0][6].brightness = 128;
-
-	
 
 		_m_flood_fill(8, 2, _m_flood_fill_cb_ceil, 0);
 		_m_flood_fill(8, 2, _m_flood_fill_cb_floor, 7);
@@ -271,14 +264,11 @@ void m_load()
 		cells[3 - 1][3 + 1].brightness = 0;
 	}
 
-
-
 	cells[0][0].brightness = 64;
 	cells[1][1].brightness = 64;
 	cells[1][3].brightness = 64;
 	cells[3][3].brightness = 64;
 	cells[3][1].brightness = 64;
-
 
 	cells[5][5].brightness = 0;
 

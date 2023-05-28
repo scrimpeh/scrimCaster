@@ -10,12 +10,11 @@
 #include <render/render.h>
 #include <render/ttf.h>
 #include <render/window.h>
-#include <resource.h>
 
 #include <SDL/SDL.h>
 
 
-#define VER_NUM "0.02"
+#define VER_NUM "0.03"
 #ifdef _MSC_VER
 #define INTRO_MSG ("Starting scrimCaster v." VER_NUM ", compiled on: " __TIMESTAMP__)
 #else

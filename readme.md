@@ -4,7 +4,7 @@ This is a basic 2.5D Raycaster written in C using SDL for windowing. It supports
 
 ### 2023 Revisit
 
-The code has been revisited to add a number of new feature. Some of the new features include:
+The code has been revisited to add a number of new features. Some of the new features include:
 
 * Ceiling and Floor Rendering
 * Wall and Floor Decals

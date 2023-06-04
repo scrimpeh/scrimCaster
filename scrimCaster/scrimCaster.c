@@ -42,8 +42,6 @@
 // [X] Geometric data structure for sprite rendering, or maybe even marking all cells that we saw
 // [X] Simplify all the actor and level object handling in general
 
-char* app_dir = NULL;
-
 i32 main(i32 argc, char** argv)
 {
 	bool quit = false;

@@ -1,6 +1,5 @@
 #include <map/cell.h>
 
-
 m_side* m_cell_get_side(m_cell* cell, m_orientation orientation)
 {
 	switch (orientation)

@@ -6,10 +6,6 @@
 #include <map/mapupdate.h>
 #include <util/mathutil.h>
 
-// Debug
-#include <map/block/block_iterator.h>
-#include <render/decal.h>
-
 bool player_noclip = false;
 
 double player_accel_forward = 0;
@@ -35,14 +31,11 @@ double player_accel_strafe = 0;
 static bool player_use_has_intercept;
 static g_intercept player_use_intercept;
 
-static bool player_fire_has_intercept;
-static g_intercept player_fire_intercept;
-
-static u32 _block_object_count = 0;
+static bool player_attack_has_intercept;
+static g_intercept player_attack_intercept;
 
 void player_make(ac_actor* ac, m_obj* obj)
 {
-	watch_add_new(1, WCH_U32, "objects: ", &_block_object_count);
 	ac->type = obj->type;
 	ac->x = obj->x;
 	ac->y = obj->y;
@@ -81,36 +74,25 @@ static void player_fire()
 	// Here be some weapon specific code, but for now, let's just draw a line and see what we hit
 	// One: Trace a ray between the player and the nearest wall
 	// Two: Check if any one sprite could have been hit
-	player_use_has_intercept = false;
-	g_cast(player->x, player->y, TO_RADF(player->angle), player_use_check_intercept, NULL);
-	if (player_use_has_intercept)
+	player_attack_has_intercept = false;
+	g_cast(player->x, player->y, TO_RADF(player->angle), player_attack_check_intercept, NULL);
+	if (player_attack_has_intercept)
 	{
 		// ...
 	}
 }
 
-static bool player_shoot_check_intercept(const g_intercept* intercept)
+static bool player_attack_check_intercept(const g_intercept* intercept)
 {
 	// The ray will happily travel any distance. That's fine, we need to render it anyway.
-	player_fire_has_intercept = true;
-	SDL_memcpy(&player_fire_intercept, intercept, sizeof(g_intercept));
+	player_attack_has_intercept = true;
+	SDL_memcpy(&player_attack_intercept, intercept, sizeof(g_intercept));
 	return intercept->type == G_INTERCEPT_NON_SOLID;
 }
 
 bool player_update(ac_actor* ac, u32 delta)
 {
 	watch_add_new(3, WCH_F64, "x: ", &ac->x, WCH_F64, ", y: ", &ac->y, WCH_F64, ", angle: ", &ac->angle);
-	_block_object_count = 0;
-	block_iterator* iter = block_iterator_make_actor(BLOCK_TYPE_DECAL_SIDE, ac);
-	r_decal_world* decal = block_iterator_next(iter);
-	while (decal)
-	{
-		//if (r->reference != ac)
-		_block_object_count++;
-		decal = block_iterator_next(iter);
-	}
-	block_iterator_free(iter);
-
 	player_set_movement(delta);
 
 	if (input_tf.use) 

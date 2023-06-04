@@ -6,7 +6,7 @@
 #include <map/block/block_tree.h>
 
 // Used for retrieving elements from the block map. A block map iterator 
-// is a virtual object that can either iterate through the blocks and actors in the blockmap...
+// is an object that can iterate through the blocks and actors in the blockmap...
 
 // ...at one point
 // ...within one rectangle

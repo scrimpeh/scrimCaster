@@ -1,10 +1,11 @@
 #include <render/lighting/lighting.h>
 
 #include <map/map.h>
-#include <util/mathutil.h>
 #include <render/lighting/smoothlight.h>
+#include <util/mathutil.h>
 
-// In theory, we could even go as far as defining lightmaps for the floors and walls, but that'd go too far
+// In theory, we could even go as far as defining lightmaps for the floors and walls and precalculating
+// lighting statically with radiosity etc., but that'd go too far
 
 r_light_type r_light = R_LIGHT_NONE;
 u8 r_light_quantization = 0x1;

@@ -3,7 +3,9 @@
 #include <common.h>
 
 // This module facilities to let other parts of the program watch RAM values
-// They are read from RAM
+// They can be read from arbitrary locations in RAM and then queried and displayed on the screen.
+// It is therefore necessary that once initialized, the address of a value no longer changes.
+// A value can be registered in each iteration of the game loop. Duplicate checking prevents it from being added more than once.
 
 typedef enum
 {
@@ -36,13 +38,15 @@ typedef struct rd_watch_list
 	struct rd_watch_list* next;
 } rd_watch_list;
 
-extern rd_watch_list* rd_watches;
+extern rd_watch_list* watch_watches;
 
-// Creates a debug watch on the screen. Expects triplets of the form type, desc, ptr, as arguments.
-// Returns the id of the watch created, or a negative error code
+// Creates a debug watch on the screen. Expects triplets of the following form as argument:
+// - type:  rd_watch_type
+// - desc:  const char*
+// - value: void*
 i32 watch_add_new(u32 count, ...);
 
-// Removes watch by id, returns 0 if the watch could be remove and -1 otherwise
+// Removes watch by id, returns 0 if the watch could be removed and -1 otherwise
 i32 watch_remove(u32 id);
 
 // Removes all watches

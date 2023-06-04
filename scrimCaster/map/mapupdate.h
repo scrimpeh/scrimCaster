@@ -11,7 +11,7 @@ typedef struct m_active_tag_list
 	struct m_active_tag_list* next;
 } m_active_tag_list;
 
-void mu_update(u32 t_delta);
+void mu_update(u32 delta);
 void mu_activate_tag(u32 tag);
 void mu_clear();
 

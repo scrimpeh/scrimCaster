@@ -47,9 +47,6 @@ void win_process_event(const SDL_Event* evt)
 	}
 }
 
-//Changes the Window Mode, returns 0 on success, 1 on error
-//windowMode is either windowed border (0), windowed noborder (1) or fullscreen (2),
-//in which case the other two parameters do not matter
 i32 win_set_mode(i32 w, i32 h, win_display_mode mode)
 {
 	win_w = w;

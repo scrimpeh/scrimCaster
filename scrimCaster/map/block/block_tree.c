@@ -29,7 +29,6 @@ block_tree* block_tree_add(block_tree* parent, block_tree* tree, block_pt pt)
 	else
 		return tree;
 
-	// TODO: Rotation is dangerously untested
 	const i32 balance = block_tree_balance(tree);
 
 	if (balance > 1 && block_tree_key_cmp(tree->l, pt) < 0)    // LL

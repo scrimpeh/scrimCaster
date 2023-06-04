@@ -13,7 +13,7 @@ i32 ac_load(const m_obj* obj, u32 count)
 
 void ac_destroy()
 {
-
+	ac_list_clear(&ac_actors);
 }
 
 void ac_create(const m_obj* obj)

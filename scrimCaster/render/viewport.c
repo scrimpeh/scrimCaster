@@ -1,7 +1,8 @@
 #include <render/viewport.h>
 
 #include <game/camera.h>
-#include <render/renderconstants.h>
+#include <render/render.h>
+#include <util/mathutil.h>
 
 #include <float.h>
 #include <math.h>
@@ -44,8 +45,7 @@ i32 viewport_init(u16 w, u16 h)
 
 void viewport_set_fov(u8 fov)
 {
-	viewport_x_fov = SDL_min(VIEWPORT_FOV_MAX, SDL_max(VIEWPORT_FOV_MIN, fov));
-
+	viewport_x_fov = MATH_CAP(VIEWPORT_FOV_MIN, fov, VIEWPORT_FOV_MAX);
 	viewport_projection_distance = (viewport_w / 2) / tanf(TO_RADF(viewport_x_fov / 2));
 }
 
@@ -83,19 +83,4 @@ float viewport_y_to_distance(i32 y)
 {
 	const i32 h = abs(viewport_h - (2 * y));
 	return (viewport_projection_distance * R_CELL_H) / h;
-}
-
-bool viewport_point_on_screen(float x, float y)
-{
-	const float dx = x - viewport_x;
-	const float dy = y - viewport_y;
-	const angle_f slope = angle_get_deg_f(dx, -dy);
-
-	const angle_f viewport_min_half = angle_normalize_deg_f(viewport_angle + (viewport_x_fov / 2));
-	const angle_f viewport_max_half = angle_normalize_deg_f(viewport_angle - (viewport_x_fov / 2));
-	const angle_f angle = angle_normalize_deg_f(viewport_max_half - slope);
-	if (viewport_max_half > viewport_min_half)
-		return slope >= viewport_max_half || slope <= viewport_min_half;
-	else
-		return slope >= viewport_max_half && slope <= viewport_min_half;
 }

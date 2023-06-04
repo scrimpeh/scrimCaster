@@ -9,7 +9,6 @@
 #include <render/color/colorramp.h>
 #include <render/lighting/lighting.h>
 #include <render/render.h>
-#include <render/renderconstants.h>
 #include <render/skybox.h>
 #include <render/texture.h>
 #include <render/viewport.h>
@@ -17,6 +16,7 @@
 
 #include <math.h>
 #include <float.h>
+
 block_iterator* scan_sprite_iter = NULL;
 
 // For drawing transparent surfaces, we keep a stack of (dynamically allocated) draw side
@@ -183,7 +183,6 @@ static void scan_draw_column(SDL_Surface* target, float x, float y, const g_inte
 			const u32 tex_col = *(slice + scan_get_tx_slice_y(wall_h, draw_y, slice_start));
 			if (tex_col != COLOR_KEY)
 				*render_px = cm_ramp_apply(r_light_apply(*render_px, brightness), distance_fog);
-			
 			render_px += viewport_w;
 		}
 	}

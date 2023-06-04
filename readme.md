@@ -8,7 +8,7 @@ The code has been revisited to add a number of new feature. Some of the new feat
 
 * Ceiling and Floor Rendering
 * Wall and Floor Decals
-* Smooth Cell Lighting with Linear Interpolation and dynamic lighting
+* Smooth Cell Lighting with Linear Interpolation and Dynamic Lighting
 * Distance Fog
 * Skyboxes
 

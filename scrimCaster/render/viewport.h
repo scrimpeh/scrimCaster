@@ -39,5 +39,3 @@ i32 viewport_distance_to_length(i32 size, float distance);
 
 angle_rad_f viewport_x_to_angle(angle_rad_f viewport_angle, i32 x);
 float viewport_y_to_distance(i32 y);
-
-bool viewport_point_on_screen(float x, float y);

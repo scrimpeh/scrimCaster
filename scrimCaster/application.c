@@ -13,14 +13,12 @@
 
 #include <SDL/SDL.h>
 
-
 #define VER_NUM "0.03"
 #ifdef _MSC_VER
 #define INTRO_MSG ("Starting scrimCaster v." VER_NUM ", compiled on: " __TIMESTAMP__)
 #else
 #define INTRO_MSG ("Starting scrimCaster v." VER_NUM ", compiled on: " __DATE__ ", " __TIME__)
 #endif
-
 
 char* app_dir;
 

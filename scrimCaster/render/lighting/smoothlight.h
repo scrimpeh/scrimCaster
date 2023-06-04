@@ -1,10 +1,5 @@
 #pragma once
 
-#include <common.h>
-
-#include <map/cell.h>
-#include <render/color/colormap.h>
-
 // Light that is smoothly blended between cells.
 
 // Currently, there are three different smooth lighting modes:
@@ -17,6 +12,11 @@
 //
 // 3. R_LIGHT_SMOOTH_FINE
 // Like R_LIGHT_SMOOTH_CORNER, but the density of the sampling grid is doubled. 
+
+#include <common.h>
+
+#include <map/cell.h>
+#include <render/color/colormap.h>
 
 i32 r_light_smooth_init();
 void r_light_smooth_destroy();

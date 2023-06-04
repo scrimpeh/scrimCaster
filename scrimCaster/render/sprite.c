@@ -7,7 +7,7 @@
 #include <render/color/colorramp.h>
 #include <render/gfxloader.h>
 #include <render/lighting/lighting.h>
-#include <render/renderconstants.h>
+#include <render/render.h>
 #include <render/scan.h>
 #include <render/viewport.h>
 #include <util/mathutil.h>

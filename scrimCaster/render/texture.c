@@ -4,9 +4,8 @@
 
 #include <SDL/SDL_video.h>
 
-// TODO: This currently mixes the general texture format, and map textures as used
-// for sides and flats.
-// This hould be separated
+// TODO: This currently mixes the general texture format, and map textures as used for sides and flats.
+// This should be separated
 
 static const char* TX_PATH = "tx/map/";
 

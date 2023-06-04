@@ -22,7 +22,6 @@ void r_light_smooth_destroy()
 	r_cell_lights = NULL;
 }
 
-
 static bool r_light_smooth_side_block(const m_side* side)
 {
 	return !side || (side->type && !(side->flags & TRANSLUCENT)) || (side->flags & BLOCK_SMOOTH_LIGHT);

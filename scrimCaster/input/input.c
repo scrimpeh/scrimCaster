@@ -1,8 +1,6 @@
 #include <input/input.h>
 #include <input/inputmap.h>
 
-#include <SDL/SDL_events.h>
-
 input_keys input;
 input_keys input_tf;
 input_keys input_lf;

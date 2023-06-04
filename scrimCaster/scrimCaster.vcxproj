@@ -331,6 +331,7 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="angle.h" />
     <ClInclude Include="game\actor\actor.h" />
     <ClInclude Include="game\actor\actorcontainers.h" />
+    <ClInclude Include="game\actor\actorlogic.h" />
     <ClInclude Include="game\actor\player.h" />
     <ClInclude Include="game\actor\trigger\light.h" />
     <ClInclude Include="game\camera.h" />
@@ -355,7 +356,6 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClInclude Include="render\texture.h" />
     <ClInclude Include="render\viewport.h" />
     <ClInclude Include="util\mathutil.h" />
-    <ClInclude Include="render\renderconstants.h" />
     <ClInclude Include="render\frame.h" />
     <ClInclude Include="render\gfxloader.h" />
     <ClInclude Include="input\input.h" />
@@ -378,7 +378,6 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="game\actor\actor.c" />
     <ClCompile Include="game\actor\actorcontainers.c" />
     <ClCompile Include="game\actor\actorlogic.c" />
-    <ClCompile Include="game\actor\actorlogic.h" />
     <ClCompile Include="game\actor\player.c" />
     <ClCompile Include="game\actor\trigger\light.c" />
     <ClCompile Include="game\camera.c" />
@@ -409,7 +408,6 @@ copy "$(ProjectDir)libsdl\SDL2_ttf-2.0.14\lib\x64\LICENSE.freetype.txt" "$(Targe
     <ClCompile Include="util\mathutil.c" />
     <ClCompile Include="input\mouselook.c" />
     <ClCompile Include="render\render.c" />
-    <ClCompile Include="render\renderconstants.c" />
     <ClCompile Include="render\renderdebug.c" />
     <ClCompile Include="render\renderutil.c" />
     <ClCompile Include="render\scan.c" />

@@ -1,6 +1,6 @@
 #pragma once
 
-// Definition for angles. Angles exist either as degrees, in the range [0, 360,
+// Definition for angles. Angles exist either as degrees, in the range [0, 360[,
 // going counter-clockwise, with 0 facing east. or as radians, in the range [0, 2 * M_PI[
 //
 //           [ 90 | PI/2 ]

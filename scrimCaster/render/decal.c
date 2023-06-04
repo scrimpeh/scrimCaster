@@ -1,23 +1,8 @@
 #include <render/decal.h>
 
-#include <game/camera.h>
 #include <map/map.h>
 #include <render/color/colormap.h>
-#include <render/color/colorramp.h>
 #include <render/gfxloader.h>
-#include <render/viewport.h>
-#include <util/mathutil.h>
-
-
-// The general idea with decal drawing is I draw them decal by decal.
-// For every floor / ceiling decal, I find the four corner points in the viewport to derive a maximum bounding box.
-// Every pixel in the bounding box is then scanned to find the corresponding decal pixel and paint it on the floor / ceiling,
-// minding the z-buffer.
-
-// For walls, I can find the leftmost and rightmost columns, and do the same by casting a ray for every pixel against the plane the decal rests on
-
-// It's worth nothing that a decal can overlap multiple surfaces (up to two for walls, up to four for walls / ceils),
-// so it might be easier to just split them accordingly.
 
 u16 r_decal_dynamic_max = 30;
 
@@ -99,7 +84,7 @@ void r_decal_unload()
 	r_decal_dynamic_slots = NULL;
 }
 
-void r_decal_update(u32 t_delta)
+void r_decal_update(u32 delta)
 {
 	for (u32 i = 0; i < r_decal_dynamic_max; i++)
 	{
@@ -108,7 +93,7 @@ void r_decal_update(u32 t_delta)
 		{
 			if (decal->ttl)
 			{
-				decal->ttl -= t_delta;
+				decal->ttl -= delta;
 				if (decal->ttl < 0)
 				{
 					r_decal_clear(decal);

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <common.h>
-
 // This module is responsible for holding the currently loaded actors
+
+#include <common.h>
 
 #include <game/actor/actor.h>
 #include <game/actor/actorcontainers.h>

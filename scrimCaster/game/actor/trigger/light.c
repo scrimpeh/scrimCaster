@@ -52,6 +52,5 @@ static void ac_logic_light_flicker_set_brightness(const ac_actor* ac, u8 brightn
 		for (i8 x_offs = -1; x_offs <= 1; x_offs++)
 			ac_logic_light_flicker_set_brightness_cell(mx + x_offs, my + y_offs, brightness);
 
-
 	r_light_update(mx - 1, my - 1, mx + 1, my + 1);
 }

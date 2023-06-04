@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
 
-u32 ttf_init();
+i32 ttf_init();
 void ttf_close();

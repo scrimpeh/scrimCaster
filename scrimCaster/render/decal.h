@@ -7,8 +7,8 @@
 // cannot have decals on them.
 
 // Decals are stored in two arrays. One is initialized at map load times and contains all fixed
-// decals of the map. The other array is a buffer for dynamic decals, which acts as a ring buffer.
-// I could also consider giving decals a time-to-live which decrements naturally.
+// decals of the map. The other array is a buffer for dynamic decals, which uses a system of decal
+// slots to keep track of free spaces
 
 #include <common.h>
 
@@ -51,7 +51,7 @@ extern r_decal_world* r_decals_dynamic;
 i32 r_decal_load();
 void r_decal_unload();
 
-void r_decal_update(u32 t_delta);
+void r_decal_update(u32 delta);
 
 void r_decal_get_map_bounds(const r_decal_world* decal, i32* bounds);
 i16 r_decal_get_col(const r_decal_world* decal, i16 mx, i16 my, u8 side_col);

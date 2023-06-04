@@ -9,13 +9,12 @@ double frame_cap_desired = 60.0;
 
 u64 frame_count = 0;
 u64 frame_ticks = 0;
-float frame_fps = 0.f;
 
 void frame_end(u32 ticks_start)
 {
 	watch_add_new(2, WCH_U64, "framecounter: ", &frame_count, WCH_U64, ", ticks: ", &frame_ticks);
 
-	++frame_count;
+	frame_count++;
 	u32 ticks_cur = SDL_GetTicks();
 	frame_ticks = ticks_cur - ticks_start;
 
@@ -23,12 +22,10 @@ void frame_end(u32 ticks_start)
 		frame_delay(frame_ticks);
 
 	frame_ticks = SDL_GetTicks() - ticks_start;
-
-	frame_fps = frame_ticks ? 1000 / (float)frame_ticks : 1000;
 }
 
 static void frame_delay(u32 diff)
 {
 	if (diff < TICKS_PER_FRAME)
-		SDL_Delay((u32)TICKS_PER_FRAME - diff);
+		SDL_Delay((u32) TICKS_PER_FRAME - diff);
 }

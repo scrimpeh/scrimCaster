@@ -8,7 +8,7 @@
 // Starting now, I want to have a unified naming system for coordinates
 
 // World coordinates should be wx (horizontal axis, west -> east), wy (vertical axis, north -> south), and wz (height, ceiling -> floor)
-// Map coordinates should be mx and my (dito)
+// Map coordinates should be mx and my (ditto)
 // Screen coordinates should be sx, sy, and sz (depth)
 
 #include <common.h>
@@ -28,7 +28,7 @@ typedef enum g_intercept_type
 	// The ray ended in the void. This is generally not supposed to happen, unless the ray started outside from the map to begin with, which it never should
 	G_INTERCEPT_VOID = 0,
 
-	// The ray ended in a solid
+	// The ray ended in a solid surface
 	G_INTERCEPT_SOLID = 1,
 
 	// The ray intersected with a transparent wall and kept going
@@ -48,7 +48,7 @@ typedef struct g_intercept {
 	u8 column;
 } g_intercept;
 
-// Callback that handles encountered intercepts, front-to-back.. The usual rendering pipeline involves
+// Callback that handles encountered intercepts, front-to-back. The usual rendering pipeline involves
 // adding them to a stack and rendering them back-to-front
 typedef bool (*g_intercept_collector)(const g_intercept*);
 

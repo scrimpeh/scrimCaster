@@ -4,11 +4,10 @@
 
 #include <SDL/SDL_events.h>
 
-// First of all, a struct to hold all the player inputs for this frame:
-typedef struct Input
+typedef struct
 {
-	u8 _blank; // Used so that unmapped input will not write to forward
-	u8 debug;  // Debug key
+	u8 _blank; // Dummy value for unused keys to write to
+
 
 	u8 forward;
 	u8 backward;

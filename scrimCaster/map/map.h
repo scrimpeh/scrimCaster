@@ -7,24 +7,23 @@
 #include <map/mapobject.h>
 #include <render/decal.h>
 
-typedef struct
-{
-	char name[32];
-	u8 texture_set_count;
-	const char** texture_sets;
-	u16 sky;
-} m_map_info;
 
 typedef struct
 {
-	m_map_info info;
 	u16 w;
 	u16 h;
+	u16 sky;
+
+	u8 texture_set_count;
+	const char** texture_sets;
+
 	m_cell* cells;
+
 	u16 obj_count;
 	m_obj* objects;
-	u16 decal_count;
+
 	// TODO: The map should have a different data structure not part of "render/..."
+	u16 decal_count;
 	r_decal_world* decals;
 } m_map_data;
 

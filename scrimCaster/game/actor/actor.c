@@ -3,12 +3,8 @@
 #include <game/actor/actorcontainers.h>
 #include <map/block/block_iterator.h>
 #include <map/map.h>
-#include <render/renderconstants.h>
 
-#define AC_MOVE_COLLIDE_WALL  1
-#define AC_MOVE_COLLIDE_ACTOR 2
-
-const double MIN_WALL_DIST = 1e-12;
+#define AC_MIN_WALL_DIST 1e-12
 
 extern m_map_data m_map;
 
@@ -55,8 +51,8 @@ static bool ac_collide_h(const ac_actor* actor, double* p_dx)
 	const i8 inc = x_start > x_end ? -1 : 1;
 	for (i16 x = x_start; x != x_end; x += inc)
 	{
-		const m_cell* cell_n = &cells[y_top    * m_map.w + x];
-		const m_cell* cell_s = &cells[y_bottom * m_map.w + x];
+		const m_cell* cell_n = m_get_cell(x, y_top);
+		const m_cell* cell_s = m_get_cell(x, y_bottom);
 
 		const m_side* side_n = d_x > 0 ? &cell_n->e : &cell_n->w;
 		const m_side* side_s = d_x > 0 ? &cell_s->e : &cell_s->w;
@@ -65,7 +61,7 @@ static bool ac_collide_h(const ac_actor* actor, double* p_dx)
 		{
 			double new_x = (double) (x * M_CELLSIZE) - bounds_x;
 			if (d_x >= 0) 
-				new_x += (double) (M_CELLSIZE) - MIN_WALL_DIST;
+				new_x += (double) M_CELLSIZE - AC_MIN_WALL_DIST;
 			*p_dx = new_x - actor->x;
 			return true;
 		}
@@ -94,17 +90,17 @@ static bool ac_collide_v(const ac_actor* actor, double* p_dy)
 	const i8 inc = y_start > y_end ? -1 : 1;
 	for (i16 y = y_start; y != y_end; y += inc)
 	{
-		const m_cell* cell_w = &cells[y * m_map.w + x_left];
-		const m_cell* cell_e = &cells[y * m_map.w + x_right];
+		const m_cell* cell_w = m_get_cell(x_left, y);
+		const m_cell* cell_e = m_get_cell(x_right, y);
 
 		const m_side* side_w = d_y > 0 ? &cell_w->s : &cell_w->n;
 		const m_side* side_e = d_y > 0 ? &cell_e->s : &cell_e->n;
 
-		if ((side_w->type && !(side_w->flags  & PASSABLE)) || (side_e->type && !(side_e->flags & PASSABLE)))
+		if ((side_w->type && !(side_w->flags & PASSABLE)) || (side_e->type && !(side_e->flags & PASSABLE)))
 		{
 			double new_y = (double) (y * M_CELLSIZE) - bounds_y;
 			if (d_y >= 0) 
-				new_y += (double) (M_CELLSIZE) - MIN_WALL_DIST;
+				new_y += (double) M_CELLSIZE - AC_MIN_WALL_DIST;
 			*p_dy = new_y - actor->y;
 			return true;
 		}
@@ -152,17 +148,17 @@ static bool ac_intersect(ac_actor* actor, const ac_actor* obstacle, bool vertica
 	if (vertical)
 	{
 		if (d_xy >= 0)
-			new_pos = obstacle->y - obstacle_bounds.h - cur_bounds.h - MIN_WALL_DIST;
+			new_pos = obstacle->y - obstacle_bounds.h - cur_bounds.h - AC_MIN_WALL_DIST ;
 		else
-			new_pos = obstacle->y + obstacle_bounds.h + cur_bounds.h + MIN_WALL_DIST;
+			new_pos = obstacle->y + obstacle_bounds.h + cur_bounds.h + AC_MIN_WALL_DIST ;
 		*disp = new_pos - actor->y;
 	}
 	else
 	{
 		if (d_xy >= 0)
-			new_pos = obstacle->x - obstacle_bounds.w - cur_bounds.w - MIN_WALL_DIST;
+			new_pos = obstacle->x - obstacle_bounds.w - cur_bounds.w - AC_MIN_WALL_DIST ;
 		else
-			new_pos = obstacle->x + obstacle_bounds.w + cur_bounds.w + MIN_WALL_DIST;
+			new_pos = obstacle->x + obstacle_bounds.w + cur_bounds.w + AC_MIN_WALL_DIST ;
 		*disp = new_pos - actor->x;
 	}
 
@@ -185,14 +181,14 @@ static bool ac_collide_actor(ac_actor* actor, bool vertical, double* disp)
 	return collision;
 }
 
-// Returns 'true', if a collision occured, false otherwise
+// Returns 'true' if a collision occurred, false otherwise
 bool ac_move(ac_actor* actor, u32 delta, u32 flags)
 {
 	actor->angle = angle_normalize_deg_d(actor->angle);
 
 	bool collision = false;
 	
-	const double arctan = TO_RAD(ATAN_DEG(actor->angle));
+	const double arctan = TO_RAD(actor->angle);
 	const double cos_atan = SDL_cos(arctan);
 	const double sin_atan = SDL_sin(arctan);
 

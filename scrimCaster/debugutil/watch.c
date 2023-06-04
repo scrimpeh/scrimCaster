@@ -1,7 +1,7 @@
 #include <debugutil/watch.h>
 
-rd_watch_list* rd_watches = NULL;
-static i32 id = 1;
+rd_watch_list* watch_watches = NULL;
+static i32 watch_id = 1;
 
 i32 watch_add_new(u32 count, ...)
 {
@@ -14,7 +14,7 @@ i32 watch_add_new(u32 count, ...)
 
 	rd_watch new_watch = { 0 };
 	new_watch.count = count;
-	new_watch.id = id++;
+	new_watch.id = watch_id++;
 	
 	for (u32 i = 0; i < count; ++i)
 	{
@@ -31,9 +31,9 @@ i32 watch_add_new(u32 count, ...)
 	list->content = new_watch;
 	list->next = NULL;
 
-	rd_watch_list* cur = rd_watches;
+	rd_watch_list* cur = watch_watches;
 	if (!cur)
-		rd_watches = list;
+		watch_watches = list;
 	else
 	{
 		while (cur->next)
@@ -41,14 +41,12 @@ i32 watch_add_new(u32 count, ...)
 		cur->next = list;
 	}	
 
-	return id;
+	return watch_id;
 }
 
-// We don't need to be efficient here
-// Just compare everything
-bool watch_check_unique(const rd_watch* watch)
+static bool watch_check_unique(const rd_watch* watch)
 {
-	rd_watch_list* cur = rd_watches;
+	rd_watch_list* cur = watch_watches;
 	while (cur)
 	{
 		if (watch_equals(watch, &cur->content))
@@ -58,7 +56,7 @@ bool watch_check_unique(const rd_watch* watch)
 	return true;
 }
 
-bool watch_equals(const rd_watch* a, const rd_watch* b)
+static bool watch_equals(const rd_watch* a, const rd_watch* b)
 {
 	if (a->count != b->count)
 		return false;
@@ -80,7 +78,7 @@ bool watch_equals(const rd_watch* a, const rd_watch* b)
 
 i32 watch_remove(u32 id)
 {
-	rd_watch_list* cur = rd_watches;
+	rd_watch_list* cur = watch_watches;
 	rd_watch_list* prev = NULL;
 	while (cur)
 	{
@@ -89,7 +87,7 @@ i32 watch_remove(u32 id)
 			if (prev)
 				prev->next = cur->next;
 			else
-				rd_watches = cur->next;
+				watch_watches = cur->next;
 			SDL_free(cur);
 
 			return 0;
@@ -103,7 +101,7 @@ i32 watch_remove(u32 id)
 
 void watch_clear_all()
 {
-	rd_watch_list* cur = rd_watches;
+	rd_watch_list* cur = watch_watches;
 	rd_watch_list* to_free;
 	while (cur)
 	{
@@ -111,5 +109,5 @@ void watch_clear_all()
 		cur = cur->next;
 		SDL_free(to_free);
 	}
-	rd_watches = NULL;
+	watch_watches = NULL;
 }

@@ -9,11 +9,12 @@
 #include <render/renderutil.h>
 #include <render/skybox.h>
 #include <render/viewport.h>
+#include <util/mathutil.h>
 
 // Cap the automap to the # of the map and inside this zone.
 #define AM_MARIGN (2 * M_CELLSIZE)
 
-// If am_foölow is false, center the map around the this point, otherwise,
+// If am_follow is false, center the map around the this point, otherwise,
 // center the map around the player
 float am_zoom = 1.25;
 float am_center_x = 0.f;
@@ -45,7 +46,7 @@ void am_draw(SDL_Surface* target)
 	// It's sorta ugly to process input at the same point while drawing,
 	// but this is the most convenient place to do it
 	am_zoom += AM_ZOOM_INC * input_mwheel;
-	am_zoom = SDL_max(SDL_min(AM_ZOOM_MAX, am_zoom), AM_ZOOM_MIN);
+	am_zoom = MATH_CAP(AM_ZOOM_MIN, am_zoom, AM_ZOOM_MAX);
 
 	am_cell_size = (1.0 / 16) * am_zoom;
 
@@ -60,8 +61,8 @@ void am_draw(SDL_Surface* target)
 	const float am_y_min = am_margin_zoom;
 	const float am_y_max = m_map.h * M_CELLSIZE - am_margin_zoom;
 
-	am_x = SDL_min(SDL_max(am_x, am_x_min), am_x_max);
-	am_y = SDL_min(SDL_max(am_y, am_y_min), am_y_max);
+	am_x = MATH_CAP(am_x_min, am_x, am_x_max);
+	am_y = MATH_CAP(am_y_min, am_y, am_y_max);
 
 	am_draw_map(target);
 	am_draw_actors(target);

@@ -9,7 +9,7 @@
 // all should be modifiable.
 
 // Any side can be universally identified by an offset on the map,
-// which is floor(x / map.w) + (x mod map.w) 
+// which is floor(i / map.w) + (i mod map.w) 
 
 // Note: All directionality in this game is East - North - West - South
 // 0° degrees in a circle is pointing east as well.
@@ -24,14 +24,13 @@ typedef enum
 	M_CEIL = 5
 } m_orientation;
 
-
-// Define The size of one individual cell in game units.
+// The size of one individual cell in game units.
 #define M_CELLSIZE 64
 // The height of one individual cell in game units.
 #define M_CELLHEIGHT 64
 
-//Possible flags. Note: Which ones are actually gonna be implemented, I'm not sure
-//Just balling around ideas so far
+// Possible flags. Note: Which ones are actually gonna be implemented, I'm not sure
+// Just balling around ideas so far
 typedef enum
 {
 	PASSABLE =           0x0001,
@@ -50,14 +49,6 @@ typedef enum
 	BLOCK_SMOOTH_LIGHT = 0x2000,
 } m_side_flags;
 
-// The floor flags. Some flags may be incompatible, e.g. a "Multiple" Trigger
-// overrides a "Once" trigger. In this case, a certain flag wins.
-typedef enum
-{
-	M_CELL_TRIGGER_ONCE     = 0x0001,
-	M_CELL_TRIGGER_MULTIPLE = 0x0002
-} m_cell_flags;
-
 typedef enum
 {
 	M_FLAT_FLIP_V =     0x0001,
@@ -72,23 +63,19 @@ typedef struct
 	m_flat_flags flags;
 } m_flat;
 
-typedef enum
-{
-	PLAYER_ACTIVATE = 1,
-	MONSTER_ACTIVATE = 2
-} DoorFlags;
-
+// Parameters for a door
 typedef struct
 {
-	u8 openspeed, closespeed; //the ticks needed to reach one increment in game units
-	u8 staytime;			  //the amount of (half-)seconds that a door stays open
-	DoorFlags door_flags;
+	u8 openspeed;
+	u8 closespeed;
+	u8 staytime;
 
-	u8 state; // 0: closed/inactive, 1: opening, 2: open, 3: opened
-	i16 scroll; // from 0 - 255, represents how open the door is, with 128 representing half
+	u8 state;
+	// How open a door is, with 0 being completely closed, and 64 being fully opened
+	i8 scroll;
 	i16 timer_staycounter;
 	u8 timer_ticks;
-} DoorParams;
+} m_side_door_params;
 
 typedef struct
 {
@@ -98,7 +85,7 @@ typedef struct
 	u8 state;
 	bool solid;
 	m_side_flags flags;
-	DoorParams door;
+	m_side_door_params door;
 } m_side;
 
 typedef struct
@@ -114,7 +101,6 @@ typedef struct
 	m_side s;
 
 	// Cell info
-	m_cell_flags flags;
 	u8 brightness;
 	u32 target;
 } m_cell;

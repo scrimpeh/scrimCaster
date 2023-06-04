@@ -6,7 +6,6 @@
 #include <render/automap.h>
 #include <render/decal.h>
 #include <render/lighting/lighting.h>
-#include <render/renderconstants.h>
 #include <render/renderdebug.h>
 #include <render/renderutil.h>
 #include <render/scan.h>
@@ -24,6 +23,8 @@ extern float frame_fps;
 bool r_show_map = false;
 bool r_show_crosshair = true;
 bool r_draw_background = false;
+
+const cm_color COLOR_KEY = CM_GET(255, 0, 255);
 
 i32 r_init(u16 w, u16 h)
 {

@@ -6,8 +6,7 @@
 
 #include <SDL/SDL_video.h>
 
-
-// Textures are 64 x 64 PX bitmaps that are loaded from disk and drawn on the walls and floors of maps
+// Textures are 24-bit RGB bitmaps that are loaded from disk and drawn on the walls and floors of maps
 // On disk, textures are stored in simple PNG files, which are then converted to an internal format for rendering
 // As textures are drawn in vertical slices, the format also stores textures as vertical slices
 
@@ -19,10 +18,9 @@
 i32 tx_map_load(u32 count, const char** tx_set_names);
 
 // A texture is basically a flat array of 32-bit integers arranged vertically in strips
-// Size information is kept externally, since it's e.g. implictly known for textures
+// Size information is kept externally, since it's implictly known for textures
 typedef u32* tx_block;
 typedef u32* tx_slice;
-
 
 void tx_unload();
 
@@ -32,12 +30,5 @@ void tx_unload();
 // though somehow this needs to handle both slices and floors
 const tx_slice tx_get_slice(const m_side* side, u8 column);
 const u32 tx_get_point(const m_flat* flat, u8 x, u8 y);
-
-
-typedef enum
-{
-	TX_BLIT_SLICE_Z_BUFFER_READ = 0x1,
-	TX_BLIT_SLICE_Z_BUFFER_WRITE = 0x2
-} tx_blit_slice_z_buffer_access;
 
 void tx_copy(const SDL_Surface* source, const SDL_Rect* r, tx_block target);

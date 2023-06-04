@@ -82,9 +82,6 @@
     <ClInclude Include="render\sprite.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="render\renderconstants.h">
-      <Filter>Source Files\render</Filter>
-    </ClInclude>
     <ClInclude Include="map\mapupdate.h">
       <Filter>Source Files\map</Filter>
     </ClInclude>
@@ -178,6 +175,9 @@
     <ClInclude Include="util\random.h">
       <Filter>Source Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="game\actor\actorlogic.h">
+      <Filter>Source Files\game\actor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scrimCaster.c">
@@ -217,9 +217,6 @@
       <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="render\sprite.c">
-      <Filter>Source Files\render</Filter>
-    </ClCompile>
-    <ClCompile Include="render\renderconstants.c">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="map\mapupdate.c">
@@ -282,12 +279,6 @@
     <ClCompile Include="game\actor\player.c">
       <Filter>Source Files\game\actor</Filter>
     </ClCompile>
-    <ClCompile Include="game\actor\actorlogic.h">
-      <Filter>Source Files\game\actor</Filter>
-    </ClCompile>
-    <ClCompile Include="game\actor\actorlogic.c">
-      <Filter>Source Files\game\actor</Filter>
-    </ClCompile>
     <ClCompile Include="map\mapobject.c">
       <Filter>Source Files\map</Filter>
     </ClCompile>
@@ -314,6 +305,9 @@
     </ClCompile>
     <ClCompile Include="util\random.c">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="game\actor\actorlogic.c">
+      <Filter>Source Files\game\actor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

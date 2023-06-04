@@ -2,15 +2,13 @@
 
 #include <input/input.h>
 
-#define KEYCODE_COUNT 0x11A
+#define INPUT_MAP_KEYCODE_COUNT 0x11A
 
 // Maps SDL scan codes to offset in the input structure
-static u8 input_map_scancodes[KEYCODE_COUNT];
+static u8 input_map_scancodes[INPUT_MAP_KEYCODE_COUNT];
 
 void input_map_load_bindings()
 {
-	input_map_scancodes[SDL_SCANCODE_LSHIFT] = offsetof(input_keys, debug);
-
 	input_map_scancodes[SDL_SCANCODE_W] = offsetof(input_keys, forward);
 	input_map_scancodes[SDL_SCANCODE_S] = offsetof(input_keys, backward);
 	input_map_scancodes[SDL_SCANCODE_A] = offsetof(input_keys, strafe_left);

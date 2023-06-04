@@ -1,23 +1,16 @@
 #include <map/mapupdate.h>
 
+#include <game/actor/player.h>
 #include <render/lighting/lighting.h>
 
 #define DOOR_SCROLL_MAX (M_CELLHEIGHT - 4)
-#define DOOR_TICKS_PER_SEC 60
-#define PLAYER_HEIGHT 32
-
-#define DOOR_OPEN (TRANSLUCENT)
-#define DOOR_PASSABLE (BULLETS_PASS | PASSABLE)
-#define DOOR_CLOSED ~DOOR_OPEN
-#define DOOR_IMPASSABLE ~DOOR_PASSABLE
 
 extern bool* m_tag_active;
 extern u32 m_max_tag;
 
 m_active_tag_list* m_active_tags = NULL;
 
-
-void mu_update(u32 t_delta)
+void mu_update(u32 delta)
 {
 	m_active_tag_list* cur_tag = m_active_tags;
 	m_active_tag_list* prev_tag = NULL;
@@ -27,7 +20,7 @@ void mu_update(u32 t_delta)
 		bool all_done = true;
 		m_taglist* sides = m_get_tags(cur_tag->tag);
 		for (u32 i = 0; i < sides->count; i++)
-			all_done &= mu_update_side(sides->sides[i], t_delta);
+			all_done &= mu_update_side(sides->sides[i], delta);
 
 		if (all_done)
 		{
@@ -84,16 +77,16 @@ void mu_clear()
 static bool mu_update_side(m_side_id id, u32 delta)
 {
 	m_side* side = m_get_side_from_id(id);
-	DoorParams* params = &side->door;
+	m_side_door_params* params = &side->door;
 	const u8 ticks = params->timer_ticks + delta;
 
 	switch (side->state)
 	{
 	default:
-		SDL_assert(0);
-		break;
+		SDL_assert(!"Invalid door state!");
+		return true;
 	case 0:		// Activated
-		side->flags = (m_side_flags)(side->flags | DOOR_OPEN);
+		side->flags |= TRANSLUCENT;	// Render things on the other side of a door
 		params->timer_ticks = 0;
 		r_light_update(id.x - 1, id.y - 1, id.x + 1, id.y + 1);
 		++side->state;
@@ -102,8 +95,10 @@ static bool mu_update_side(m_side_id id, u32 delta)
 		params->scroll += ticks / params->openspeed;
 		params->timer_ticks = ticks % params->openspeed;
 
+		// TODO: Rather than setting the side flags based on a constant, doors should
+		// be checked in the actor movement code, and each actor should be given its own height value
 		if (params->scroll > PLAYER_HEIGHT)
-			side->flags = (m_side_flags)(side->flags | DOOR_PASSABLE);
+			side->flags |= PASSABLE;
 
 		if (params->scroll > DOOR_SCROLL_MAX - 1)
 		{
@@ -111,14 +106,14 @@ static bool mu_update_side(m_side_id id, u32 delta)
 			{
 				params->scroll = DOOR_SCROLL_MAX;
 				params->timer_ticks = 0;
-				params->timer_staycounter = params->staytime * DOOR_TICKS_PER_SEC;
+				params->timer_staycounter = params->staytime * 1000;
 				++side->state;
 			}
 			else
 				side->state = 4;
 		}
 		return false;
-	case 2:		//stay open
+	case 2:		// Stay open
 		params->timer_staycounter -= delta;
 		if (params->timer_staycounter <= 0)
 			++side->state;
@@ -128,11 +123,11 @@ static bool mu_update_side(m_side_id id, u32 delta)
 		params->timer_ticks = ticks % params->closespeed;
 
 		if (params->scroll < PLAYER_HEIGHT)
-			side->flags = (m_side_flags)(side->flags & DOOR_IMPASSABLE);
+			side->flags &= ~PASSABLE;
 
 		if (params->scroll <= 0)
 		{
-			side->flags = (m_side_flags)(side->flags & DOOR_CLOSED);
+			side->flags &= ~TRANSLUCENT;
 			params->scroll = 0;
 			++side->state;
 			r_light_update(id.x - 1, id.y - 1, id.x + 1, id.y + 1);

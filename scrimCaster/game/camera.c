@@ -1,10 +1,5 @@
 #include <game/camera.h>
 
-#include <game/gameobjects.h>
-#include <input/input.h>
-#include <render/render.h>
-#include <render/scan.h>
-
 angle_f viewport_angle;
 float viewport_x;
 float viewport_y;
@@ -37,6 +32,4 @@ void cam_update(u32 delta)
 		viewport_x = (float) viewport_actor->x;
 		viewport_y = (float) viewport_actor->y;
 	}
-
-
 }

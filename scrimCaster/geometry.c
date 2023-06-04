@@ -1,7 +1,6 @@
 #include <geometry.h>
 
 #include <map/map.h>
-#include <render/renderconstants.h>
 #include <util/mathutil.h>
 
 #include <math.h>
@@ -57,7 +56,7 @@ void g_cast(float wx, float wy, angle_rad_f angle, g_intercept_collector interce
 				intercept.wy = wy_inv;
 				intercept.mx = mx;
 				intercept.my = my_cur;
-				intercept.column = g_is_north(orientation) ? column : TEX_SIZE - 1 - column;
+				intercept.column = g_is_north(orientation) ? column : M_CELLSIZE - 1 - column;
 
 				// Add the intercept
 				if (!intercept_collector(&intercept))
@@ -91,7 +90,7 @@ void g_cast(float wx, float wy, angle_rad_f angle, g_intercept_collector interce
 			intercept.wy = wy;
 			intercept.mx = mx;
 			intercept.my = my;
-			intercept.column = g_is_east(orientation) ? column : TEX_SIZE - 1 - column;
+			intercept.column = g_is_east(orientation) ? column : M_CELLSIZE - 1 - column;
 
 			// Add the intercept
 			if (!intercept_collector(&intercept))
@@ -133,7 +132,6 @@ static inline bool g_is_south(g_orientation orientation)
 {
 	return !g_is_north(orientation);
 }
-
 
 static inline g_intercept_type g_get_intercept_type(const m_side* side, bool is_edge)
 {

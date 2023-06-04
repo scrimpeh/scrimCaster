@@ -85,26 +85,26 @@ m_cell* m_get_next_cell(u16 x, u16 y, m_orientation o)
 
 void m_load()
 {
-	u8 i, j, n;
 	u32 target = 1;
+
 	m_map.w = 16;
 	m_map.h = 16;
 	m_map.cells = cells[0];
 	m_map.objects = &objects[0];
 	m_map.obj_count = 7;
-	m_map.info.texture_set_count = 1;
-	m_map.info.texture_sets = tx_sets;
-	m_map.info.sky = 0;
+	m_map.texture_set_count = 1;
+	m_map.texture_sets = tx_sets;
+	m_map.sky = 0;
 	m_map.decal_count = 7;
 	m_map.decals = &decals[0];
 
-	tx_map_load(m_map.info.texture_set_count, m_map.info.texture_sets);
-	r_sky_set_current(m_map.info.sky);
+	tx_map_load(m_map.texture_set_count, m_map.texture_sets);
+	r_sky_set_current(m_map.sky);
 	_m_flood_fill(0, 0, _m_flood_fill_cb_brightness, 255);
 
-	for (i = 0; i < 8; ++i)
-		for (j = 0; j < 8; ++j)
-			for (n = 0; n < 4; ++n)
+	for (u8 i = 0; i < 8; i++)
+		for (u8 j = 0; j < 8; j++)
+			for (u8 n = 0; n < 4; n++)
 				m_cell_get_side(&cells[i][j], n)->type = 0;
 
 	// Make rudimentary walls
@@ -142,7 +142,7 @@ void m_load()
 		cells[1][3].s.type = 2;
 		cells[1][3].w.type = 2;
 		cells[2][4].w.type = 6;
-		cells[2][4].w.flags = (m_side_flags) (MIRR_H | SCROLL_H);
+		cells[2][4].w.flags = MIRR_H | SCROLL_H;
 		cells[2][0].e.type = 6;
 		cells[3][1].e.type = 2;
 		cells[3][1].n.type = 2;
@@ -170,7 +170,6 @@ void m_load()
 
 		cells[4][2].w.type = 3;
 		cells[3][3].w.target = 1;
-		cells[3][3].w.door.door_flags = PLAYER_ACTIVATE;
 
 		{
 			m_side side = { 0 };
@@ -184,9 +183,8 @@ void m_load()
 		cells[6][1].s.flags = DOOR_V;
 		cells[6][1].s.door.state = 0;
 		cells[6][1].s.door.openspeed = 12;
-		cells[6][1].s.door.staytime = 12;
+		cells[6][1].s.door.staytime = 2;
 		cells[6][1].s.door.closespeed = 12;
-		cells[6][1].s.door.door_flags = PLAYER_ACTIVATE;
 		cells[6][1].s.tag = target++;
 		cells[6][1].s.target = cells[6][1].s.tag;
 
@@ -194,9 +192,8 @@ void m_load()
 		cells[7][1].n.flags = DOOR_V;
 		cells[7][1].n.door.state = 0;
 		cells[7][1].n.door.openspeed = 12;
-		cells[7][1].n.door.staytime = 12;
+		cells[7][1].n.door.staytime = 2;
 		cells[7][1].n.door.closespeed = 12;
-		cells[7][1].n.door.door_flags = PLAYER_ACTIVATE;
 		cells[7][1].n.tag = cells[6][1].s.tag;
 		cells[7][1].n.target = cells[6][1].s.tag;
 

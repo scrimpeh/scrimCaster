@@ -1,4 +1,4 @@
-#include "renderutil.h"
+#include <render/renderutil.h>
 
 #include <math.h>
 
@@ -27,7 +27,7 @@ void r_draw_text(SDL_Surface* target, const char* str, i32 x, i32 y, TTF_Font* f
 void r_draw_pixel(SDL_Surface* target, i32 x, i32 y, cm_color color)
 {
 	if (x >= 0 && x < target->w && y >= 0 && y < target->h)
-		*((u32*)target->pixels + y * target->w + x) = color;
+		*((u32*) target->pixels + y * target->w + x) = color;
 }
 
 // Draw a line using Bresenham's algorithm
@@ -75,7 +75,7 @@ void r_draw_line(SDL_Surface* target, i32 x_a, i32 y_a, i32 x_b, i32 y_b, cm_col
 		const i32 x_draw = steep ? y : x;
 		const i32 y_draw = steep ? x : y;
 		SDL_assert(x_draw >= 0 && x_draw < target->w && y_draw >= 0 && y_draw < target->h);
-		*((u32*)target->pixels + y_draw * target->w + x_draw) = color;
+		*((u32*) target->pixels + y_draw * target->w + x_draw) = color;
 
 		err -= dy;
 		if (err < 0)

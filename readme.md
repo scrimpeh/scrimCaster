@@ -1,4 +1,4 @@
-This is a basic 2.5D Raycaster written in C using SDL for windowing. It supports sprites, usable doors and seni-transparent walls.
+This is a basic 2.5D Raycaster written in C using SDL for windowing. It supports sprites, usable doors and semi-transparent walls.
 
 ![Screenshot](screenshot.png "640 * 480 window screenshot, rendering at 480 * 360")
 
